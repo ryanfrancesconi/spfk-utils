@@ -92,7 +92,7 @@
             Task { @MainActor in
                 // Log.debug("firstResponder is", NSApp.mainWindow?.firstResponder)
 
-                NSApp.sendAction(selector, to: nil, from: self)
+                NSApp.sendAction(selector, to: nil, from: nil)
             }
         }
     }
