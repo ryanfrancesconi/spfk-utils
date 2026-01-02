@@ -3,48 +3,8 @@
 import CoreGraphics
 import CoreImage
 import Foundation
-import UniformTypeIdentifiers
 
 extension CGImage {
-    public enum ExportType: String {
-        case png
-        case jpeg
-        case heif
-        case tiff
-
-        public var utType: UTType {
-            switch self {
-            case .png: return .png
-            case .jpeg: return .jpeg
-            case .heif: return .heif
-            case .tiff: return .tiff
-            }
-        }
-    }
-
-    public func export(type: ExportType, to url: URL) throws {
-        let ciContext = CIContext()
-        let ciImage = CIImage(cgImage: self)
-
-        guard let colorSpace = ciImage.colorSpace else {
-            throw NSError(description: "Invalid colorSpace in returned CIImage")
-        }
-
-        switch type {
-        case .png:
-            try ciContext.writePNGRepresentation(of: ciImage, to: url, format: .RGBA8, colorSpace: colorSpace)
-
-        case .jpeg:
-            try ciContext.writeJPEGRepresentation(of: ciImage, to: url, colorSpace: colorSpace)
-
-        case .heif:
-            try ciContext.writeHEIFRepresentation(of: ciImage, to: url, format: .RGBA8, colorSpace: colorSpace)
-
-        case .tiff:
-            try ciContext.writeTIFFRepresentation(of: ciImage, to: url, format: .RGBA8, colorSpace: colorSpace)
-        }
-    }
-
     public func scaled(to size: CGSize) -> CGImage? {
         let width: Int = Int(size.width)
         let height: Int = Int(size.height)
@@ -76,80 +36,6 @@ extension CGImage {
 
         return context.makeImage()
     }
-}
-
-extension CGImage {
-    public var jpegRepresentation: Data? {
-        try? dataRepresentation(utType: .jpeg)
-    }
-
-    public var pngRepresentation: Data? {
-        try? dataRepresentation(utType: .png)
-    }
-
-    /// Generate data for the image in the format defined by utType.
-    /// - Parameters:
-    ///   - utType: The UTType for the image to generate
-    ///   - dpi: The image's dpi
-    ///   - compression: The compression level to apply (0...1)
-    ///   - excludeGPSData: If true, strips any GPS information from the output
-    ///   - otherOptions: Other options as defined in [documentation](https://developer.apple.com/documentation/imageio/cgimagedestination)
-    /// - Returns: image data
-    public func dataRepresentation(
-        utType: UTType,
-        dpi: CGFloat = 72,
-        compression: CGFloat? = nil,
-        excludeGPSData: Bool = true,
-        otherOptions: [String: Any]? = nil
-    ) throws -> Data {
-        // Make sure that the DPI level is at least somewhat sane
-        guard dpi >= 0 else {
-            throw NSError(description: "invalid DPI \(dpi)")
-        }
-
-        var options: [CFString: Any] = [
-            kCGImagePropertyPixelWidth: self.width,
-            kCGImagePropertyPixelHeight: self.height,
-            kCGImagePropertyDPIWidth: dpi,
-            kCGImagePropertyDPIHeight: dpi,
-        ]
-
-        if utType == .jpeg, let compression {
-            options[kCGImageDestinationLossyCompressionQuality] = compression.clamped(to: 0 ... 1)
-        }
-
-        if excludeGPSData == true {
-            options[kCGImageMetadataShouldExcludeGPS] = true
-        }
-
-        // Add in the user's customizations
-        otherOptions?.forEach {
-            options[$0.0 as CFString] = $0.1
-        }
-
-        let uniformTypeIdentifier = utType.identifier as CFString
-
-        guard
-            let mutableData = CFDataCreateMutable(nil, 0),
-            let destination = CGImageDestinationCreateWithData(mutableData, uniformTypeIdentifier, 1, nil)
-        else {
-            throw NSError(description: "CGImageDestinationCreateWithData")
-        }
-
-        CGImageDestinationAddImage(destination, self, options as CFDictionary)
-        
-        // [Internal] Thread running at User-initiated quality-of-service class waiting on a thread without a QoS class specified (base priority 0). Investigate ways to avoid priority inversions
-        
-        CGImageDestinationFinalize(destination)
-
-        let resultData = mutableData as Data
-
-        if resultData.count == 0 {
-            throw NSError(description: "resultData.count == 0")
-        }
-
-        return resultData
-    }
 
     public static func createJPEG(from data: Data) throws -> CGImage {
         guard let dataProvider = CGDataProvider(data: data as CFData) else {
@@ -166,5 +52,59 @@ extension CGImage {
         }
 
         return cgImage
+    }
+}
+
+extension CGColor {
+    public static func from(hexColor: HexColor) -> CGColor? {
+        from(hexString: hexColor.hexString)
+    }
+
+    public static func from(hexString: String) -> CGColor? {
+        let hexColor = hexString.replacingOccurrences(of: "#", with: "")
+        let scanner = Scanner(string: hexColor)
+        var hexNumber: UInt64 = 0
+
+        guard scanner.scanHexInt64(&hexNumber) else { return nil }
+
+        let red = CGFloat((hexNumber & 0xFF0000) >> 16) / 255.0
+        let green = CGFloat((hexNumber & 0x00FF00) >> 8) / 255.0
+        let blue = CGFloat((hexNumber & 0x0000FF) >> 0) / 255.0
+
+        return self.init(red: red, green: green, blue: blue, alpha: 1.0)
+    }
+
+    public func toHex(alpha: Bool = false) -> String? {
+        guard let components,
+              components.count >= 3
+        else {
+            return nil
+        }
+
+        let r = Float(components[0])
+        let g = Float(components[1])
+        let b = Float(components[2])
+        var a = Float(1.0)
+
+        if components.count >= 4 {
+            a = Float(components[3])
+        }
+
+        if alpha {
+            return String(
+                format: "%02lX%02lX%02lX%02lX",
+                lroundf(r * 255),
+                lroundf(g * 255),
+                lroundf(b * 255),
+                lroundf(a * 255)
+            )
+        } else {
+            return String(
+                format: "%02lX%02lX%02lX",
+                lroundf(r * 255),
+                lroundf(g * 255),
+                lroundf(b * 255)
+            )
+        }
     }
 }
