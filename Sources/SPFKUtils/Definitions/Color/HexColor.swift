@@ -4,15 +4,13 @@
     import CoreGraphics
 
     public struct HexColor: Hashable, Codable, Sendable {
+        public static let random = HexColor(nsColor: .random)
+
         public private(set) var hexString: String
 
-        public lazy var nsColor: NSColor? = {
-            NSColor.from(hexString: hexString)
-        }()
-        
-        public lazy var cgColor: CGColor? = {
-            CGColor.from(hexString: hexString)
-        }()
+        public lazy var nsColor: NSColor? = NSColor.from(hexString: hexString)
+
+        public lazy var cgColor: CGColor? = CGColor.from(hexString: hexString)
 
         public init?(nsColor: NSColor) {
             guard let string = nsColor.toHex() else { return nil }
