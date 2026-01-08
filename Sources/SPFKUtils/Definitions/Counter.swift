@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Counter: Sendable {
-    var identifier: Int = -1
+    var identifier: Int
 
-    public init(startingValue identifier: Int = -1) {
+    public init(startingValue identifier: Int = 0) {
         self.identifier = identifier
     }
 
@@ -13,6 +13,6 @@ public struct Counter: Sendable {
     }
 
     public mutating func reset() {
-        identifier = -1
+        identifier = 0
     }
 }

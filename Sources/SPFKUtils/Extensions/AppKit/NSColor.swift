@@ -51,4 +51,11 @@
             cgColor.toHex(alpha: alpha)
         }
     }
+
+    extension CGColor {
+        public var nsColor: NSColor? {
+            NSColor(cgColor: self)
+        }
+    }
+
 #endif
