@@ -13,7 +13,9 @@
         public lazy var cgColor: CGColor? = CGColor.from(hexString: hexString)
 
         public init?(nsColor: NSColor) {
-            guard let string = nsColor.toHex() else { return nil }
+            guard let string = nsColor.toHex() else {
+                return nil
+            }
             self = HexColor(hexString: string)
         }
 
