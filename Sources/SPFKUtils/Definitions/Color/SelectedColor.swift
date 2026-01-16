@@ -12,6 +12,10 @@
             self.selected = selected
             self.unselected = unselected
         }
+        
+        public func color(state: Bool) -> NSColor {
+            state ? selected : unselected
+        }
     }
 
 #endif
