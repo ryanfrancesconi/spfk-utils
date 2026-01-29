@@ -32,6 +32,7 @@
             case moveRightAndModifySelection
             case performMiniaturize
             case performZoom
+            case arrangeInFront
             case showHelp
         }
 
@@ -83,6 +84,8 @@
                 send(selector: #selector(performMiniaturize(_:)))
             case .performZoom:
                 send(selector: #selector(performZoom(_:)))
+            case .arrangeInFront:
+                send(selector: #selector(arrangeInFront(_:)))
             case .showHelp:
                 send(selector: #selector(showHelp(_:)))
             }
@@ -144,6 +147,7 @@
 
         @objc fileprivate static func performMiniaturize(_ sender: Any) {}
         @objc fileprivate static func performZoom(_ sender: Any) {}
+        @objc fileprivate static func arrangeInFront(_ sender: Any) {}
 
         // MARK: - Help
 
