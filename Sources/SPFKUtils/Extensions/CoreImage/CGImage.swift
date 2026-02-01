@@ -37,18 +37,14 @@ extension CGImage {
         return context.makeImage()
     }
 
-    public static func createJPEG(from data: Data) throws -> CGImage {
-        guard let dataProvider = CGDataProvider(data: data as CFData) else {
-            throw NSError(description: "Failed to create CGDataProvider")
+    public static func create(from data: Data) throws -> CGImage {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            throw NSError(description: "CGImageSourceCreateWithData failed to create source")
         }
 
-        guard let cgImage = CGImage(
-            jpegDataProviderSource: dataProvider,
-            decode: nil,
-            shouldInterpolate: false,
-            intent: .defaultIntent
-        ) else {
-            throw NSError(description: "Failed to create CGImage")
+        // Get the first image from the source
+        guard let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            throw NSError(description: "CGImageSourceCreateImageAtIndex 0 failed to create cgImage")
         }
 
         return cgImage
