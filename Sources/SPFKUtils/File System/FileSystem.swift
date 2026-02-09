@@ -135,7 +135,8 @@
                     }
 
                     if let directoryContents = try? FileManager.default.contentsOfDirectory(atPath: localURL.path),
-                       directoryContents.isEmpty {
+                       directoryContents.isEmpty
+                    {
                         do {
                             try FileManager.default.trashItem(at: localURL, resultingItemURL: nil)
                             Log.debug("🗑 Deleted Empty Directory:", localURL)
@@ -152,7 +153,8 @@
 
         public static func nextAvailableURL(_ url: URL,
                                             delimiter: String = "_",
-                                            suffix: String = "") -> URL {
+                                            suffix: String = "") -> URL
+        {
             guard url.exists else { return url } // no need to do anything
 
             let isDirectory = url.isDirectory
@@ -163,7 +165,7 @@
                 url.lastPathComponent + suffix :
                 url.deletingPathExtension().lastPathComponent + suffix
 
-            for i in 1 ... 100000 {
+            for i in 1 ... 100_000 {
                 let filename = "\(baseFilename)\(delimiter)\(i)"
 
                 let test = parentDirectory
@@ -177,7 +179,8 @@
         }
 
         public static func getQueryStringParameter(url: String,
-                                                   param: String) -> String? {
+                                                   param: String) -> String?
+        {
             guard let url = URLComponents(string: url) else { return nil }
             return url.queryItems?.first(where: { $0.name == param })?.value
         }
@@ -187,7 +190,8 @@
         // has overlap with getFileURLs
         public static func getDirectories(in directory: URL,
                                           recursive: Bool,
-                                          skipHidden: Bool = true) -> [URL] {
+                                          skipHidden: Bool = true) -> [URL]
+        {
             var allFiles = [URL]()
 
             guard directory.exists else {
@@ -213,7 +217,7 @@
 
                     let isPackage = localURL.isPackage
 
-                    if localURL.isDirectory && !isPackage {
+                    if localURL.isDirectory, !isPackage {
                         allFiles += localURL
 
                         if recursive {
@@ -241,7 +245,8 @@
         public static func getPackages(in directory: URL,
                                        withExtension: String? = nil,
                                        recursive: Bool,
-                                       skipHidden: Bool = true) -> [URL] {
+                                       skipHidden: Bool = true) -> [URL]
+        {
             var allFiles = [URL]()
 
             guard directory.exists else {
@@ -267,7 +272,7 @@
 
                     let isPackage = localURL.isPackage
 
-                    if localURL.isDirectory && !isPackage {
+                    if localURL.isDirectory, !isPackage {
                         if recursive {
                             allFiles += getPackages(in: localURL,
                                                     withExtension: withExtension,
@@ -286,6 +291,18 @@
                 }
             }
             return allFiles
+        }
+
+        @MainActor
+        public static func getAuthorizedFileURLs(at url: URL, showOpenPanel: Bool = true) async throws -> [URL] {
+            if showOpenPanel {
+                try url.authorize() // will open panel to select
+            }
+
+            return FileSystem.getFileURLs(
+                in: url,
+                recursive: true
+            ).filter(\.isAuthorized)
         }
 
         ///  Returns all files at the given URL.
@@ -330,15 +347,15 @@
                     localURL = resolved
                 }
 
-                if localURL.isPackage && skipsPackageDescendants {
+                if localURL.isPackage, skipsPackageDescendants {
                     // SKIP
                     continue
 
-                } else if localURL.isPackage && !allowedPackageTypes.contains(localURL.pathExtension) {
+                } else if localURL.isPackage, !allowedPackageTypes.contains(localURL.pathExtension) {
                     // treat package as leaf
                     allFiles.append(localURL)
 
-                } else if localURL.isDirectoryOrPackage && recursive {
+                } else if localURL.isDirectoryOrPackage, recursive {
                     // treat package as directory
                     allFiles += getFileURLs(
                         in: localURL,

@@ -70,6 +70,10 @@
             ofSize: NSFont.systemFontSize(for: .regular)
         )
 
+        public static let regularItalicSystemFont = NSFont.systemFont(
+            controlSize: .regular, traits: [.italic]
+        )
+
         public static let regularMonoSpacedFont: NSFont? = NSFont(
             name: "Monaco",
             size: NSFont.systemFontSize(for: .regular)
