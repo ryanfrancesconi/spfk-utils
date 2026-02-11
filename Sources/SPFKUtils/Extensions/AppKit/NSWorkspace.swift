@@ -8,16 +8,16 @@
         /// Cache these common types as `CGImage`s
         public enum FinderIcon {
             /// Any audio and/or video content.
-            public static let media: CGImage? = NSWorkspace.shared.icon(for: .audiovisualContent).cgImage
+            public static let media: NSImage? = NSWorkspace.shared.icon(for: .audiovisualContent)
 
             /// Pure audio data with no video data.
-            public static let audio: CGImage? = NSWorkspace.shared.icon(for: .audio).cgImage
+            public static let audio: NSImage? = NSWorkspace.shared.icon(for: .audio)
 
             /// Pure video data with no audio data.
-            public static let video: CGImage? = NSWorkspace.shared.icon(for: .video).cgImage
+            public static let video: NSImage? = NSWorkspace.shared.icon(for: .video)
 
             /// A base type for abstract image data.
-            public static let image: CGImage? = NSWorkspace.shared.icon(for: .image).cgImage
+            public static let image: NSImage? = NSWorkspace.shared.icon(for: .image)
         }
 
         public static func showInFinder(urls: [URL]) {
