@@ -43,6 +43,7 @@
             return (url: url, isStale: isStale)
         }
 
+        /// To be called on app shutdown to release all security scoped URLs
         public func releaseAll() {
             Log.debug("Releasing", active.count, "security scoped urls,", stale.count, "stale")
 
