@@ -23,4 +23,10 @@ final class NumberTests {
         #expect(1111.roundToNearestPowerOfTwo() == 1024)
         #expect(-100.roundToNearestPowerOfTwo() == -128)
     }
+
+    @Test func uuid() {
+        for item in UUIDConstant.allCases {
+            Log.debug(item.uuid)
+        }
+    }
 }

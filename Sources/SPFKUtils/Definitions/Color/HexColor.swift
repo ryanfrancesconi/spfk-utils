@@ -3,7 +3,7 @@
     import AppKit
     import CoreGraphics
 
-    public struct HexColor: Hashable, Sendable {
+    public struct HexColor: Hashable, Sendable, Equatable {
         public static let random = HexColor(nsColor: .random)
 
         public var hexString: String
