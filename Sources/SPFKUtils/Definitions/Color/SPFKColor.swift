@@ -37,6 +37,10 @@
             case .defaultWaveformColor:         scheme == .dark ? Self.xcPreprocessor : Self.xcPreprocessor
             }
         }
+
+        public func hexColor(for scheme: SPFKColorScheme) -> HexColor? {
+            HexColor(nsColor: value(for: scheme))
+        }
     }
 
     extension SPFKColor {
