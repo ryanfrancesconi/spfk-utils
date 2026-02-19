@@ -38,16 +38,17 @@
     }
 
     extension NSColor {
-        public static func from(hexColor: HexColor) -> NSColor? {
-            from(hexString: hexColor.hexString)
+        public var hexColor: HexColor? {
+            guard let string = toHex() else { return nil }
+            return HexColor(string: string)
         }
 
-        public static func from(hexString: String) -> NSColor? {
-            guard let cgColor = CGColor.from(hexString: hexString) else { return nil }
+        public static func from(hexColor: HexColor) -> NSColor? {
+            guard let cgColor = hexColor.cgColor else { return nil }
             return NSColor(cgColor: cgColor)
         }
 
-        public func toHex(alpha: Bool = false) -> String? {
+        public func toHex(alpha: Bool = true) -> String? {
             cgColor.toHex(alpha: alpha)
         }
     }

@@ -12,14 +12,14 @@
         }
 
         public var title: String
-        public var children: [OutlineNode] = .init()
-        public var isExpanded: Bool = false
         public var isEditable: Bool = true
+        public var symbolName: String?
+        public var hexColor: HexColor?
         public var parentId: UUID?
         public let id: UUID?
+        public var children: [OutlineNode] = .init()
+        public var isExpanded: Bool = false
         public var sortIndex: Int?
-        public var symbolName: String?
-//        public var hexColor: HexColor?
 
         public var isLeaf: Bool { parentId != nil && children.isEmpty }
 
@@ -41,7 +41,7 @@
             title: String,
             isEditable: Bool,
             symbolName: String?,
-//            hexColor: HexColor? = nil,
+            hexColor: HexColor? = nil,
             parentId: UUID?,
             id: UUID?,
             children: [OutlineNode] = []
@@ -49,7 +49,7 @@
             self.title = title
             self.isEditable = isEditable
             self.symbolName = symbolName
-//            self.hexColor = hexColor
+            self.hexColor = hexColor
             self.id = id
             self.parentId = parentId
             self.children = children
@@ -71,6 +71,7 @@
 
         public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            
             title = try container.decode(String.self, forKey: .title)
             isEditable = try container.decode(Bool.self, forKey: .isEditable)
 
@@ -82,7 +83,7 @@
             id = try? container.decodeIfPresent(UUID.self, forKey: .id)
             sortIndex = try? container.decodeIfPresent(Int.self, forKey: .sortIndex)
 
-//            hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
+            hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
         }
 
         public func encode(to encoder: any Encoder) throws {
@@ -97,7 +98,7 @@
             try? container.encodeIfPresent(parentId, forKey: .parentId)
             try? container.encodeIfPresent(id, forKey: .id)
             try? container.encodeIfPresent(sortIndex, forKey: .sortIndex)
-//            try? container.encodeIfPresent(hexColor, forKey: .hexColor)
+            try? container.encodeIfPresent(hexColor, forKey: .hexColor)
         }
     }
 
