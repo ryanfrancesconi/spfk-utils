@@ -71,7 +71,7 @@
 
         public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
+
             title = try container.decode(String.self, forKey: .title)
             isEditable = try container.decode(Bool.self, forKey: .isEditable)
 
@@ -101,5 +101,7 @@
             try? container.encodeIfPresent(hexColor, forKey: .hexColor)
         }
     }
+
+    extension OutlineNode: Serializable {}
 
 #endif

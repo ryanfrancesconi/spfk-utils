@@ -29,8 +29,6 @@
         public func clamp(windowRect rect: NSRect) -> NSRect {
             let screenRect = visibleFrame
 
-            // Log.debug("Clamping to screen", localizedName, screenRect)
-
             var rect = rect
             rect.size.width = min(screenRect.width, rect.size.width)
             rect.size.height = min(screenRect.height, rect.size.height)
@@ -65,5 +63,31 @@
 
             return nil
         }
+
+        /// Clamp to both main and menubar screens, which are generally the same screen
+        public static func clamp(size: NSSize) -> NSSize {
+            var size = size
+
+            let screens: [NSScreen] = NSScreen.screens.filter {
+                $0 == .main || $0 == .menubarScreen
+            }
+
+            for screen in screens {
+                let screenRect = screen.visibleFrame
+                let width = min(screenRect.width, size.width)
+                let height = min(screenRect.height, size.height)
+
+                if width < size.width {
+                    size.width = width
+                }
+
+                if height < size.width {
+                    size.height = height
+                }
+            }
+
+            return size
+        }
     }
+
 #endif

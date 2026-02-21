@@ -22,6 +22,10 @@ extension SerializableEncoder {
         return nil
     }
 
+    public var base64EncodedString: String? {
+        dataRepresentation?.base64EncodedString()
+    }
+
     public var plistRepresentation: String? {
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .xml
@@ -32,16 +36,20 @@ extension SerializableEncoder {
 
         return String(data: data, encoding: .utf8)
     }
-
-    public var base64EncodedString: String? {
-        dataRepresentation?.base64EncodedString()
-    }
 }
 
 extension SerializableDecoder {
-    public init(base64EncodedString: String) throws {
-        guard let data = Data(base64Encoded: base64EncodedString) else {
-            throw NSError(description: "Failed to parse string")
+    public init(base64Encoded string: String) throws {
+        guard let data = Data(base64Encoded: string) else {
+            throw NSError(description: "Failed to parse \(string)")
+        }
+
+        try self.init(data: data)
+    }
+
+    public init(plist string: String) throws {
+        guard let data = string.data(using: .utf8) else {
+            throw NSError(description: "Failed to parse plist \(string)")
         }
 
         try self.init(data: data)

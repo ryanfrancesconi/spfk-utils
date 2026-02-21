@@ -1,5 +1,6 @@
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
+    import SPFKBase
 
     extension NSDraggingInfo {
         @MainActor
@@ -50,6 +51,35 @@
             }
 
             return url
+        }
+
+        @MainActor
+        public func toString() throws -> [String] {
+            guard let items = draggingPasteboard.pasteboardItems,
+                  items.isNotEmpty,
+                  let types = draggingPasteboard.types
+            else {
+                throw NSError(description: "pasteboardItems is empty")
+            }
+
+            guard types.contains(.string) else {
+                throw NSError(description: "no .string type in types")
+            }
+
+            var results: [String] = []
+
+            for item in items {
+                guard let stringValue = item.data(forType: .string) else {
+                    Log.error("failed to convert to string")
+                    continue
+                }
+
+                if let string = stringValue.toString(using: .utf8) {
+                    results.append(string)
+                }
+            }
+
+            return results
         }
     }
 #endif
