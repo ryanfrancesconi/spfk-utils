@@ -305,6 +305,27 @@
             ).filter(\.isAuthorized)
         }
 
+        /// Create a flat array of urls containing only file urls.
+        /// Recursively scans directories.
+        public static func getFileURLs(in urls: [URL]) -> Set<URL> {
+            let directories = urls.filter(\.isDirectoryOrPackage)
+            var directoryURLs = [URL]()
+
+            if directories.isNotEmpty {
+                for directoryURL in directories {
+                    let innerURLs = FileSystem.getFileURLs(in: directoryURL, recursive: true).filter {
+                        !$0.isDirectoryOrPackage
+                    }
+
+                    directoryURLs += innerURLs
+                }
+            }
+
+            let result = (urls + directoryURLs).filter { !$0.isDirectoryOrPackage }
+
+            return Set<URL>(result)
+        }
+
         ///  Returns all files at the given URL.
         public static func getFileURLs(
             in directory: URL,
