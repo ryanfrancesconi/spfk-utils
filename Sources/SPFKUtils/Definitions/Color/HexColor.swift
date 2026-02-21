@@ -30,12 +30,12 @@
                 return nil
             }
 
-            stringValue = string
+            stringValue = string.trimmed
             parse()
         }
 
         public init(string: String) {
-            stringValue = string
+            stringValue = string.trimmed
             parse()
         }
 

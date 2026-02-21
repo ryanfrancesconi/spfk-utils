@@ -3,18 +3,6 @@
 import Foundation
 
 extension URL {
-    /// Checks for NSFileReadUnknownError when accessing via security scope
-    public var isAuthorized: Bool {
-        do {
-            // throws error if unable to get data, lack of security access
-            _ = try bookmarkData(options: [.withSecurityScope])
-            return true
-        } catch {
-            Log.error(error)
-            return false
-        }
-    }
-
     public func isParent(of otherURL: URL) -> Bool {
         guard isDirectory else { return false }
 
@@ -24,6 +12,20 @@ extension URL {
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
+
+    extension URL {
+        /// Checks for NSFileReadUnknownError when accessing via security scope
+        public var isAuthorized: Bool {
+            do {
+                // throws error if unable to get data, lack of security access
+                _ = try bookmarkData(options: [.withSecurityScope])
+                return true
+            } catch {
+                Log.error(error)
+                return false
+            }
+        }
+    }
 
     extension URL {
         @MainActor

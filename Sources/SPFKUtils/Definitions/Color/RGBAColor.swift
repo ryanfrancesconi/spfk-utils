@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RGBAColor {
+public struct RGBAColor: Hashable, Sendable, Equatable {
     public var r: CGFloat = 0.0
     public var g: CGFloat = 0.0
     public var b: CGFloat = 0.0

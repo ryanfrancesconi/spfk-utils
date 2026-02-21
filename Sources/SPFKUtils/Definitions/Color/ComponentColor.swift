@@ -1,39 +1,45 @@
-import Foundation
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-public struct ComponentColor {
-    public enum Key: CaseIterable {
-        case background
-        case text
-        case stroke
-    }
+    // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-    public var collection: [Key: SelectedColor] = {
-        var collection = [Key: SelectedColor]()
+    import Foundation
 
-        collection[.background] = SelectedColor(
-            selected: SPFKColor.controlActiveBackgroundColor.value(for: .dark),
-            unselected: SPFKColor.controlAlphaBackgroundColor.value(for: .dark)
-        )
-
-        collection[.text] = SelectedColor(
-            selected: SPFKColor.selectedTextColor.value(for: .dark),
-            unselected: SPFKColor.textColor.value(for: .dark)
-        )
-
-        collection[.stroke] = SelectedColor(
-            selected: .controlAccentColor,
-            unselected: .controlColor
-        )
-
-        return collection
-    }()
-
-    public subscript(key: Key) -> SelectedColor {
-        get { collection[key] ?? SelectedColor() }
-        set {
-            collection[key] = newValue
+    public struct ComponentColor {
+        public enum Key: CaseIterable {
+            case background
+            case text
+            case stroke
         }
+
+        public var collection: [Key: SelectedColor] = {
+            var collection = [Key: SelectedColor]()
+
+            collection[.background] = SelectedColor(
+                selected: SPFKColor.controlActiveBackgroundColor.value(for: .dark),
+                unselected: SPFKColor.controlAlphaBackgroundColor.value(for: .dark)
+            )
+
+            collection[.text] = SelectedColor(
+                selected: SPFKColor.selectedTextColor.value(for: .dark),
+                unselected: SPFKColor.textColor.value(for: .dark)
+            )
+
+            collection[.stroke] = SelectedColor(
+                selected: .controlAccentColor,
+                unselected: .controlColor
+            )
+
+            return collection
+        }()
+
+        public subscript(key: Key) -> SelectedColor {
+            get { collection[key] ?? SelectedColor() }
+            set {
+                collection[key] = newValue
+            }
+        }
+
+        public init() {}
     }
 
-    public init() {}
-}
+#endif

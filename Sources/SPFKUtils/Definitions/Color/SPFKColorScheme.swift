@@ -1,26 +1,30 @@
-import AppKit
-import Foundation
-import SwiftUI
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-/// Not to be confused with the SwiftUI version
-public enum SPFKColorScheme: String {
-    case dark
-    case light
+    import AppKit
+    import Foundation
+    import SwiftUI
 
-    public init(appearanceNamed name: NSAppearance.Name) {
-        self = name == .aqua ? .light : .dark
-    }
+    /// Not to be confused with the SwiftUI version
+    public enum SPFKColorScheme: String {
+        case dark
+        case light
 
-    public init(colorScheme: SwiftUI.ColorScheme) {
-        self = colorScheme == .light ? .light : .dark
-    }
-
-    @MainActor
-    public static var currentScheme: SPFKColorScheme {
-        guard let name = NSApp?.effectiveAppearance.name else {
-            return .dark
+        public init(appearanceNamed name: NSAppearance.Name) {
+            self = name == .aqua ? .light : .dark
         }
 
-        return SPFKColorScheme(appearanceNamed: name)
+        public init(colorScheme: SwiftUI.ColorScheme) {
+            self = colorScheme == .light ? .light : .dark
+        }
+
+        @MainActor
+        public static var currentScheme: SPFKColorScheme {
+            guard let name = NSApp?.effectiveAppearance.name else {
+                return .dark
+            }
+
+            return SPFKColorScheme(appearanceNamed: name)
+        }
     }
-}
+
+#endif

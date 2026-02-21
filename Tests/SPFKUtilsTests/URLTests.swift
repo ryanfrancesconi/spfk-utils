@@ -1,28 +1,32 @@
-import Numerics
-import SPFKBase
-import SPFKTesting
-import Testing
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-class URLTests: BinTestCase {
-    @Test func modificationDates() async throws {
-        deleteBinOnExit = true
+    import Numerics
+    import SPFKBase
+    import SPFKTesting
+    import Testing
 
-        let url = try copyToBin(url: TestBundleResources.shared.mp3_id3)
-        let startDate = try #require(url.modificationDate)
+    class URLTests: BinTestCase {
+        @Test func modificationDates() async throws {
+            deleteBinOnExit = true
 
-        Log.debug(startDate)
-        try await Task.sleep(seconds: 2)
+            let url = try copyToBin(url: TestBundleResources.shared.mp3_id3)
+            let startDate = try #require(url.modificationDate)
 
-        try url.set(tagColors: [.blue, .gray])
-        let modificationDate = try #require(url.modificationDate)
-        Log.debug(modificationDate) // +2
+            Log.debug(startDate)
+            try await Task.sleep(seconds: 2)
 
-        #expect(modificationDate > startDate)
-        try await Task.sleep(seconds: 2)
+            try url.set(tagColors: [.blue, .gray])
+            let modificationDate = try #require(url.modificationDate)
+            Log.debug(modificationDate) // +2
 
-        try url.set(tagNames: ["tag1", "tag2"])
-        let modificationDate2 = try #require(url.modificationDate)
-        Log.debug(modificationDate2) // +4
-        #expect(modificationDate2 > modificationDate)
+            #expect(modificationDate > startDate)
+            try await Task.sleep(seconds: 2)
+
+            try url.set(tagNames: ["tag1", "tag2"])
+            let modificationDate2 = try #require(url.modificationDate)
+            Log.debug(modificationDate2) // +4
+            #expect(modificationDate2 > modificationDate)
+        }
     }
-}
+
+#endif
