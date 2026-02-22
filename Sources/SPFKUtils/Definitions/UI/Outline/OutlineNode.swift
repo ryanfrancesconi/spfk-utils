@@ -5,7 +5,7 @@
     import AppKit
     import Foundation
 
-    /// Data structure for OutlineView
+    /// Data structure for OutlineView elements
     public struct OutlineNode: Equatable, Sendable, Hashable {
         public static func == (lhs: Self, rhs: Self) -> Bool {
             lhs.id == rhs.id

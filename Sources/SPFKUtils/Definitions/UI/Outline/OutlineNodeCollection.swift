@@ -1,13 +1,20 @@
 import AppKit
 import Foundation
 
+/// Data structure for OutlineView UI.
+///
 /// A single level, non recursive group of nodes. Each top level OutlineNode may have
 /// an array of children [OutlineNode]
 public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
-    /// Only for top level nodes
+    /// Only for top level parent nodes
     public subscript(index index: Int) -> OutlineNode? {
         guard nodes.indices.contains(index) else { return nil }
         return nodes[index]
+    }
+
+    /// Will recursively search for the node
+    public subscript(uuid uuid: UUID) -> OutlineNode? {
+        lookup(uuid: uuid)
     }
 
     // MARK: -
@@ -22,10 +29,6 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     public init(nodes: [OutlineNode] = []) {
         self.nodes = nodes
-    }
-
-    public subscript(uuid uuid: UUID) -> OutlineNode? {
-        lookup(uuid: uuid)
     }
 
     public func lookup(uuid: UUID) -> OutlineNode? {
