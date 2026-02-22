@@ -3,9 +3,10 @@
     import CoreGraphics
     import Foundation
     import SPFKTesting
-    @testable import SPFKUtils
     import Testing
     import UniformTypeIdentifiers
+
+    @testable import SPFKUtils
 
     class CGImageTests: BinTestCase {
         @Test func cgImageDataRoundtrip() async throws {
