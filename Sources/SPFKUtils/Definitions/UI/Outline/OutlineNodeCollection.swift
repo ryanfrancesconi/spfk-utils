@@ -29,6 +29,26 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     public init(nodes: [OutlineNode] = []) {
         self.nodes = nodes
+        updateSortIndexes()
+    }
+
+    public mutating func updateSortIndexes() {
+        for i in 0 ..< nodes.count {
+            nodes[i].sortIndex = i
+            Log.debug(i, nodes[i].titleAndID)
+
+            for j in 0 ..< nodes[i].children.count {
+                nodes[i].children[j].sortIndex = j
+
+                Log.debug("    *", j, nodes[i].children[j].titleAndID)
+            }
+        }
+    }
+
+    public func lookup(uuids: [UUID]) -> [OutlineNode] {
+        uuids.compactMap {
+            lookup(uuid: $0)
+        }
     }
 
     public func lookup(uuid: UUID) -> OutlineNode? {
@@ -80,7 +100,13 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         return result
     }
 
-    public mutating func insert(nodes children: [OutlineNode], in parentId: UUID, atIndex: Int? = nil) throws -> [OutlineNode] {
+    /// updates parentId and sortIndex
+    public mutating func insert(
+        nodes children: [OutlineNode],
+        in parentId: UUID,
+        atIndex: Int? = nil
+    ) throws -> [OutlineNode] {
+        //
         var children = children
 
         for i in 0 ..< children.count {
@@ -98,7 +124,11 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
             }
 
             nodes[i].isExpanded = true // expand parent
-            return children
+
+            updateSortIndexes()
+
+            let ids = children.map(\.id)
+            return lookup(uuids: ids)
         }
 
         throw NSError(description: "Failed to find parentId (\(parentId)) in nodes")
@@ -106,6 +136,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     public mutating func append(node: OutlineNode) {
         nodes.append(node)
+        updateSortIndexes()
     }
 
     public mutating func rename(id: UUID, title: String) throws {
@@ -153,6 +184,10 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     @discardableResult
     public mutating func remove(ids: [UUID]) throws -> [OutlineNode] {
+        defer {
+            updateSortIndexes()
+        }
+
         var removed: [OutlineNode] = []
 
         for id in ids {
@@ -165,7 +200,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     }
 
     @discardableResult
-    public mutating func remove(id: UUID) throws -> OutlineNode {
+    private mutating func remove(id: UUID) throws -> OutlineNode {
         for i in 0 ..< nodes.count {
             if nodes[i].id == id {
                 let value = nodes[i]

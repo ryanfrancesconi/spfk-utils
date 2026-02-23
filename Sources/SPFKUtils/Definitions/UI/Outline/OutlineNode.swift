@@ -25,6 +25,7 @@
         public var isLeaf: Bool { nodeIdentifier.parentId != nil && children.isEmpty }
 
         public var id: UUID { nodeIdentifier.id }
+        public var parentId: UUID? { nodeIdentifier.parentId }
 
         public var identifier: NSUserInterfaceItemIdentifier {
             let id = isLeaf ? "OutlineNodeLeaf" : "OutlineNodeGroup"
@@ -57,7 +58,7 @@
         }
 
         public func duplicate() -> OutlineNode {
-            .init(
+            var result = OutlineNode(
                 title: "Copy of \(title)",
                 isEditable: isEditable,
                 symbolName: symbolName,
@@ -65,6 +66,10 @@
                 nodeIdentifier: .init(parentId: nodeIdentifier.parentId, id: UUID()),
                 children: children
             )
+
+            result.nodeIdentifier.originalId = id
+
+            return result
         }
     }
 

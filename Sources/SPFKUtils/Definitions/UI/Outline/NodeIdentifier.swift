@@ -2,13 +2,25 @@ import Foundation
 
 public struct NodeIdentifier: Sendable, Hashable, Equatable, Codable, CustomStringConvertible {
     /// Leaf nodes have a parentId but a top level group node does not
-    public var parentId: UUID?
+    public var parentId: UUID? {
+        willSet {
+            previousParentId = parentId
+        }
+    }
 
-    /// UUID to identify this instance
+    /// `UUID` to identify this instance
     public var id: UUID
 
+    // MARK: - cached, transient values
+
+    /// if the node was duplicated, the previous `id` is stored here for tracking changes
+    public var originalId: UUID?
+
+    /// when the node is moved, the prevoius `parentId` will be cached here
+    public private(set) var previousParentId: UUID?
+
     public var description: String {
-        "NodeIdentifier(id: \(id.uuidString), parentId: \(parentId?.uuidString ?? "nil"))"
+        "NodeIdentifier(id: \(id.uuidString), parentId: \(parentId?.uuidString ?? "nil"), originalId: \(originalId?.uuidString ?? "nil"), previousParentId: \(previousParentId?.uuidString ?? "nil"))"
     }
 
     public init(parentId: UUID? = nil, id: UUID) {
