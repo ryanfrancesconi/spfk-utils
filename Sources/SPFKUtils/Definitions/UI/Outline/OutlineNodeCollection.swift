@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import SPFKBase
 
 /// Data structure for OutlineView UI.
 ///
@@ -35,12 +36,11 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     public mutating func updateSortIndexes() {
         for i in 0 ..< nodes.count {
             nodes[i].sortIndex = i
-            Log.debug(i, nodes[i].titleAndID)
+            // Log.debug(i, nodes[i].titleAndID)
 
             for j in 0 ..< nodes[i].children.count {
                 nodes[i].children[j].sortIndex = j
-
-                Log.debug("    *", j, nodes[i].children[j].titleAndID)
+                // Log.debug("    *", j, nodes[i].children[j].titleAndID)
             }
         }
     }
@@ -68,6 +68,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     public mutating func update(node: OutlineNode, isExpanded: Bool) {
         for i in 0 ..< nodes.count where nodes[i] == node {
             nodes[i].isExpanded = isExpanded
+            Log.debug(nodes[i].title, isExpanded)
         }
     }
 
@@ -134,9 +135,44 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         throw NSError(description: "Failed to find parentId (\(parentId)) in nodes")
     }
 
-    public mutating func append(node: OutlineNode) {
-        nodes.append(node)
+    public mutating func append(nodes incoming: [OutlineNode]) {
+        let nodeState = nodes
+
+        _ = try? remove(nodes: incoming)
+        nodes.append(contentsOf: incoming)
         updateSortIndexes()
+
+        for node in nodeState {
+            for i in 0 ..< nodes.count where nodes[i].id == node.id {
+                nodes[i].isExpanded = node.isExpanded
+            }
+        }
+    }
+
+    public mutating func insert(nodes incoming: [OutlineNode], atIndex: Int?) {
+        let nodeState = nodes
+
+        var atIndex = atIndex ?? nodes.count
+
+        if let occupyingNode = self[index: atIndex], !occupyingNode.isEditable {
+            atIndex += 1
+        }
+
+        guard nodes.indices.contains(atIndex) else {
+            append(nodes: incoming)
+            return
+        }
+
+        _ = try? remove(nodes: incoming)
+
+        nodes.insert(contentsOf: incoming, at: atIndex)
+        updateSortIndexes()
+
+        for node in nodeState {
+            for i in 0 ..< nodes.count where nodes[i].id == node.id {
+                nodes[i].isExpanded = node.isExpanded
+            }
+        }
     }
 
     public mutating func rename(id: UUID, title: String) throws {
@@ -204,15 +240,12 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         for i in 0 ..< nodes.count {
             if nodes[i].id == id {
                 let value = nodes[i]
-
                 nodes.remove(at: i)
-
                 return value
             }
 
             for j in 0 ..< nodes[i].children.count where nodes[i].children[j].id == id {
                 let value = nodes[i].children[j]
-
                 nodes[i].children.remove(at: j)
                 return value
             }
@@ -223,6 +256,23 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     public mutating func removeAll() {
         nodes.removeAll()
+    }
+
+    public mutating func sortChildren(of node: OutlineNode) throws {
+        guard node.children.isNotEmpty else {
+            throw NSError(description: "No child nodes to sort")
+        }
+
+        let children = node.children.sorted { lhs, rhs in
+            lhs.title.standardCompare(with: rhs.title)
+        }
+
+        for i in 0 ..< nodes.count where nodes[i] == node {
+            nodes[i].children = children
+            return
+        }
+
+        throw NSError(description: "Didn't find \(node.titleAndID) in collection")
     }
 }
 

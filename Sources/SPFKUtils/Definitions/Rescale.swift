@@ -1,6 +1,6 @@
 import Foundation
 
-/** here you scale the domain to the range. The advantage is that you can flip signs to your target range.  */
+/// Scale the domain to the range. The advantage is that you can flip signs to your target range
 public struct Rescale {
     public var range0: Double
     public var range1: Double

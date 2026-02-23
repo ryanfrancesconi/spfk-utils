@@ -38,7 +38,7 @@
         }
 
         public var titleAndID: String {
-            "\(title) (\(nodeIdentifier))"
+            "\(title) (\(nodeIdentifier.id))"
         }
 
         public init(
