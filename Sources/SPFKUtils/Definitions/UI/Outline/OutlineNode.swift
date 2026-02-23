@@ -5,23 +5,26 @@
     import AppKit
     import Foundation
 
-    /// Data structure for OutlineView elements
+    /// Data structure for tree structures
     public struct OutlineNode: Equatable, Sendable, Hashable {
         public static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.id == rhs.id
+            lhs.nodeIdentifier == rhs.nodeIdentifier
         }
 
         public var title: String
         public var isEditable: Bool = true
         public var symbolName: String?
         public var hexColor: HexColor?
-        public var parentId: UUID?
-        public let id: UUID?
+
+        public var nodeIdentifier: NodeIdentifier
+
         public var children: [OutlineNode] = .init()
         public var isExpanded: Bool = false
         public var sortIndex: Int?
 
-        public var isLeaf: Bool { parentId != nil && children.isEmpty }
+        public var isLeaf: Bool { nodeIdentifier.parentId != nil && children.isEmpty }
+
+        public var id: UUID { nodeIdentifier.id }
 
         public var identifier: NSUserInterfaceItemIdentifier {
             let id = isLeaf ? "OutlineNodeLeaf" : "OutlineNodeGroup"
@@ -34,7 +37,7 @@
         }
 
         public var titleAndID: String {
-            "\(title) (\(id?.uuidString ?? "nil")"
+            "\(title) (\(nodeIdentifier))"
         }
 
         public init(
@@ -42,17 +45,26 @@
             isEditable: Bool,
             symbolName: String?,
             hexColor: HexColor? = nil,
-            parentId: UUID?,
-            id: UUID?,
+            nodeIdentifier: NodeIdentifier,
             children: [OutlineNode] = []
         ) {
             self.title = title
             self.isEditable = isEditable
             self.symbolName = symbolName
             self.hexColor = hexColor
-            self.id = id
-            self.parentId = parentId
+            self.nodeIdentifier = nodeIdentifier
             self.children = children
+        }
+
+        public func duplicate() -> OutlineNode {
+            .init(
+                title: "Copy of \(title)",
+                isEditable: isEditable,
+                symbolName: symbolName,
+                hexColor: hexColor,
+                nodeIdentifier: .init(parentId: nodeIdentifier.parentId, id: UUID()),
+                children: children
+            )
         }
     }
 
@@ -64,8 +76,7 @@
             case hexColor
             case children
             case isExpanded
-            case parentId
-            case id
+            case nodeIdentifier
             case sortIndex
         }
 
@@ -74,15 +85,12 @@
 
             title = try container.decode(String.self, forKey: .title)
             isEditable = try container.decode(Bool.self, forKey: .isEditable)
-
             children = try container.decode([OutlineNode].self, forKey: .children)
             isExpanded = try container.decode(Bool.self, forKey: .isExpanded)
+            nodeIdentifier = try container.decode(NodeIdentifier.self, forKey: .nodeIdentifier)
 
             symbolName = try? container.decodeIfPresent(String.self, forKey: .symbolName)
-            parentId = try? container.decodeIfPresent(UUID.self, forKey: .parentId)
-            id = try? container.decodeIfPresent(UUID.self, forKey: .id)
             sortIndex = try? container.decodeIfPresent(Int.self, forKey: .sortIndex)
-
             hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
         }
 
@@ -93,10 +101,9 @@
             try container.encode(isEditable, forKey: .isEditable)
             try container.encode(children, forKey: .children)
             try container.encode(isExpanded, forKey: .isExpanded)
+            try container.encode(nodeIdentifier, forKey: .nodeIdentifier)
 
             try? container.encodeIfPresent(symbolName, forKey: .symbolName)
-            try? container.encodeIfPresent(parentId, forKey: .parentId)
-            try? container.encodeIfPresent(id, forKey: .id)
             try? container.encodeIfPresent(sortIndex, forKey: .sortIndex)
             try? container.encodeIfPresent(hexColor, forKey: .hexColor)
         }

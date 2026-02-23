@@ -60,7 +60,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
             for j in 0 ..< nodes[i].children.count where nodes[i].children[j].id == node.id {
                 var node = node
-                node.parentId = nodes[i].id
+                node.nodeIdentifier.parentId = nodes[i].id
                 nodes[i].children[j] = node
                 return
             }
@@ -70,13 +70,35 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     }
 
     /// finds a top level group node to insert into
-    public mutating func insert(child node: OutlineNode, in parentId: UUID) throws {
+    public mutating func insert(node child: OutlineNode, in parentId: UUID, atIndex: Int? = nil) throws -> OutlineNode {
+        let results = try insert(nodes: [child], in: parentId, atIndex: atIndex)
+
+        guard let result = results.first else {
+            throw NSError(description: "failed to insert")
+        }
+
+        return result
+    }
+
+    public mutating func insert(nodes children: [OutlineNode], in parentId: UUID, atIndex: Int? = nil) throws -> [OutlineNode] {
+        var children = children
+
+        for i in 0 ..< children.count {
+            // Update the parentId for its new group
+            children[i].nodeIdentifier.parentId = parentId
+        }
+
         for i in 0 ..< nodes.count where nodes[i].id == parentId {
-            var node = node
-            node.parentId = parentId
-            nodes[i].children.append(node)
+            //
+            if let atIndex, atIndex != -1, nodes[i].children.indices.contains(atIndex) {
+                nodes[i].children.insert(contentsOf: children, at: atIndex)
+
+            } else {
+                nodes[i].children.append(contentsOf: children)
+            }
+
             nodes[i].isExpanded = true // expand parent
-            return
+            return children
         }
 
         throw NSError(description: "Failed to find parentId (\(parentId)) in nodes")
@@ -112,7 +134,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
             }
         }
 
-        guard let parentId = node.parentId,
+        guard let parentId = node.nodeIdentifier.parentId,
               let parentNode = self[uuid: parentId]
         else { return nil }
 
@@ -124,24 +146,19 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     }
 
     @discardableResult
-    public mutating func remove(nodes: [OutlineNode]) -> [OutlineNode] {
+    public mutating func remove(nodes: [OutlineNode]) throws -> [OutlineNode] {
         let ids = nodes.compactMap(\.id)
-        return remove(ids: ids)
+        return try remove(ids: ids)
     }
 
     @discardableResult
-    public mutating func remove(ids: [UUID]) -> [OutlineNode] {
+    public mutating func remove(ids: [UUID]) throws -> [OutlineNode] {
         var removed: [OutlineNode] = []
 
         for id in ids {
-            do {
-                try removed.append(
-                    remove(id: id)
-                )
-
-            } catch {
-                Log.error(error)
-            }
+            try removed.append(
+                remove(id: id)
+            )
         }
 
         return removed
@@ -154,11 +171,12 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
                 let value = nodes[i]
 
                 nodes.remove(at: i)
+
                 return value
             }
 
             for j in 0 ..< nodes[i].children.count where nodes[i].children[j].id == id {
-                let value = nodes[i]
+                let value = nodes[i].children[j]
 
                 nodes[i].children.remove(at: j)
                 return value
@@ -170,5 +188,11 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
 
     public mutating func removeAll() {
         nodes.removeAll()
+    }
+}
+
+extension [OutlineNode] {
+    public func duplicate() -> [OutlineNode] {
+        map { $0.duplicate() }
     }
 }

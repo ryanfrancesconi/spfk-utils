@@ -58,6 +58,34 @@
             }
         }
 
+        /// Recursively enable menu items by their tag values.
+        /// Calling this function will set `autoenablesItems` = false
+        ///
+        /// - Parameters:
+        ///   - menu: nil = self
+        ///   - tags: Array of [Int] tags or nil to change all items found
+        ///   - enabled: new state
+        public func updateItems(in menu: NSMenu? = nil, tags: [Int]? = nil, enabled: Bool) {
+            let menu = menu ?? self
+
+            menu.autoenablesItems = false
+
+            for item in menu.items {
+                if let tags {
+                    if tags.contains(item.tag) {
+                        item.isEnabled = enabled
+                    }
+
+                } else {
+                    item.isEnabled = enabled
+                }
+
+                if let submenu = item.submenu, submenu.items.isNotEmpty {
+                    updateItems(in: submenu, tags: tags, enabled: enabled)
+                }
+            }
+        }
+
         @MainActor
         public static func popUpContextMenuBeneath(
             _ menu: NSMenu,
