@@ -8,4 +8,6 @@ public enum OutlineEditOperation: Sendable {
     case removed(nodes: [OutlineNode])
     
     case sort(nodes: [OutlineNode])
+    
+    case append(urls: [URL], destination: OutlineNode)
 }
