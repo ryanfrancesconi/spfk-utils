@@ -135,7 +135,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         throw NSError(description: "Failed to find parentId (\(parentId)) in nodes")
     }
 
-    public mutating func append(nodes incoming: [OutlineNode]) {
+    public mutating func append(groupNodes incoming: [OutlineNode]) {
         let nodeState = nodes
 
         _ = try? remove(nodes: incoming)
@@ -149,7 +149,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         }
     }
 
-    public mutating func insert(nodes incoming: [OutlineNode], atIndex: Int?) {
+    public mutating func insert(groupNodes incoming: [OutlineNode], atIndex: Int?) {
         let nodeState = nodes
 
         var atIndex = atIndex ?? nodes.count
@@ -159,7 +159,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         }
 
         guard nodes.indices.contains(atIndex) else {
-            append(nodes: incoming)
+            append(groupNodes: incoming)
             return
         }
 
@@ -275,6 +275,8 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
         throw NSError(description: "Didn't find \(node.titleAndID) in collection")
     }
 }
+
+extension OutlineNodeCollection: Codable, Serializable {}
 
 extension [OutlineNode] {
     public func duplicate() -> [OutlineNode] {

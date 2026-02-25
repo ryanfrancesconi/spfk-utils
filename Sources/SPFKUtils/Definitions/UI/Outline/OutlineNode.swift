@@ -23,7 +23,6 @@
         public var sortIndex: Int?
 
         public var isLeaf: Bool { nodeIdentifier.parentId != nil && children.isEmpty }
-
         public var id: UUID { nodeIdentifier.id }
         public var parentId: UUID? { nodeIdentifier.parentId }
 
@@ -73,7 +72,7 @@
         }
     }
 
-    extension OutlineNode: Codable {
+    extension OutlineNode: Codable, Serializable {
         enum CodingKeys: String, CodingKey {
             case title
             case isEditable
@@ -113,7 +112,5 @@
             try? container.encodeIfPresent(hexColor, forKey: .hexColor)
         }
     }
-
-    extension OutlineNode: Serializable {}
 
 #endif
