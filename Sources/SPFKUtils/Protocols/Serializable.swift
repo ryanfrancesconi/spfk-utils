@@ -3,7 +3,7 @@
 import Foundation
 
 /// Convenience protocol for property list data
-public protocol Serializable: SerializableEncoder, SerializableDecoder {}
+public protocol Serializable: SerializableEncoder, SerializableDecoder, Sendable {}
 
 public protocol SerializableEncoder: Encodable {}
 public protocol SerializableDecoder: Decodable {}
