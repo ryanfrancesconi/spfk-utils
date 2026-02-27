@@ -56,6 +56,7 @@
         case minusDiamond = "minus.diamond"
         case musicNote = "music.note"
         case musicNoteSlash = "music.note.slash"
+        case musicPages = "music.pages"
         case openDocument = "arrow.up.forward.square"
         case paste = "document.on.clipboard"
         case pause = "stop.fill"
