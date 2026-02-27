@@ -91,6 +91,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     }
 
     /// finds a top level group node to insert into
+    @discardableResult
     public mutating func insert(node child: OutlineNode, in parentId: UUID, atIndex: Int? = nil) throws -> OutlineNode {
         let results = try insert(nodes: [child], in: parentId, atIndex: atIndex)
 
@@ -236,7 +237,7 @@ public struct OutlineNodeCollection: Sendable, Hashable, Equatable {
     }
 
     @discardableResult
-    private mutating func remove(id: UUID) throws -> OutlineNode {
+    mutating func remove(id: UUID) throws -> OutlineNode {
         for i in 0 ..< nodes.count {
             if nodes[i].id == id {
                 let value = nodes[i]

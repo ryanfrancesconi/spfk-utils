@@ -37,12 +37,12 @@
                     let cid = try nextUUID()
 
                     children.append(
-                        OutlineNode(title: "Playlist \(i).\(c)", isEditable: true, symbolName: "playlist", parentId: gid, id: cid)
+                        OutlineNode(title: "Playlist \(i).\(c)", isEditable: true, symbolName: "playlist", nodeIdentifier: .init(parentId: gid, id: cid))
                     )
                 }
 
                 nodes.append(
-                    OutlineNode(title: "Group \(i)", isEditable: true, symbolName: "folder", parentId: nil, id: gid, children: children)
+                    OutlineNode(title: "Group \(i)", isEditable: true, symbolName: "folder", nodeIdentifier: .init(parentId: nil, id: gid), children: children)
                 )
             }
 
@@ -73,7 +73,7 @@
         @Test func update() throws {
             var collection = try create(nodeCount: 2, childrenCount: 2)
 
-            let node = OutlineNode(title: "New Playlist", isEditable: true, symbolName: "playlist", parentId: nil, id: uuids[5])
+            let node = OutlineNode(title: "New Playlist", isEditable: true, symbolName: "playlist", nodeIdentifier: .init(parentId: nil, id: uuids[5]))
 
             try collection.update(node: node)
             let newNode = try #require(collection[uuid: uuids[5]])
@@ -85,8 +85,8 @@
             var collection = try create(nodeCount: 2, childrenCount: 2)
 
             let id = try nextUUID()
-            let node = OutlineNode(title: "New Playlist", isEditable: true, symbolName: "playlist", parentId: nil, id: id)
-            try collection.insert(child: node, in: uuids[0])
+            let node = OutlineNode(title: "New Playlist", isEditable: true, symbolName: "playlist", nodeIdentifier: .init(parentId: nil, id: id))
+            try collection.insert(node: node, in: uuids[0])
 
             let newNode = try #require(collection[uuid: id])
             #expect(newNode.title == "New Playlist")
@@ -115,7 +115,7 @@
         @Test func removeNodes() throws {
             var collection = try create(nodeCount: 2, childrenCount: 2)
 
-            let removedNodes = collection.remove(nodes: [collection[uuid: uuids[1]]!, collection[uuid: uuids[2]]!])
+            let removedNodes = try collection.remove(nodes: [collection[uuid: uuids[1]]!, collection[uuid: uuids[2]]!])
             #expect(removedNodes.count == 2)
 
             let group0 = collection.lookup(uuid: uuids[0])
