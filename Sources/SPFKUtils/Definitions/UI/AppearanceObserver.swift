@@ -34,6 +34,8 @@
             for cancellable in cancellables {
                 cancellable.cancel()
             }
+
+            cancellables.removeAll()
         }
     }
 

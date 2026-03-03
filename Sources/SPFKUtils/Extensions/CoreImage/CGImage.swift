@@ -19,7 +19,7 @@ extension CGImage {
             width: width,
             height: height,
             bitsPerComponent: bitsPerComponent,
-            bytesPerRow: bytesPerRow,
+            bytesPerRow: 0,
             space: colorSpace,
             bitmapInfo: binfo
         ) else {

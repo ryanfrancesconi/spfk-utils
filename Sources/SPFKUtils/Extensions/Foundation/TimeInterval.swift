@@ -6,7 +6,7 @@ import Foundation
 /// Duration in real-time seconds of 1 tick in mach (host) time domain.
 public let machTimeSecondsPerTick: Double = {
     var tinfo = mach_timebase_info()
-    let err = mach_timebase_info(&tinfo)
+    _ = mach_timebase_info(&tinfo)
     let timecon = Double(tinfo.numer) / Double(tinfo.denom)
     return timecon * 0.000_000_001
 }()
@@ -14,7 +14,7 @@ public let machTimeSecondsPerTick: Double = {
 /// Number of mach (host) time domain ticks in 1 second of real time.
 public let machTimeTicksPerSecond: Double = {
     var tinfo = mach_timebase_info()
-    let err = mach_timebase_info(&tinfo)
+    _ = mach_timebase_info(&tinfo)
     let timecon = Double(tinfo.denom) / Double(tinfo.numer)
     return timecon * 1_000_000_000
 }()

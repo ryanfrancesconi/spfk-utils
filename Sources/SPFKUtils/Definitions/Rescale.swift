@@ -24,7 +24,7 @@ public struct Rescale {
     }
 
     public func uninterpolate(_ value: Double) -> Double {
-        let b: Double = (domain1 - domain0) != 0 ? domain1 - domain0 : 1 / domain1
+        let b: Double = (domain1 - domain0) != 0 ? domain1 - domain0 : 1
         return (value - domain0) / b
     }
 

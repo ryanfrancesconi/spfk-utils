@@ -9,6 +9,6 @@ public enum StereoState: String {
     /// Channel order is reversed, L-R becomes R-L, or 123 becomes 321
     case flipped
 
-    /// Changed are mixed to mono
+    /// Channels are mixed to mono
     case mono
 }
