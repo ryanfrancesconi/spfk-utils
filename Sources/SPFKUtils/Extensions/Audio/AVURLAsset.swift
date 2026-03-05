@@ -3,38 +3,42 @@
 import AVFoundation
 
 extension AVURLAsset {
-    public var audioFormat: AVAudioFormat? {
+    public func audioFormat() async -> AVAudioFormat? {
         // pull the input format out of the audio file...
         if let source = try? AVAudioFile(forReading: url) {
             return source.fileFormat
 
             // if that fails it might be a video, so check the tracks for audio
         } else {
-            
-            let audioTracks = tracks(withMediaType: .audio)
+            guard let audioTracks = try? await loadTracks(withMediaType: .audio),
+                  !audioTracks.isEmpty else { return nil }
 
-            guard !audioTracks.isEmpty else { return nil }
+            var allDescriptions: [CMFormatDescription] = []
+            for track in audioTracks {
+                if let descriptions = try? await track.load(.formatDescriptions) {
+                    allDescriptions.append(contentsOf: descriptions)
+                }
+            }
 
-            let formatDescriptions = audioTracks.compactMap({
-                $0.formatDescriptions as? [CMFormatDescription]
-            }).reduce([], +)
-
-            let audioFormats: [AVAudioFormat] = formatDescriptions.compactMap {
+            let audioFormats: [AVAudioFormat] = allDescriptions.compactMap {
                 AVAudioFormat(cmAudioFormatDescription: $0)
             }
             return audioFormats.first
         }
     }
 
-    public var hasTimecode: Bool {
-        !tracks(withMediaType: .timecode).isEmpty
+    public func hasTimecode() async -> Bool {
+        guard let tracks = try? await loadTracks(withMediaType: .timecode) else { return false }
+        return !tracks.isEmpty
     }
 
-    public var hasAudio: Bool {
-        !tracks(withMediaType: .audio).isEmpty
+    public func hasAudio() async -> Bool {
+        guard let tracks = try? await loadTracks(withMediaType: .audio) else { return false }
+        return !tracks.isEmpty
     }
 
-    public var hasVideo: Bool {
-        !tracks(withMediaType: .video).isEmpty
+    public func hasVideo() async -> Bool {
+        guard let tracks = try? await loadTracks(withMediaType: .video) else { return false }
+        return !tracks.isEmpty
     }
 }
