@@ -28,36 +28,29 @@ final class URLParentTests {
     }
 }
 
-// MARK: - FileSystem.getQueryStringParameter
+// MARK: - URL.queryStringParameter
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 final class QueryStringTests {
     @Test func basicParam() {
-        let value = FileSystem.getQueryStringParameter(url: "https://example.com?name=test", param: "name")
-        #expect(value == "test")
+        let url = URL(string: "https://example.com?name=test")!
+        #expect(url.queryStringParameter("name") == "test")
     }
 
     @Test func multipleParams() {
-        let value = FileSystem.getQueryStringParameter(url: "https://example.com?a=1&b=2&c=3", param: "b")
-        #expect(value == "2")
+        let url = URL(string: "https://example.com?a=1&b=2&c=3")!
+        #expect(url.queryStringParameter("b") == "2")
     }
 
     @Test func missingParam() {
-        let value = FileSystem.getQueryStringParameter(url: "https://example.com?name=test", param: "missing")
-        #expect(value == nil)
-    }
-
-    @Test func invalidURL() {
-        let value = FileSystem.getQueryStringParameter(url: "", param: "name")
-        #expect(value == nil)
+        let url = URL(string: "https://example.com?name=test")!
+        #expect(url.queryStringParameter("missing") == nil)
     }
 
     @Test func encodedValue() {
-        let value = FileSystem.getQueryStringParameter(url: "https://example.com?name=hello%20world", param: "name")
-        #expect(value == "hello world")
+        let url = URL(string: "https://example.com?name=hello%20world")!
+        #expect(url.queryStringParameter("name") == "hello world")
     }
 }
-#endif
 
 // MARK: - CGRect.largestCenteredSquare
 
@@ -384,6 +377,31 @@ final class ByteCountTests {
         #expect(ByteCount.megabyte.rawValue == ByteCount.kilobyte.rawValue * 1024)
         #expect(ByteCount.gigabyte.rawValue == ByteCount.megabyte.rawValue * 1024)
         #expect(ByteCount.terabyte.rawValue == ByteCount.gigabyte.rawValue * 1024)
+    }
+
+    @Test func fromString() throws {
+        let size1 = try #require(ByteCount.fromString("1 KB"))
+        #expect(size1 == ByteCount.kilobyte.rawValue)
+
+        let size2 = try #require(ByteCount.fromString("1 MB"))
+        #expect(size2 == ByteCount.megabyte.rawValue)
+
+        let size3 = try #require(ByteCount.fromString("1 GB"))
+        #expect(size3 == ByteCount.gigabyte.rawValue)
+
+        let size4 = try #require(ByteCount.fromString("1 TB"))
+        #expect(size4 == ByteCount.terabyte.rawValue)
+
+        let size5 = try #require(ByteCount.fromString("160.2 MB"))
+        #expect(size5 == 167_981_875)
+
+        let size6 = try #require(ByteCount.fromString("765.5 MB")).double
+        #expect(size6 == 765.5 * ByteCount.megabyte.rawValue.double)
+    }
+
+    @Test func toStringFormatting() throws {
+        let result = try #require(ByteCount.toString(1_048_576))
+        #expect(result == "1 MB")
     }
 }
 

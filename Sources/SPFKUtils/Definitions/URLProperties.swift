@@ -27,7 +27,7 @@
 
         private mutating func initialize() {
             if let fileSize {
-                fileSizeString = FileSystem.byteCountToString(fileSize.int64)
+                fileSizeString = ByteCount.toString(fileSize.int64)
             }
         }
     }
