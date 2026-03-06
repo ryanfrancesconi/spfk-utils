@@ -1,25 +1,27 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-import Dispatch
 import Foundation
 
-public final class DirectoryObserver: @unchecked Sendable {
-    static let retryCount: Int = 3
-    static let pollInterval: TimeInterval = 0.5
+public actor DirectoryObserver {
+    static let stabilizationChecks: Int = 1
+    static let pollInterval: TimeInterval = 0.25
 
     public weak var delegate: DirectoryObserverDelegate?
 
-    public let url: URL
+    public func setDelegate(_ delegate: DirectoryObserverDelegate?) {
+        self.delegate = delegate
+    }
+
+    public nonisolated let url: URL
 
     private let eventMask: DispatchSource.FileSystemEvent
 
-    private var eventTask: Task<Void, Error>?
+    private var pollTask: Task<Void, Error>?
     private var isWatching: Bool { source != nil }
 
     private var source: DispatchSourceFileSystemObject?
-    private var queue: DispatchQueue = DispatchQueue.global(qos: .background)
-    private var retriesLeft: Int = 0
-    private var directoryChanged = false
+    private var fileDescriptor: Int32 = -1
+    private var isPolling = false
     private var previousContents: Set<URL>?
 
     public init(url: URL, eventMask: DispatchSource.FileSystemEvent = .all) throws {
@@ -30,11 +32,16 @@ public final class DirectoryObserver: @unchecked Sendable {
         self.url = url
         self.eventMask = eventMask
 
-        previousContents = contents(of: url)
+        let initialContents = Self.contentsOfDirectory(at: url)
+        self.previousContents = initialContents
     }
 
     deinit {
-        stop()
+        source?.cancel()
+        source = nil
+        if fileDescriptor != -1 {
+            close(fileDescriptor)
+        }
     }
 
     public func start() throws {
@@ -47,19 +54,20 @@ public final class DirectoryObserver: @unchecked Sendable {
             throw NSError(description: "failed to open url: \(url.path)")
         }
 
-        queue = DispatchQueue.global(qos: .background)
+        fileDescriptor = descriptor
 
         source = DispatchSource.makeFileSystemObjectSource(
             fileDescriptor: descriptor,
-            eventMask: eventMask, // actions to monitor
-            queue: queue
+            eventMask: eventMask,
+            queue: .global(qos: .background)
         )
 
         source?.setEventHandler { [weak self] in
-            self?.directoryDidChange()
+            guard let self else { return }
+            Task { await self.directoryDidChange() }
         }
 
-        source?.setCancelHandler {
+        source?.setCancelHandler { [descriptor] in
             close(descriptor)
         }
 
@@ -69,10 +77,12 @@ public final class DirectoryObserver: @unchecked Sendable {
     public func stop() {
         guard isWatching else { return }
 
+        pollTask?.cancel()
+        pollTask = nil
+
         source?.cancel()
-        source?.setEventHandler(handler: nil)
-        source?.setCancelHandler(handler: nil)
         source = nil
+        fileDescriptor = -1
     }
 }
 
@@ -80,16 +90,15 @@ public final class DirectoryObserver: @unchecked Sendable {
 
 extension DirectoryObserver {
     private func directoryDidChange() {
-        guard !directoryChanged else { return }
+        guard !isPolling else { return }
 
         Log.debug("* change detected for \(url.path)")
 
-        directoryChanged = true
-        retriesLeft = DirectoryObserver.retryCount
-        checkChanges(after: DirectoryObserver.pollInterval)
+        isPolling = true
+        startPolling()
     }
 
-    private func contents(of url: URL) -> Set<URL> {
+    private static func contentsOfDirectory(at url: URL) -> Set<URL> {
         let urls = (try? FileManager.default.contentsOfDirectory(
             at: url,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -99,10 +108,14 @@ extension DirectoryObserver {
         return Set(urls)
     }
 
-    private func directoryMetadata(url: URL) throws -> [String] {
-        let contents = try FileManager.default.contentsOfDirectory(atPath: url.path)
+    /// Returns a snapshot of directory metadata for change comparison.
+    /// Uses filename → file size mapping to detect when writes have settled.
+    private nonisolated func directoryMetadata(url: URL) -> [String: Int] {
+        guard let contents = try? FileManager.default.contentsOfDirectory(atPath: url.path) else {
+            return [:]
+        }
 
-        var directoryMetadata = [String]()
+        var metadata = [String: Int]()
 
         for filename in contents {
             let fileUrl = url.appendingPathComponent(filename)
@@ -111,61 +124,51 @@ extension DirectoryObserver {
                 continue
             }
 
-            let sizeString = fileSize.string
-            let fileHash = filename + sizeString
-
-            directoryMetadata.append(fileHash)
+            metadata[filename] = fileSize
         }
 
-        return directoryMetadata
+        return metadata
     }
 
-    private func checkChanges(after delay: TimeInterval) {
-        guard let directoryMetadata = try? directoryMetadata(url: url)
-        else {
-            return
-        }
+    private func startPolling() {
+        pollTask?.cancel()
+        pollTask = Task { [weak self] in
+            guard let self else { return }
+            var stableCount = 0
 
-        let time = DispatchTime.now() + delay
+            while !Task.isCancelled {
+                let snapshot = directoryMetadata(url: url)
 
-        queue.asyncAfter(deadline: time) { [weak self] in
-            self?.pollDirectoryForChangesWith(directoryMetadata)
-        }
-    }
-
-    private func pollDirectoryForChangesWith(_ oldMetadata: [String]) {
-        guard let newDirectoryMetadata = try? directoryMetadata(url: url) else {
-            return
-        }
-
-        directoryChanged = newDirectoryMetadata != oldMetadata
-
-        retriesLeft = directoryChanged
-            ? Self.retryCount
-            : retriesLeft
-
-        retriesLeft = retriesLeft - 1
-
-        if directoryChanged || retriesLeft > 0 {
-            // Either the directory is changing or
-            // we should try again as more changes may occur
-            checkChanges(after: Self.pollInterval)
-
-        } else {
-            // Changes appear to be completed
-            // Post a notification informing that the directory did change
-            eventTask?.cancel()
-            eventTask = Task {
+                try await Task.sleep(seconds: Self.pollInterval)
                 try Task.checkCancellation()
-                try await postNotification()
+
+                let current = directoryMetadata(url: url)
+                let changed = current != snapshot
+
+                if changed {
+                    stableCount = 0
+                } else {
+                    stableCount += 1
+                }
+
+                if stableCount >= Self.stabilizationChecks {
+                    await postNotification()
+                    break
+                }
             }
+
+            await resetPollingState()
         }
     }
 
-    private func postNotification() async throws {
+    private func resetPollingState() {
+        isPolling = false
+    }
+
+    private func postNotification() async {
         guard let previousContents else { return }
 
-        let newContents = contents(of: url)
+        let newContents = Self.contentsOfDirectory(at: url)
 
         let newElements = newContents.subtracting(previousContents)
         let deletedElements = previousContents.subtracting(newContents)
@@ -193,13 +196,13 @@ extension DirectoryObserver: Equatable {
 }
 
 extension DirectoryObserver: Hashable {
-    public func hash(into hasher: inout Hasher) {
+    nonisolated public func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
 }
 
 extension DirectoryObserver: CustomStringConvertible {
-    public var description: String {
+    nonisolated public var description: String {
         "DirectoryObserver(url: \"\(url.path)\")"
     }
 }

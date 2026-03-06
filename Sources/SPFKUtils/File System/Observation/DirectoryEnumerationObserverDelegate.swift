@@ -1,4 +1,5 @@
-// Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/SPFK
+// Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
+
 import Foundation
 
 public protocol DirectoryEnumerationObserverDelegate: AnyObject, Sendable {
