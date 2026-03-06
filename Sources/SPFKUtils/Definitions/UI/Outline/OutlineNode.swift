@@ -87,15 +87,28 @@
         public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            title = try container.decode(String.self, forKey: .title)
-            isEditable = try container.decode(Bool.self, forKey: .isEditable)
-            children = try container.decode([OutlineNode].self, forKey: .children)
-            isExpanded = try container.decode(Bool.self, forKey: .isExpanded)
-            nodeIdentifier = try container.decode(NodeIdentifier.self, forKey: .nodeIdentifier)
+            // SwiftData may create an empty container for nil optional OutlineNode values.
+            // Use decodeIfPresent so individual fields tolerate missing keys, but throw when
+            // no keys are present at all so callers using try? correctly get nil.
+            let decodedTitle = try container.decodeIfPresent(String.self, forKey: .title)
+            let decodedNodeId = try container.decodeIfPresent(NodeIdentifier.self, forKey: .nodeIdentifier)
 
-            symbolName = try? container.decodeIfPresent(String.self, forKey: .symbolName)
-            sortIndex = try? container.decodeIfPresent(Int.self, forKey: .sortIndex)
-            hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
+            guard decodedTitle != nil || decodedNodeId != nil else {
+                throw DecodingError.valueNotFound(
+                    OutlineNode.self,
+                    .init(codingPath: container.codingPath, debugDescription: "Empty container for optional OutlineNode")
+                )
+            }
+
+            title = decodedTitle ?? ""
+            nodeIdentifier = decodedNodeId ?? NodeIdentifier(id: UUID())
+            isEditable = try container.decodeIfPresent(Bool.self, forKey: .isEditable) ?? true
+            children = try container.decodeIfPresent([OutlineNode].self, forKey: .children) ?? []
+            isExpanded = try container.decodeIfPresent(Bool.self, forKey: .isExpanded) ?? false
+
+            symbolName = try container.decodeIfPresent(String.self, forKey: .symbolName)
+            sortIndex = try container.decodeIfPresent(Int.self, forKey: .sortIndex)
+            hexColor = try container.decodeIfPresent(HexColor.self, forKey: .hexColor)
         }
 
         public func encode(to encoder: any Encoder) throws {
@@ -107,9 +120,9 @@
             try container.encode(isExpanded, forKey: .isExpanded)
             try container.encode(nodeIdentifier, forKey: .nodeIdentifier)
 
-            try? container.encodeIfPresent(symbolName, forKey: .symbolName)
-            try? container.encodeIfPresent(sortIndex, forKey: .sortIndex)
-            try? container.encodeIfPresent(hexColor, forKey: .hexColor)
+            try container.encodeIfPresent(symbolName, forKey: .symbolName)
+            try container.encodeIfPresent(sortIndex, forKey: .sortIndex)
+            try container.encodeIfPresent(hexColor, forKey: .hexColor)
         }
     }
 
