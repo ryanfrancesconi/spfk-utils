@@ -2,7 +2,7 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 
-A Swift utility library providing file system helpers, UI definitions, audio extensions, and Foundation/CoreGraphics conveniences for macOS and iOS development.
+A Swift utility library providing UI definitions, audio extensions, and Foundation/CoreGraphics conveniences for macOS and iOS development.
 
 ## Platforms
 
@@ -11,14 +11,6 @@ A Swift utility library providing file system helpers, UI definitions, audio ext
 - Swift 6.2
 
 ## Modules
-
-### File System
-
-- **FileSystemUtilities** — Directory creation, file moving/copying, size calculation, and temporary file management.
-- **DirectoryObserver** — Monitor directories for changes using `DispatchSource` file system events.
-- **SecureURLRegistry** — An actor-based registry for managing security-scoped URL bookmarks.
-- **Finder Tags** — Read and write macOS Finder tags via extended attributes (`xattr`).
-- **Checksum** — File integrity verification using MD5/SHA checksums.
 
 ### Definitions
 
@@ -47,7 +39,7 @@ Categorized extensions across Foundation, AppKit, CoreGraphics, and Audio framew
 
 | Category | Highlights |
 |---|---|
-| **Foundation** | `String` (padding, truncation, data conversion), `URL` (parent detection, query parameters, bookmark management), `Dictionary` (merging, key mapping), `TimeInterval` (mach time conversion), `UUID` (zero constants), `NumberFormatter`, `ByteCount` |
+| **Foundation** | `String` (padding, truncation, data conversion), `URL` (parent detection, query parameters, bookmark management), `Dictionary` (merging, key mapping), `TimeInterval` (mach time conversion), `UUID` (zero constants), `NumberFormatter` |
 | **AppKit** | `NSView` (Auto Layout constraint helpers), `NSImage` (resizing, tinting), `NSWindow` (positioning), `NSEdgeInsets` (convenience inits) |
 | **CoreGraphics** | `CGImage` (scaling), `CGRect` (square fitting), `CGSize` (equality init), `CGColor` (hex conversion) |
 | **Audio** | `AUValue` (dB/linear conversion, normalization), `AVAudioTime` (host time utilities) |
@@ -62,9 +54,9 @@ Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) l
 | Package | Description |
 |---|---|
 | [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions |
+| [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
 | [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
 | [Checksum](https://github.com/rnine/Checksum) | File checksum utilities |
-| [swift-xattr](https://github.com/jozefizso/swift-xattr) | Extended file attribute access |
 
 ## About
 
