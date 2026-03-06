@@ -1,3 +1,5 @@
+// Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
+
 import Foundation
 
 /// Scale the domain to the range. The advantage is that you can flip signs to your target range

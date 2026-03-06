@@ -4,11 +4,10 @@
 
 A Swift utility library providing UI definitions, audio extensions, and Foundation/CoreGraphics conveniences for macOS and iOS development.
 
-## Platforms
+## Requirements
 
-- macOS 12+
-- iOS 15+
-- Swift 6.2
+- **Platforms:** macOS 13+, iOS 16+
+- **Swift:** 6.2+
 
 ## Modules
 
