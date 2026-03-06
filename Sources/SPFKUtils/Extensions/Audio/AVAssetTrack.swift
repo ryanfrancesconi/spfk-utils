@@ -9,21 +9,21 @@ extension AVAssetTrack {
     }
 
     public var mediaFormats: [SimpleMediaFormat] {
-        var formats = [SimpleMediaFormat]()
+        get async throws {
+            var formats = [SimpleMediaFormat]()
 
-        guard let descriptions = formatDescriptions as? [CMFormatDescription] else { return [] }
+            let descriptions = try await load(.formatDescriptions)
 
-        for (_, formatDesc) in descriptions.enumerated() {
-            // Get String representation of media type (vide, soun, sbtl, etc.)
-            let type = CMFormatDescriptionGetMediaType(formatDesc).fourCC
+            for formatDesc in descriptions {
+                // Get String representation of media type (vide, soun, sbtl, etc.)
+                let type = CMFormatDescriptionGetMediaType(formatDesc).fourCC
 
-            // Get String representation media subtype (avc1, aac, tx3g, etc.)
-            let subType = CMFormatDescriptionGetMediaSubType(formatDesc).fourCC
+                // Get String representation media subtype (avc1, aac, tx3g, etc.)
+                let subType = CMFormatDescriptionGetMediaSubType(formatDesc).fourCC
 
-            // Format string as type/subType
-
-            formats.append(SimpleMediaFormat(type: type, subType: subType))
+                formats.append(SimpleMediaFormat(type: type, subType: subType))
+            }
+            return formats
         }
-        return formats
     }
 }
