@@ -1,6 +1,7 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 import Foundation
+import SwiftExtensions
 
 // swiftformat:disable consecutiveSpaces
 
@@ -13,11 +14,11 @@ import Foundation
 public enum ByteCount: UInt64 {
     case byte     = 1
     case kilobyte = 1024
-    case megabyte = 1048576
-    case gigabyte = 1073741824
-    case terabyte = 1099511627776
-    case petabyte = 1125899906842624
-    case exabyte  = 1152921504606846976
+    case megabyte = 1_048_576
+    case gigabyte = 1_073_741_824
+    case terabyte = 1_099_511_627_776
+    case petabyte = 1_125_899_906_842_624
+    case exabyte  = 1_152_921_504_606_846_976
 
     // MARK: - Formatting
 
