@@ -23,6 +23,7 @@
         public var sortIndex: Int?
 
         public var isLeaf: Bool { nodeIdentifier.parentId != nil && children.isEmpty }
+        public var hasChildren: Bool { children.isNotEmpty }
         public var id: UUID { nodeIdentifier.id }
         public var parentId: UUID? { nodeIdentifier.parentId }
 
