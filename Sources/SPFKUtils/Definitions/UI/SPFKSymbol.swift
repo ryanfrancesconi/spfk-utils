@@ -24,6 +24,7 @@
         case copy = "document.on.document"
         case cut = "scissors"
         case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
+        case dragHandle = "line.3.horizontal"
         case duplicate = "plus.square.on.square"
         case editor = "waveform.path.ecg.rectangle.fill"
         case ellipsis
