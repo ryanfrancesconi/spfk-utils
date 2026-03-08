@@ -51,6 +51,7 @@
         case lock
         case lockSquareStack = "lock.square.stack"
         case loop = "repeat"
+        case macwindow
         case magnifyingGlass = "magnifyingglass"
         case minus
         case minusDiamond = "minus.diamond"
@@ -68,6 +69,7 @@
         case playSquareStack = "play.square.stack"
         case plus
         case plusDiamond = "plus.diamond"
+        case power
         case quarterNote = "music.quarternote.3"
         case quit = "xmark.rectangle"
         case redo = "arrow.uturn.forward"
