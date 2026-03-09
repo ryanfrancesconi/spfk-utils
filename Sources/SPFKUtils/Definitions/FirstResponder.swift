@@ -6,6 +6,9 @@
     /// Generates first responder actions to assist with building main application menus programatically.
     ///
     /// `FirstResponder.send(action: .showHelp)`
+    ///
+    /// Reference for first responder actions in NSResponder
+    /// @MainActor public protocol NSStandardKeyBindingResponding : NSObjectProtocol {
     public class FirstResponder {
         /// A subset of general responder actions which are handled by this class
         public enum Action: Equatable, Sendable {
@@ -24,8 +27,8 @@
             case delete
             case selectAll
             case deselectAll
-            case selectPrevious
-            case selectNext
+            case moveUp
+            case moveDown
             case moveLeft
             case moveLeftAndModifySelection
             case moveRight
@@ -68,10 +71,10 @@
                 send(selector: #selector(selectAll(_:)))
             case .deselectAll:
                 send(selector: #selector(deselectAll(_:)))
-            case .selectPrevious:
-                send(selector: #selector(selectPrevious(_:)))
-            case .selectNext:
-                send(selector: #selector(selectNext(_:)))
+            case .moveUp:
+                send(selector: #selector(moveUp(_:)))
+            case .moveDown:
+                send(selector: #selector(moveDown(_:)))
             case .moveLeft:
                 send(selector: #selector(moveLeft(_:)))
             case .moveLeftAndModifySelection:
@@ -131,14 +134,14 @@
 
         @objc fileprivate static func selectAll(_ sender: Any) {}
         @objc fileprivate static func deselectAll(_ sender: Any) {}
-        @objc fileprivate static func selectPrevious(_ sender: Any) {}
-        @objc fileprivate static func selectNext(_ sender: Any) {}
+        @objc fileprivate static func moveUp(_ sender: Any) {}
+        @objc fileprivate static func moveDown(_ sender: Any) {}
 
         // MARK: - Text or Arrow Keys
 
         @objc fileprivate static func moveLeft(_ sender: Any) {} // Left Arrow
-        @objc fileprivate static func moveLeftAndModifySelection(_ sender: Any) {} // Shift Left
         @objc fileprivate static func moveRight(_ sender: Any) {} // Right Arrow
+        @objc fileprivate static func moveLeftAndModifySelection(_ sender: Any) {} // Shift Left
         @objc fileprivate static func moveRightAndModifySelection(_ sender: Any) {} // Shift Right
 
         // MARK: - View
