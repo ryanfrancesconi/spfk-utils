@@ -71,6 +71,7 @@ public struct BundleProperties: Sendable {
 extension BundleProperties {
     /// Return this application's default Caches directory based on the `bundleIdentifier`.
     /// IE: /Users/[USERNAME]/Library/Caches/[BUNDLE ID]
+    ///
     /// or if it is sandboxed:
     /// /Users/[USERNAME]/Library/Containers/[BUNDLE ID]/Data/Library/Caches/[BUNDLE ID]
     ///
@@ -80,7 +81,8 @@ extension BundleProperties {
               let cachesDirectory = FileManager.default.urls(
                   for: .cachesDirectory,
                   in: .userDomainMask
-              ).first else {
+              ).first
+        else {
             return nil
         }
 
