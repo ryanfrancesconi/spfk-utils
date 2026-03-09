@@ -19,10 +19,10 @@
                 location: windowLocation,
                 modifierFlags: event?.modifierFlags ?? [],
                 timestamp: event?.timestamp ?? 0,
-                windowNumber: event?.windowNumber ??  NSApp.mainWindow?.windowNumber ?? 0,
+                windowNumber: event?.windowNumber ?? window?.windowNumber ?? 0,
                 context: nil,
                 eventNumber: event?.eventNumber ?? NSApp.currentEvent?.eventNumber ?? 0,
-                clickCount: 1,
+                clickCount: event?.clickCount ?? 1,
                 pressure: 0
             ) else {
                 return
