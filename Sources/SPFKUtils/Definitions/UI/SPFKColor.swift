@@ -13,16 +13,12 @@
         case controlAlphaBackgroundColor
         case controlBackgroundColor
         case controlDarkBackgroundColor
+        case defaultWaveformColor
         case gridBackgroundColor
         case gridColor
         case secondaryLabelColor
         case selectedTextColor
         case textColor
-        case defaultWaveformColor
-
-        private static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
-        private static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
-        private static let alphaOrange = Self.xcPreprocessor.withAlphaComponent(0.75)
 
         public func value(for scheme: SPFKColorScheme) -> NSColor {
             switch self {
@@ -31,12 +27,12 @@
             case .controlAlphaBackgroundColor:  scheme == .dark ? Self.alphaWhite06 : Self.alphaBlack02
             case .controlBackgroundColor:       scheme == .dark ? #colorLiteral(red: 0.2728477716, green: 0.2728477716, blue: 0.2728477716, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
             case .controlDarkBackgroundColor:   scheme == .dark ? #colorLiteral(red: 0.1600990295, green: 0.1600990295, blue: 0.1600990295, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
+            case .defaultWaveformColor:         scheme == .dark ? Self.xcPreprocessor : Self.xcPreprocessor
             case .gridBackgroundColor:          scheme == .dark ? #colorLiteral(red: 0.1949233711, green: 0.1949233711, blue: 0.1949233711, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
             case .gridColor:                    scheme == .dark ? #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1) : #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .secondaryLabelColor:          scheme == .dark ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5490196078) : #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5490196078)
             case .selectedTextColor:            scheme == .dark ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1) : #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .textColor:                    scheme == .dark ? #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1) : #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
-            case .defaultWaveformColor:         scheme == .dark ? Self.xcPreprocessor : Self.xcPreprocessor
             }
         }
 
@@ -44,6 +40,8 @@
             HexColor(nsColor: value(for: scheme))
         }
     }
+
+    // MARK: Dark Mode Code Colors
 
     extension SPFKColor {
         public static let xcAttribute =     #colorLiteral(red: 0.7238948941, green: 0.5747394562, blue: 0.4295355082, alpha: 1)
@@ -57,6 +55,20 @@
         public static let xcString =        #colorLiteral(red: 0.7784311771, green: 0.5900088549, blue: 0.5077829957, alpha: 1)
         public static let xcType =          #colorLiteral(red: 0.496894896, green: 0.8131126761, blue: 0.9852605462, alpha: 1)
         public static let xcURL =           #colorLiteral(red: 0.4614251852, green: 0.6554939747, blue: 0.9696692824, alpha: 1)
+    }
+
+    // MARK: Some static defaults
+
+    extension SPFKColor {
+        public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
+        public static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
+        public static let alphaOrange = Self.xcPreprocessor.withAlphaComponent(0.75)
+        public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.6)
+
+        public static let defaultControlSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark).withAlphaComponent(0.3)
+        public static let defaultControlUnselected = alphaWhite06
+        public static let defaultControlStrokeSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark)
+        public static let defaultControlStrokeUnselected = SPFKColor.textColor.value(for: .dark)
     }
 
     // swiftformat:enable consecutiveSpaces
