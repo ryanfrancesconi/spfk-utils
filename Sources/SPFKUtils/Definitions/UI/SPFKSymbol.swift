@@ -12,6 +12,7 @@
     /// SPFKSymbol.plusDiamond.tinted(color: .white)
     ///
     public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
+        case audioUnit = "dot.radiowaves.left.and.right"
         case bookmark
         case cCircle = "c.circle"
         case cCircleFill = "c.circle.fill"
