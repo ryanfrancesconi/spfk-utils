@@ -5,6 +5,7 @@ import AudioToolbox
 import Foundation
 import SPFKAudioBase
 
+/// Descriptor for audio effect components (manufacturer, type, subtype).
 public struct AudioEffectDescription: Equatable {
     public static func == (
         lhs: AudioEffectDescription,
