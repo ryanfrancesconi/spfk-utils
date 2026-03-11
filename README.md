@@ -18,7 +18,6 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 - **Counter** — Simple incrementing counter with reset support.
 - **ProgressTracker / ChunkedProgressTracker** — Track completion progress as a normalized value, with optional chunked progress for parallel operations.
 - **URLProperties** — Structured metadata container for URL-associated properties.
-- **AudioEffectDescription** — Descriptor for audio effect components (manufacturer, type, subtype).
 - **BundleProperties** — Typed access to common `Bundle.main` info dictionary values.
 - **HardwareInfo** — System hardware queries (model identifier, machine name).
 - **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
