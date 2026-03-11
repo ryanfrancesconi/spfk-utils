@@ -65,6 +65,7 @@
         case pause = "stop.fill"
         case performMiniaturize = "minus.rectangle"
         case performZoom = "square.arrowtriangle.4.outward"
+        case person
         case play
         case playFill = "play.fill"
         case playlist = "music.note.list"
@@ -88,6 +89,8 @@
         case settings = "gear"
         case shield
         case showAll = "rectangle.on.rectangle"
+        case sliderHorizontal = "slider.horizontal.3"
+        case sliderVertical = "slider.vertical.3"
         case sort = "arrow.up.arrow.down"
         case squareStack = "square.stack.3d.up"
         case tablecells
