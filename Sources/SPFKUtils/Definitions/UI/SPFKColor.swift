@@ -23,7 +23,7 @@
         public func value(for scheme: SPFKColorScheme) -> NSColor {
             switch self {
             case .controlAccentColor:           scheme == .dark ? Self.xcRegEx : Self.xcRegEx
-            case .controlActiveBackgroundColor: scheme == .dark ? Self.alphaOrange : Self.alphaOrange
+            case .controlActiveBackgroundColor: scheme == .dark ? Self.defaultControlSelected : Self.defaultControlSelected
             case .controlAlphaBackgroundColor:  scheme == .dark ? Self.alphaWhite06 : Self.alphaBlack02
             case .controlBackgroundColor:       scheme == .dark ? #colorLiteral(red: 0.2728477716, green: 0.2728477716, blue: 0.2728477716, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
             case .controlDarkBackgroundColor:   scheme == .dark ? #colorLiteral(red: 0.1600990295, green: 0.1600990295, blue: 0.1600990295, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
@@ -62,10 +62,9 @@
     extension SPFKColor {
         public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
         public static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
-        public static let alphaOrange = Self.xcPreprocessor.withAlphaComponent(0.75)
         public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.6)
 
-        public static let defaultControlSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark).withAlphaComponent(0.3)
+        public static let defaultControlSelected = Self.xcPreprocessor.withAlphaComponent(0.3)
         public static let defaultControlUnselected = alphaWhite06
         public static let defaultControlStrokeSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark)
         public static let defaultControlStrokeUnselected = SPFKColor.textColor.value(for: .dark)

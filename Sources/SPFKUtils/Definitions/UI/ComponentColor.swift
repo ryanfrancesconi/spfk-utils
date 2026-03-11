@@ -27,8 +27,8 @@
             )
 
             collection[.stroke] = SelectedColor(
-                selected: .controlAccentColor,
-                unselected: .controlColor
+                selected: SPFKColor.controlAccentColor.value(for: .dark),
+                unselected: SPFKColor.controlAlphaBackgroundColor.value(for: .dark)
             )
 
             return collection
