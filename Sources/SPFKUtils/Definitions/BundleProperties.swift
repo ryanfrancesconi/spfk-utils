@@ -16,7 +16,7 @@ public struct BundleProperties: Sendable {
         return string + " \(Log.buildConfig)"
     }
 
-    public var appName: String? = Bundle.main.infoDictionary?["CFBundleName"] as? String
+    public var appName: String? = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
     public var appVersionBuild: String? = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
     public var appCopyright: String? = Bundle.main.infoDictionary?["NSHumanReadableCopyright"] as? String
     public var appCopyrightShort: String? = Bundle.main.infoDictionary?["ShortCopyright"] as? String
@@ -60,10 +60,9 @@ public struct BundleProperties: Sendable {
         return info
     }
 
-    // String for the About / Splash Window
+    /// String for the About / Splash Window
     public var systemDescription: String {
         appVersionAndCopyright +
-            "\n" +
             HardwareInfo.description
     }
 }
