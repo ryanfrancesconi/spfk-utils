@@ -109,7 +109,7 @@
 
             symbolName = try container.decodeIfPresent(String.self, forKey: .symbolName)
             sortIndex = try container.decodeIfPresent(Int.self, forKey: .sortIndex)
-            hexColor = try container.decodeIfPresent(HexColor.self, forKey: .hexColor)
+            hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
         }
 
         public func encode(to encoder: any Encoder) throws {

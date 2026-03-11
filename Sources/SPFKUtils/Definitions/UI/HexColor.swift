@@ -58,13 +58,20 @@ extension HexColor: Codable {
         case stringValue
     }
 
+    /// SwiftData may create empty containers for nil optional composite types.
+    /// Throw when the key is missing so callers using try? get nil.
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let value = try? container.decodeIfPresent(String.self, forKey: .stringValue) {
-            stringValue = value
-            parse()
+        guard let value = try container.decodeIfPresent(String.self, forKey: .stringValue) else {
+            throw DecodingError.valueNotFound(
+                HexColor.self,
+                .init(codingPath: container.codingPath, debugDescription: "Empty container for optional HexColor")
+            )
         }
+
+        stringValue = value
+        parse()
     }
 
     public func encode(to encoder: Encoder) throws {
