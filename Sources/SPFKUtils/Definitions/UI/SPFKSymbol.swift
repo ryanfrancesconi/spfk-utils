@@ -31,6 +31,8 @@
         case ellipsis
         case eraser
         case eraserLineDashed = "eraser.line.dashed"
+        case export = "square.and.arrow.up"
+        case exportMultiple = "square.and.arrow.up.on.square"
         case eye
         case eyeSlash = "eye.slash"
         case fill = "inset.filled.rectangle"
@@ -95,12 +97,12 @@
         case squareStack = "square.stack.3d.up"
         case tablecells
         case tablecellsFill = "tablecells.fill"
-        
+
         case tag
         case tagFill = "tag.fill"
         case tagSlash = "tag.slash"
         case tagSlashFill = "tag.slash.fill"
-        
+
         case textSparkle = "character.textbox.badge.sparkles"
         case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
         case trash
