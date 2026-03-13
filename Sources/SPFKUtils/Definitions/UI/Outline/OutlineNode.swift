@@ -4,6 +4,7 @@
 
     import AppKit
     import Foundation
+    import SPFKBase
 
     /// Data structure for tree structures
     public struct OutlineNode: Equatable, Sendable, Hashable {

@@ -2,6 +2,7 @@
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
+    import SPFKBase
 
     extension NSWindow {
         public var titlebarHeight: CGFloat {

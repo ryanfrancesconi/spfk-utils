@@ -1,6 +1,7 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 import Foundation
+import SPFKBase
 
 /// Tracks a collection of items based on index/total
 public actor ProgressTracker {

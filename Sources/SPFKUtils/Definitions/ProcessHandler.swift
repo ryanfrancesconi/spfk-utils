@@ -2,6 +2,7 @@
 
 #if os(macOS)
     import Foundation
+    import SPFKBase
 
     public class ProcessHandler {
         public var process = Process()

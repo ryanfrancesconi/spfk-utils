@@ -2,6 +2,7 @@
 
 import Foundation
 import QuartzCore
+import SPFKBase
 
 extension CALayer {
     @objc
@@ -36,7 +37,7 @@ extension CALayer {
     }
 
     public func centerInSuperlayer() {
-        guard let superlayer = superlayer else { return }
+        guard let superlayer else { return }
 
         frame.origin = CGPoint(
             x: (superlayer.frame.width / 2) - (frame.width / 2),
@@ -45,7 +46,7 @@ extension CALayer {
     }
 
     public func centerVerticalInSuperlayer() {
-        guard let superlayer = superlayer else { return }
+        guard let superlayer else { return }
 
         frame.origin = CGPoint(
             x: frame.origin.x,
@@ -54,7 +55,7 @@ extension CALayer {
     }
 
     public func centerHorizontalInSuperlayer(allowSubpixelValues: Bool = false) {
-        guard let superlayer = superlayer else { return }
+        guard let superlayer else { return }
 
         let value = CGPoint(
             x: (superlayer.frame.width / 2) - (frame.width / 2),
@@ -121,7 +122,8 @@ extension CALayer {
                 bitsPerPixel: 32
             ),
 
-                let context = NSGraphicsContext(bitmapImageRep: imageRep) else {
+                let context = NSGraphicsContext(bitmapImageRep: imageRep)
+            else {
                 Log.error("Failed to make context")
                 return nil
             }

@@ -2,6 +2,7 @@
 
 #if os(macOS)
     import Foundation
+    import SPFKFileSystem
 
     public struct URLProperties: Hashable, Sendable {
         public private(set) var url: URL

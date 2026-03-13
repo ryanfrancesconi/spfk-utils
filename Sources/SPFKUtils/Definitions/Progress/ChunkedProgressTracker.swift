@@ -1,6 +1,7 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 import Foundation
+import SPFKBase
 
 /// Track the progress of 'chunklength' items by summing an array of values to one
 public actor ChunkedProgressTracker {

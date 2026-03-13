@@ -3,6 +3,7 @@
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
     import CoreGraphics
+    import SPFKBase
 
     extension CGMutablePath {
         /// Safely create round rect checking that the rect is big enough to support the cornerRadius

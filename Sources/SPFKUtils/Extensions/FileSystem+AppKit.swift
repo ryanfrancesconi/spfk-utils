@@ -2,6 +2,8 @@
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
+    import SPFKBase
+    import SPFKFileSystem
 
     extension FileSystem {
         @MainActor

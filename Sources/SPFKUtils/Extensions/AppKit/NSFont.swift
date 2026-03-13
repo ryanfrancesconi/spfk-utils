@@ -2,6 +2,7 @@
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
     import AppKit
+    import SPFKBase
 
     extension NSFont {
         public var fontHeight: CGFloat {
