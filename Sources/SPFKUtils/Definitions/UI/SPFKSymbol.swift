@@ -22,6 +22,7 @@
         case chevronLeft = "chevron.left"
         case chevronRight = "chevron.right"
         case chevronUp = "chevron.up"
+        case clock
         case copy = "document.on.document"
         case cut = "scissors"
         case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
@@ -68,6 +69,7 @@
         case performMiniaturize = "minus.rectangle"
         case performZoom = "square.arrowtriangle.4.outward"
         case person
+        case piano = "pianokeys.inverse"
         case play
         case playFill = "play.fill"
         case playlist = "music.note.list"
@@ -94,6 +96,8 @@
         case sliderHorizontal = "slider.horizontal.3"
         case sliderVertical = "slider.vertical.3"
         case sort = "arrow.up.arrow.down"
+        case speakerWave3 = "speaker.wave.3"
+        case stopwatch
         case squareStack = "square.stack.3d.up"
         case tablecells
         case tablecellsFill = "tablecells.fill"
@@ -106,6 +110,7 @@
         case textSparkle = "character.textbox.badge.sparkles"
         case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
         case trash
+        case triangle
         case undo = "arrow.uturn.backward"
         case warning = "exclamationmark.triangle"
         case warningCircle = "exclamationmark.circle"

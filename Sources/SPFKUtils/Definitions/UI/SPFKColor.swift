@@ -22,7 +22,7 @@
 
         public func value(for scheme: SPFKColorScheme) -> NSColor {
             switch self {
-            case .controlAccentColor:           scheme == .dark ? Self.xcRegEx : Self.xcRegEx
+            case .controlAccentColor:           scheme == .dark ? Self.xcPreprocessor : Self.xcPreprocessor
             case .controlActiveBackgroundColor: scheme == .dark ? Self.defaultControlSelected : Self.defaultControlSelected
             case .controlAlphaBackgroundColor:  scheme == .dark ? Self.alphaWhite06 : Self.alphaBlack02
             case .controlBackgroundColor:       scheme == .dark ? #colorLiteral(red: 0.2728477716, green: 0.2728477716, blue: 0.2728477716, alpha: 1) : #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974402547, alpha: 1)
