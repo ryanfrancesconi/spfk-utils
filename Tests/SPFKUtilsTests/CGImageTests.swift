@@ -4,6 +4,7 @@
     import AppKit
     import CoreGraphics
     import Foundation
+import SPFKBase
     import SPFKTesting
     import Testing
     import UniformTypeIdentifiers

@@ -4,6 +4,7 @@
     import AppKit
     import Foundation
     import Numerics
+import SPFKBase
     import SPFKTesting
     import Testing
 

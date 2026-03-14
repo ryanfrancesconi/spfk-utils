@@ -3,6 +3,8 @@
 import AudioToolbox
 import CoreGraphics
 import Foundation
+import SPFKAudioBase
+import SPFKBase
 import SPFKUtils
 import Testing
 
@@ -166,7 +168,7 @@ final class AUValueTests {
     @Test func dBValueHalf() {
         let value: AUValue = 0.5
         // 20 * log10(0.5) ≈ -6.02
-        #expect(abs(value.dBValue - (-6.0206)) < 0.01)
+        #expect(abs(value.dBValue - -6.0206) < 0.01)
     }
 
     @Test func linearValueFromZeroDB() {
@@ -406,23 +408,24 @@ final class ByteCountTests {
 }
 
 #if os(macOS)
-// MARK: - NSEdgeInsets
 
-import Foundation
+    // MARK: - NSEdgeInsets
 
-final class NSEdgeInsetsTests {
-    @Test func equalInit() {
-        let insets = NSEdgeInsets(equal: 10)
-        #expect(insets.top == 10)
-        #expect(insets.left == 10)
-        #expect(insets.bottom == 10)
-        #expect(insets.right == 10)
+    import Foundation
+
+    final class NSEdgeInsetsTests {
+        @Test func equalInit() {
+            let insets = NSEdgeInsets(equal: 10)
+            #expect(insets.top == 10)
+            #expect(insets.left == 10)
+            #expect(insets.bottom == 10)
+            #expect(insets.right == 10)
+        }
+
+        @Test func zeroInit() {
+            let insets = NSEdgeInsets(equal: 0)
+            #expect(insets.top == 0)
+            #expect(insets.left == 0)
+        }
     }
-
-    @Test func zeroInit() {
-        let insets = NSEdgeInsets(equal: 0)
-        #expect(insets.top == 0)
-        #expect(insets.left == 0)
-    }
-}
 #endif

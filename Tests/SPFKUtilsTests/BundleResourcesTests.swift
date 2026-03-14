@@ -2,6 +2,7 @@
 
 #if os(macOS)
     import Foundation
+import SPFKBase
     import SPFKTesting
     import SPFKUtils
     import Testing

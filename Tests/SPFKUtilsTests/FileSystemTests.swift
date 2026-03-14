@@ -3,6 +3,7 @@
 #if os(macOS)
     import Checksum
     import Foundation
+import SPFKBase
     import SPFKTesting
     import SPFKUtils
     import Testing
