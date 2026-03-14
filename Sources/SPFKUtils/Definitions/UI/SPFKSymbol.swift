@@ -86,6 +86,7 @@
         case rewindAllFill = "backward.end.fill"
         case rewindFill = "backward.fill"
         case save = "square.and.arrow.down"
+        case saveMultiple = "square.and.arrow.down.on.square"
         case searchSparkle = "sparkle.magnifyingglass"
         case selectAll = "character.textbox"
         case selectNext = "arrowtriangle.down.fill"
