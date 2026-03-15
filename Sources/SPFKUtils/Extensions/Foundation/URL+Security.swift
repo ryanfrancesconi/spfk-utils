@@ -11,7 +11,7 @@ extension URL {
     }
 }
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+#if os(macOS)
     import AppKit
 
     extension URL {

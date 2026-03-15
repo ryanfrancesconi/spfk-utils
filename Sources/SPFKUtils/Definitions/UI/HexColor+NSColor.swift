@@ -1,20 +1,21 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+#if os(macOS)
     import AppKit
 
     extension HexColor {
         public var nsColor: NSColor? {
-            NSColor.from(hexColor: self)
+            NSColor(cgColor: cgColor)
         }
 
         public init?(nsColor: NSColor) {
-            guard let string = nsColor.toHex() else {
-                return nil
-            }
-
-            stringValue = string.trimmed
-            parse()
+            guard let rgb = nsColor.usingColorSpace(.sRGB) else { return nil }
+            self.init(
+                red: rgb.redComponent,
+                green: rgb.greenComponent,
+                blue: rgb.blueComponent,
+                alpha: rgb.alphaComponent
+            )
         }
     }
 #endif

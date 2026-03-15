@@ -3,36 +3,84 @@
 import CoreGraphics
 import Foundation
 
+/// A lightweight, Codable color type that serializes as an 8-character RGBA hex string (e.g. `"FF000080"`).
+///
+/// `HexColor` is designed for persistent storage via `Codable` and SwiftData. It stores normalized
+/// RGBA components and bridges to `CGColor` directly, with optional `NSColor` conversion on macOS.
+/// Equality and hashing are based solely on `stringValue`, ensuring consistent behavior across
+/// construction paths.
 public struct HexColor: Hashable, Sendable, Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.stringValue == rhs.stringValue
     }
 
-    public internal(set) var stringValue: String = "FFFFFFFF"
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(stringValue)
+    }
+
+    /// Always 8-character RGBA hex string (e.g. "FF0000FF").
+    public private(set) var stringValue: String = "FFFFFFFF"
 
     public private(set) var red: CGFloat = 1
     public private(set) var green: CGFloat = 1
     public private(set) var blue: CGFloat = 1
     public private(set) var alpha: CGFloat = 1
 
-    public var cgColor: CGColor? {
-        CGColor(red: red, green: green, blue: blue, alpha: alpha)
+    /// Returns the 6-character RGB hex string without alpha (e.g. "FF0000").
+    public var rgbStringValue: String {
+        String(stringValue.prefix(6))
     }
 
-    public init(string: String) {
+    public private(set) var cgColor: CGColor = Self.makeCGColor(1, 1, 1, 1)
+
+    // MARK: - Initializers
+
+    /// Create from a hex string. Accepts 6-char RGB or 8-char RGBA, with or without `#` prefix.
+    /// Returns `nil` if the string is not a valid hex color.
+    public init?(string: String) {
         stringValue = string.trimmed
-        parse()
+        guard parse() else { return nil }
     }
 
-    mutating func parse() {
-        let string = stringValue.replacingOccurrences(of: "#", with: "")
+    /// Create from RGBA component values (0-1 range, clamped).
+    public init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat = 1) {
+        self.red = min(max(red, 0), 1)
+        self.green = min(max(green, 0), 1)
+        self.blue = min(max(blue, 0), 1)
+        self.alpha = min(max(alpha, 0), 1)
+        stringValue = Self.formatRGBA(self.red, self.green, self.blue, self.alpha)
+        cgColor = Self.makeCGColor(self.red, self.green, self.blue, self.alpha)
+    }
 
-        let scanner = Scanner(string: string)
+    // MARK: - Private
 
-        var hexNumber: UInt64 = 0
-        guard scanner.scanHexInt64(&hexNumber) else { return }
+    private static let sRGBColorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
 
-        // alpha channel, FF000080
+    private static func makeCGColor(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat) -> CGColor {
+        CGColor(colorSpace: sRGBColorSpace, components: [r, g, b, a])!
+    }
+
+    private static func formatRGBA(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat) -> String {
+        String(
+            format: "%02lX%02lX%02lX%02lX",
+            lroundf(Float(r) * 255),
+            lroundf(Float(g) * 255),
+            lroundf(Float(b) * 255),
+            lroundf(Float(a) * 255)
+        )
+    }
+
+    /// Returns `true` if parsing succeeded.
+    @discardableResult
+    private mutating func parse() -> Bool {
+        var string = stringValue
+        if string.hasPrefix("#") { string = String(string.dropFirst()) }
+
+        guard let hexNumber = UInt64(string, radix: 16) else {
+            return false
+        }
+
+        // 8-char RGBA: FF000080
         if string.count == 8 {
             red = CGFloat((hexNumber & 0xFF00_0000) >> 24) / 255.0
             green = CGFloat((hexNumber & 0x00FF_0000) >> 16) / 255.0
@@ -41,17 +89,24 @@ public struct HexColor: Hashable, Sendable, Equatable {
 
             alpha = alpha.rounded(decimalPlaces: 2)
 
-            // FF0000
+            // 6-char RGB: FF0000
         } else if string.count == 6 {
             red = CGFloat((hexNumber & 0xFF0000) >> 16) / 255.0
             green = CGFloat((hexNumber & 0x00FF00) >> 8) / 255.0
             blue = CGFloat((hexNumber & 0x0000FF) >> 0) / 255.0
 
         } else {
-            assertionFailure("invalid string \(string)")
+            return false
         }
+
+        // Always normalize to 8-character RGBA format
+        stringValue = Self.formatRGBA(red, green, blue, alpha)
+        cgColor = Self.makeCGColor(red, green, blue, alpha)
+        return true
     }
 }
+
+// MARK: - Codable
 
 extension HexColor: Codable {
     enum CodingKeys: String, CodingKey {
@@ -71,7 +126,12 @@ extension HexColor: Codable {
         }
 
         stringValue = value
-        parse()
+
+        guard parse() else {
+            throw DecodingError.dataCorrupted(
+                .init(codingPath: container.codingPath, debugDescription: "Invalid hex color string: \(value)")
+            )
+        }
     }
 
     public func encode(to encoder: Encoder) throws {

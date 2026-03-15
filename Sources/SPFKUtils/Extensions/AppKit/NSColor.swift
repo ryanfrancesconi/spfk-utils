@@ -1,6 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+#if os(macOS)
     import AppKit
 
     extension NSColor {
@@ -46,8 +46,7 @@
         }
 
         public static func from(hexColor: HexColor) -> NSColor? {
-            guard let cgColor = hexColor.cgColor else { return nil }
-            return NSColor(cgColor: cgColor)
+            NSColor(cgColor: hexColor.cgColor)
         }
 
         public func toHex(alpha: Bool = true) -> String? {

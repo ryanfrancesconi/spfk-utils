@@ -1,6 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+#if os(macOS)
     import AppKit
 
     /// Generates first responder actions to assist with building main application menus programatically.
