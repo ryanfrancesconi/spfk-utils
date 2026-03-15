@@ -31,7 +31,11 @@ public struct HexColor: Hashable, Sendable, Equatable {
         String(stringValue.prefix(6))
     }
 
-    public private(set) var cgColor: CGColor = Self.makeCGColor(1, 1, 1, 1)
+    /// Computed from stored RGBA components. Not a stored property because SwiftData
+    /// introspects composite types at runtime and `CGColor` is not a supported type.
+    public var cgColor: CGColor {
+        Self.makeCGColor(red, green, blue, alpha)
+    }
 
     // MARK: - Initializers
 
@@ -49,7 +53,6 @@ public struct HexColor: Hashable, Sendable, Equatable {
         self.blue = min(max(blue, 0), 1)
         self.alpha = min(max(alpha, 0), 1)
         stringValue = Self.formatRGBA(self.red, self.green, self.blue, self.alpha)
-        cgColor = Self.makeCGColor(self.red, self.green, self.blue, self.alpha)
     }
 
     // MARK: - Private
@@ -101,7 +104,6 @@ public struct HexColor: Hashable, Sendable, Equatable {
 
         // Always normalize to 8-character RGBA format
         stringValue = Self.formatRGBA(red, green, blue, alpha)
-        cgColor = Self.makeCGColor(red, green, blue, alpha)
         return true
     }
 }
