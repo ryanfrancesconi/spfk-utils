@@ -28,7 +28,6 @@
         case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
         case dragHandle = "line.3.horizontal"
         case duplicate = "plus.square.on.square"
-        case editor = "waveform.path.ecg.rectangle.fill"
         case ellipsis
         case eraser
         case eraserLineDashed = "eraser.line.dashed"
@@ -102,12 +101,10 @@
         case squareStack = "square.stack.3d.up"
         case tablecells
         case tablecellsFill = "tablecells.fill"
-
         case tag
         case tagFill = "tag.fill"
         case tagSlash = "tag.slash"
         case tagSlashFill = "tag.slash.fill"
-
         case textSparkle = "character.textbox.badge.sparkles"
         case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
         case trash
@@ -117,7 +114,10 @@
         case warningCircle = "exclamationmark.circle"
         case warningCircleFill = "exclamationmark.circle.fill"
         case warningFill = "exclamationmark.triangle.fill"
+        case waveform = "waveform.path"
         case waveformSimple = "waveform.path.ecg"
+        case waveformMagnifyingGlass = "waveform.path.ecg.magnifyingglass"
+        case waveformRectangle = "waveform.path.ecg.rectangle"
         case xmark
 
         public var systemSymbolName: String { rawValue }
