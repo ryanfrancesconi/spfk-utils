@@ -37,6 +37,25 @@ extension CGImage {
         return context.makeImage()
     }
 
+    /// Compares the raw pixel data of two images.
+    ///
+    /// Returns `true` when both images have the same dimensions and their
+    /// `CGDataProvider` byte sequences are identical. Returns `false` if
+    /// dimensions differ or pixel data cannot be read from either image.
+    public func hasEqualPixelData(_ other: CGImage) -> Bool {
+        guard width == other.width, height == other.height else {
+            return false
+        }
+
+        guard let selfData = dataProvider?.data as Data?,
+              let otherData = other.dataProvider?.data as Data?
+        else {
+            return false
+        }
+
+        return selfData == otherData
+    }
+
     public static func create(from data: Data) throws -> CGImage {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
             throw NSError(description: "CGImageSourceCreateWithData failed to create source")

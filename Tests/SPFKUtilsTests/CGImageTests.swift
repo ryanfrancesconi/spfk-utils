@@ -33,6 +33,50 @@ import SPFKBase
             #expect(newImage.alphaInfo == originalImage.alphaInfo)
         }
 
+        /// Load the same JPEG twice from disk via NSImage and verify pixel data matches.
+        @Test func hasEqualPixelDataWithJPEGLoadedTwice() async throws {
+            let url = TestBundleResources.shared.sharksandwich
+
+            let first = try #require(NSImage(contentsOf: url)?.cgImage)
+            let second = try #require(NSImage(contentsOf: url)?.cgImage)
+
+            #expect(first.hasEqualPixelData(second))
+        }
+
+        /// JPEG re-encoded from memory should NOT match the original pixel data.
+        @Test func hasEqualPixelDataFailsAfterReEncoding() async throws {
+            let url = TestBundleResources.shared.sharksandwich
+
+            let original = try #require(NSImage(contentsOf: url)?.cgImage)
+            let jpegData = try #require(original.jpegRepresentation)
+            let reencoded = try #require(NSImage(data: jpegData)?.cgImage)
+
+            // Re-encoding introduces lossy compression artifacts
+            #expect(!original.hasEqualPixelData(reencoded))
+        }
+
+        /// Load a HEIC image twice and verify pixel data comparison works.
+        @Test func hasEqualPixelDataWithHEICLoadedTwice() async throws {
+            let url = URL(fileURLWithPath: "/Users/rf/Desktop/_picts/BirthdayPricess.HEIC")
+            guard FileManager.default.fileExists(atPath: url.path) else {
+                Issue.record("HEIC test file not found — skipping")
+                return
+            }
+
+            let first = try #require(NSImage(contentsOf: url)?.cgImage)
+            let second = try #require(NSImage(contentsOf: url)?.cgImage)
+
+            let firstData = first.dataProvider?.data as Data?
+            let secondData = second.dataProvider?.data as Data?
+
+            Log.debug("first: \(first.width)x\(first.height) bpc:\(first.bitsPerComponent) bpp:\(first.bitsPerPixel) bpr:\(first.bytesPerRow) alpha:\(first.alphaInfo.rawValue)")
+            Log.debug("second: \(second.width)x\(second.height) bpc:\(second.bitsPerComponent) bpp:\(second.bitsPerPixel) bpr:\(second.bytesPerRow) alpha:\(second.alphaInfo.rawValue)")
+            Log.debug("first data: \(firstData?.count ?? -1) bytes")
+            Log.debug("second data: \(secondData?.count ?? -1) bytes")
+
+            #expect(first.hasEqualPixelData(second))
+        }
+
         @Test func scale() async throws {
             deleteBinOnExit = false
             let nsImage = try #require(TestBundleResources.shared.cowbell_wav.bestImageRepresentation)
