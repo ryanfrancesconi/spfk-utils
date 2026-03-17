@@ -57,6 +57,8 @@
         case loop = "repeat"
         case macwindow
         case magnifyingGlass = "magnifyingglass"
+        case metronome
+        case metronomeFill = "metronome.fill"
         case minus
         case minusDiamond = "minus.diamond"
         case musicNote = "music.note"
@@ -116,7 +118,7 @@
         case warningFill = "exclamationmark.triangle.fill"
         case waveform = "waveform.path"
         case waveformSimple = "waveform.path.ecg"
-        case waveformMagnifyingGlass = "waveform.path.ecg.magnifyingglass"
+        case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
         case waveformRectangle = "waveform.path.ecg.rectangle"
         case xmark
 
