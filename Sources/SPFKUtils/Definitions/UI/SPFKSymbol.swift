@@ -13,6 +13,7 @@
     ///
     public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case arrowClockwise = "arrow.clockwise"
+        case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
         case audioUnit = "dot.radiowaves.left.and.right"
         case bookmark
         case cCircle = "c.circle"
@@ -27,10 +28,12 @@
         case clock
         case copy = "document.on.document"
         case cut = "scissors"
+        case dialHigh = "dial.high"
         case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
         case dragHandle = "line.3.horizontal"
         case duplicate = "plus.square.on.square"
         case ellipsis
+        case ellipsisCircle = "ellipsis.circle"
         case eraser
         case eraserLineDashed = "eraser.line.dashed"
         case export = "square.and.arrow.up"
@@ -40,6 +43,7 @@
         case fill = "inset.filled.rectangle"
         case find = "text.page.badge.magnifyingglass"
         case finder
+        case flag
         case folder
         case folderGearBadge = "folder.badge.gearshape"
         case forward
@@ -54,6 +58,8 @@
         case infoBubble = "info.bubble"
         case infoCircle = "info.circle"
         case infoTriangle = "info.triangle"
+        case linesDecrease = "line​.3​.horizontal​.decrease"
+        case listAndFilm = "list.and.film"
         case lock
         case lockSquareStack = "lock.square.stack"
         case loop = "repeat"
@@ -80,6 +86,7 @@
         case plus
         case plusDiamond = "plus.diamond"
         case power
+        case questionmarkCircle = "questionmark.circle"
         case quarterNote = "music.quarternote.3"
         case quit = "xmark.rectangle"
         case redo = "arrow.uturn.forward"
@@ -101,6 +108,7 @@
         case sliderVertical = "slider.vertical.3"
         case sort = "arrow.up.arrow.down"
         case speakerWave3 = "speaker.wave.3"
+        case star
         case stopwatch
         case squareStack = "square.stack.3d.up"
         case tablecells
@@ -111,6 +119,7 @@
         case tagSlashFill = "tag.slash.fill"
         case textSparkle = "character.textbox.badge.sparkles"
         case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
+        case tuningfork
         case trash
         case triangle
         case undo = "arrow.uturn.backward"
@@ -122,6 +131,7 @@
         case waveformSimple = "waveform.path.ecg"
         case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
         case waveformRectangle = "waveform.path.ecg.rectangle"
+        case wrenchAndScrewdriver = "wrench.and.screwdriver"
         case xmark
 
         public var systemSymbolName: String { rawValue }
