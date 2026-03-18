@@ -12,6 +12,7 @@
     /// SPFKSymbol.plusDiamond.tinted(color: .white)
     ///
     public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
+        case arrowClockwise = "arrow.clockwise"
         case audioUnit = "dot.radiowaves.left.and.right"
         case bookmark
         case cCircle = "c.circle"
@@ -22,6 +23,7 @@
         case chevronLeft = "chevron.left"
         case chevronRight = "chevron.right"
         case chevronUp = "chevron.up"
+        case chevronMarkup = "chevron.left.forwardslash.chevron.right"
         case clock
         case copy = "document.on.document"
         case cut = "scissors"
