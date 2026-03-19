@@ -13,6 +13,7 @@
     ///
     public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case arrowClockwise = "arrow.clockwise"
+        case arrowRightArrowLeft = "arrow.right.arrow.left"
         case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
         case audioUnit = "dot.radiowaves.left.and.right"
         case barcode
