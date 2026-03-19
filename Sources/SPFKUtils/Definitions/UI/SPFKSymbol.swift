@@ -15,6 +15,7 @@
         case arrowClockwise = "arrow.clockwise"
         case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
         case audioUnit = "dot.radiowaves.left.and.right"
+        case barcode
         case bookmark
         case cCircle = "c.circle"
         case cCircleFill = "c.circle.fill"
@@ -30,6 +31,7 @@
         case copy = "document.on.document"
         case cut = "scissors"
         case dialHigh = "dial.high"
+        case documentBadgePlus = "document.badge.plus"
         case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
         case dragHandle = "line.3.horizontal"
         case duplicate = "plus.square.on.square"
@@ -119,6 +121,7 @@
         case tagFill = "tag.fill"
         case tagSlash = "tag.slash"
         case tagSlashFill = "tag.slash.fill"
+        case textBadgePlus = "text.badge.plus"
         case textDocumentMagnifyingGlass = "text.page.badge.magnifyingglass"
         case textMagnifyingGlass = "text.magnifyingglass"
         case textSparkle = "character.textbox.badge.sparkles"
