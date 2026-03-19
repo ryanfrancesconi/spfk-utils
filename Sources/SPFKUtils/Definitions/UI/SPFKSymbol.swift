@@ -5,7 +5,7 @@
     import AppKit
     import Foundation
 
-    /// Thin wrapper ontop of SFSymbol name definitions for simple use in menus
+    /// Thin convenience enum wrapper ontop of SFSymbol name definitions for simple use in menus
     /// or images.
     ///
     /// SPFKSymbol.plusDiamond.tinted(color: .lightGray)
@@ -20,11 +20,12 @@
         case cCircleFill = "c.circle.fill"
         case center = "inset.filled.center.rectangle"
         case checkmark
+        case checkmarkCircle = "checkmark.circle"
         case chevronDown = "chevron.down"
         case chevronLeft = "chevron.left"
+        case chevronMarkup = "chevron.left.forwardslash.chevron.right"
         case chevronRight = "chevron.right"
         case chevronUp = "chevron.up"
-        case chevronMarkup = "chevron.left.forwardslash.chevron.right"
         case clock
         case copy = "document.on.document"
         case cut = "scissors"
@@ -41,7 +42,6 @@
         case eye
         case eyeSlash = "eye.slash"
         case fill = "inset.filled.rectangle"
-        case find = "text.page.badge.magnifyingglass"
         case finder
         case flag
         case folder
@@ -60,6 +60,7 @@
         case infoTriangle = "info.triangle"
         case linesDecrease = "line​.3​.horizontal​.decrease"
         case listAndFilm = "list.and.film"
+        case listBullet = "list.bullet"
         case lock
         case lockSquareStack = "lock.square.stack"
         case loop = "repeat"
@@ -86,8 +87,8 @@
         case plus
         case plusDiamond = "plus.diamond"
         case power
-        case questionmarkCircle = "questionmark.circle"
         case quarterNote = "music.quarternote.3"
+        case questionmarkCircle = "questionmark.circle"
         case quit = "xmark.rectangle"
         case redo = "arrow.uturn.forward"
         case revert = "arrow.counterclockwise"
@@ -108,29 +109,32 @@
         case sliderVertical = "slider.vertical.3"
         case sort = "arrow.up.arrow.down"
         case speakerWave3 = "speaker.wave.3"
+        case squareStack = "square.stack"
+        case squareStack3d = "square.stack.3d.up"
         case star
         case stopwatch
-        case squareStack = "square.stack.3d.up"
         case tablecells
         case tablecellsFill = "tablecells.fill"
         case tag
         case tagFill = "tag.fill"
         case tagSlash = "tag.slash"
         case tagSlashFill = "tag.slash.fill"
+        case textDocumentMagnifyingGlass = "text.page.badge.magnifyingglass"
+        case textMagnifyingGlass = "text.magnifyingglass"
         case textSparkle = "character.textbox.badge.sparkles"
         case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
-        case tuningfork
         case trash
         case triangle
+        case tuningfork
         case undo = "arrow.uturn.backward"
         case warning = "exclamationmark.triangle"
         case warningCircle = "exclamationmark.circle"
         case warningCircleFill = "exclamationmark.circle.fill"
         case warningFill = "exclamationmark.triangle.fill"
         case waveform = "waveform.path"
-        case waveformSimple = "waveform.path.ecg"
         case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
         case waveformRectangle = "waveform.path.ecg.rectangle"
+        case waveformSimple = "waveform.path.ecg"
         case wrenchAndScrewdriver = "wrench.and.screwdriver"
         case xmark
 
@@ -145,6 +149,11 @@
 
         public func tinted(color: NSColor) -> NSImage? {
             NSImage.systemSymbol(named: rawValue, tinted: color)
+        }
+
+        public func stateImage(offColor: NSColor = .lightGray, onColor: NSColor = .white) -> StateImage? {
+            guard let on = tinted(color: onColor), let off = tinted(color: offColor) else { return nil }
+            return .init(image: off, alternateImage: on)
         }
     }
 
