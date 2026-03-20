@@ -8,8 +8,8 @@
     /// Thin convenience enum wrapper ontop of SFSymbol name definitions for simple use in menus
     /// or images.
     ///
-    /// SPFKSymbol.plusDiamond.tinted(color: .lightGray)
-    /// SPFKSymbol.plusDiamond.tinted(color: .white)
+    /// SPFKSymbol.arrowClockwise.tinted(color: .lightGray)
+    /// SPFKSymbol.arrowClockwise.tinted(color: .white)
     ///
     public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case arrowClockwise = "arrow.clockwise"
@@ -144,33 +144,12 @@
 
         public var systemSymbolName: String { rawValue }
 
+        // NSImageConvertible
         public var nsImage: NSImage? {
             NSImage(
-                systemSymbolName: rawValue,
-                accessibilityDescription: rawValue
-            )
-        }
-
-        public func tinted(color: NSColor) -> NSImage? {
-            NSImage.systemSymbol(named: rawValue, tinted: color)
-        }
-
-        public func stateImage(offColor: NSColor = .lightGray, onColor: NSColor = .white) -> StateImage? {
-            guard let on = tinted(color: onColor), let off = tinted(color: offColor) else { return nil }
-            return .init(image: off, alternateImage: on)
-        }
-    }
-
-    extension NSImage {
-        public static func systemSymbol(named systemSymbolName: String, tinted color: NSColor) -> NSImage? {
-            let nsImage = NSImage(
                 systemSymbolName: systemSymbolName,
                 accessibilityDescription: systemSymbolName
             )
-
-            let config = NSImage.SymbolConfiguration(paletteColors: [color])
-
-            return nsImage?.withSymbolConfiguration(config)
         }
     }
 

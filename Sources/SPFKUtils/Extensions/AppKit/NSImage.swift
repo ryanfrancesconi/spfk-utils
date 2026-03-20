@@ -8,6 +8,17 @@
     }
 
     extension NSImage {
+        public static func systemSymbol(named systemSymbolName: String, tinted color: NSColor) -> NSImage? {
+            let nsImage = NSImage(
+                systemSymbolName: systemSymbolName,
+                accessibilityDescription: systemSymbolName
+            )
+
+            let config = NSImage.SymbolConfiguration(paletteColors: [color])
+
+            return nsImage?.withSymbolConfiguration(config)
+        }
+
         /// Initializes a new `NSImage` by tinting a template image.
         /// If image is not a template, image is unmodified.
         public convenience init?(templateNamed: NSImage.Name, tint color: NSColor) {
