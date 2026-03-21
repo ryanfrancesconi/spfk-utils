@@ -27,7 +27,7 @@ class HexColorTests: TestCaseModel {
         #expect(hexColor.red == 1)
         #expect(hexColor.green == 0)
         #expect(hexColor.blue == 0)
-        #expect(hexColor.alpha == 0.5)
+        #expect(hexColor.alpha == 128.0 / 255.0)
         #expect(hexColor.stringValue == "FF000080")
     }
 
@@ -84,7 +84,11 @@ class HexColorTests: TestCaseModel {
 
     @Test func cgColorWithAlpha() throws {
         let hexColor = try #require(HexColor(string: "FF000080"))
-        #expect(hexColor.cgColor.components == [1, 0, 0, 0.5])
+        let components = try #require(hexColor.cgColor.components)
+        #expect(components[0] == 1)
+        #expect(components[1] == 0)
+        #expect(components[2] == 0)
+        #expect(components[3] == 128.0 / 255.0)
     }
 
     @Test func cgColorIsSRGB() throws {
@@ -190,7 +194,7 @@ class HexColorTests: TestCaseModel {
             #expect(srgb.redComponent == 1)
             #expect(srgb.greenComponent == 0)
             #expect(srgb.blueComponent == 0)
-            #expect(srgb.alphaComponent == 0.5)
+            #expect(srgb.alphaComponent == 128.0 / 255.0)
         }
     }
 #endif
