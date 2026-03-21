@@ -64,15 +64,13 @@ extension CALayer {
         )
     }
 
-    public func centerHorizontalInSuperlayer(allowSubpixelValues: Bool = false) {
+    public func centerHorizontalInSuperlayer() {
         guard let superlayer else { return }
 
-        let value = CGPoint(
+        frame.origin = CGPoint(
             x: (superlayer.frame.width / 2) - (frame.width / 2),
             y: frame.origin.y
         )
-
-        frame.origin = allowSubpixelValues ? value : CGPoint(x: value.x.int, y: value.y.int)
     }
 
     @objc

@@ -117,7 +117,7 @@ final class CALayerLayoutTests {
 
     // MARK: - centerHorizontalInSuperlayer
 
-    @Test func centerHorizontalInSuperlayerDefaultSnapping() {
+    @Test func centerHorizontalInSuperlayerOddWidth() {
         let parent = CALayer()
         parent.frame = CGRect(x: 0, y: 0, width: 200, height: 100)
 
@@ -127,24 +127,9 @@ final class CALayerLayoutTests {
 
         child.centerHorizontalInSuperlayer()
 
-        // (200/2) - (41/2) = 79.5, snapped to int = 79
-        #expect(child.frame.origin.x == 79)
-        // y preserved
-        #expect(child.frame.origin.y == 15)
-    }
-
-    @Test func centerHorizontalInSuperlayerAllowSubpixel() {
-        let parent = CALayer()
-        parent.frame = CGRect(x: 0, y: 0, width: 200, height: 100)
-
-        let child = CALayer()
-        child.frame = CGRect(x: 0, y: 15, width: 41, height: 20)
-        parent.addSublayer(child)
-
-        child.centerHorizontalInSuperlayer(allowSubpixelValues: true)
-
-        // (200/2) - (41/2) = 79.5, not snapped
+        // (200/2) - (41/2) = 79.5
         #expect(child.frame.origin.x == 79.5)
+        // y preserved
         #expect(child.frame.origin.y == 15)
     }
 
