@@ -44,8 +44,18 @@
 
         public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            url = try container.decode(URL.self, forKey: .url)
-            finderTags = try container.decode(FinderTagGroup.self, forKey: .finderTags)
+
+            // Guard against SwiftData nil-materialization producing an empty container
+            let decodedURL = try? container.decodeIfPresent(URL.self, forKey: .url)
+            guard let decodedURL else {
+                throw DecodingError.valueNotFound(
+                    Self.self,
+                    .init(codingPath: container.codingPath, debugDescription: "Empty URLProperties container")
+                )
+            }
+
+            url = decodedURL
+            finderTags = (try? container.decodeIfPresent(FinderTagGroup.self, forKey: .finderTags)) ?? FinderTagGroup()
             creationDate = try? container.decodeIfPresent(Date.self, forKey: .creationDate)
             modificationDate = try? container.decodeIfPresent(Date.self, forKey: .modificationDate)
             fileSize = try? container.decodeIfPresent(UInt64.self, forKey: .fileSize)

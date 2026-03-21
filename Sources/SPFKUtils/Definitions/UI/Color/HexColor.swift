@@ -167,8 +167,6 @@ public struct HexColor: Hashable, Sendable, Equatable, Comparable {
             blue = CGFloat((hexNumber & 0x0000_FF00) >> 8) / 255.0
             alpha = CGFloat(hexNumber & 0x0000_00FF) / 255.0
 
-            alpha = alpha.rounded(decimalPlaces: 2)
-
             // 6-char RGB: FF0000
         } else if string.count == 6 {
             red = CGFloat((hexNumber & 0xFF0000) >> 16) / 255.0
