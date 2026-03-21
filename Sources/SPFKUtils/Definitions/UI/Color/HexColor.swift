@@ -9,9 +9,32 @@ import Foundation
 /// RGBA components and bridges to `CGColor` directly, with optional `NSColor` conversion on macOS.
 /// Equality and hashing are based solely on `stringValue`, ensuring consistent behavior across
 /// construction paths.
-public struct HexColor: Hashable, Sendable, Equatable {
+public struct HexColor: Hashable, Sendable, Equatable, Comparable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.stringValue == rhs.stringValue
+    }
+
+    /// Sorts by HSB hue (rainbow order). Achromatic colors (saturation < 0.05)
+    /// are placed at the end, sorted by brightness.
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        let (lh, ls, lb) = lhs.hsb
+        let (rh, rs, rb) = rhs.hsb
+
+        let lChromatic = ls >= 0.05
+        let rChromatic = rs >= 0.05
+
+        // Chromatic colors before achromatic
+        if lChromatic != rChromatic { return lChromatic }
+
+        if lChromatic {
+            // Both chromatic: sort by hue, then saturation, then brightness
+            if lh != rh { return lh < rh }
+            if ls != rs { return ls < rs }
+            return lb < rb
+        } else {
+            // Both achromatic: sort by brightness
+            return lb < rb
+        }
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -37,6 +60,36 @@ public struct HexColor: Hashable, Sendable, Equatable {
         Self.makeCGColor(red, green, blue, alpha)
     }
 
+    /// Returns (hue, saturation, brightness) computed from RGB components.
+    /// Hue is in the range 0...360, saturation and brightness are 0...1.
+    public var hsb: (hue: CGFloat, saturation: CGFloat, brightness: CGFloat) {
+        let maxC = max(red, green, blue)
+        let minC = min(red, green, blue)
+        let delta = maxC - minC
+
+        let brightness = maxC
+
+        guard delta > 0.0001 else {
+            return (hue: 0, saturation: 0, brightness: brightness)
+        }
+
+        let saturation = maxC > 0 ? delta / maxC : 0
+
+        var hue: CGFloat
+        if red == maxC {
+            hue = (green - blue) / delta
+        } else if green == maxC {
+            hue = 2 + (blue - red) / delta
+        } else {
+            hue = 4 + (red - green) / delta
+        }
+
+        hue *= 60
+        if hue < 0 { hue += 360 }
+
+        return (hue: hue, saturation: saturation, brightness: brightness)
+    }
+
     // MARK: - Initializers
 
     /// Create from a hex string. Accepts 6-char RGB or 8-char RGBA, with or without `#` prefix.
@@ -53,6 +106,30 @@ public struct HexColor: Hashable, Sendable, Equatable {
         self.blue = min(max(blue, 0), 1)
         self.alpha = min(max(alpha, 0), 1)
         stringValue = Self.formatRGBA(self.red, self.green, self.blue, self.alpha)
+    }
+
+    /// Create from HSB components. Hue is 0...360, saturation and brightness are 0...1.
+    public init(hue: CGFloat, saturation: CGFloat, brightness: CGFloat, alpha: CGFloat = 1) {
+        let h = min(max(hue, 0), 360)
+        let s = min(max(saturation, 0), 1)
+        let b = min(max(brightness, 0), 1)
+        let a = min(max(alpha, 0), 1)
+
+        let c = b * s
+        let x = c * (1 - abs((h / 60).truncatingRemainder(dividingBy: 2) - 1))
+        let m = b - c
+
+        let r1, g1, b1: CGFloat
+        switch h {
+        case 0 ..< 60: (r1, g1, b1) = (c, x, 0)
+        case 60 ..< 120: (r1, g1, b1) = (x, c, 0)
+        case 120 ..< 180: (r1, g1, b1) = (0, c, x)
+        case 180 ..< 240: (r1, g1, b1) = (0, x, c)
+        case 240 ..< 300: (r1, g1, b1) = (x, 0, c)
+        default: (r1, g1, b1) = (c, 0, x)
+        }
+
+        self.init(red: r1 + m, green: g1 + m, blue: b1 + m, alpha: a)
     }
 
     // MARK: - Private

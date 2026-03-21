@@ -20,6 +20,7 @@
         case bookmark
         case cCircle = "c.circle"
         case cCircleFill = "c.circle.fill"
+        case circleSlash = "circle.slash"
         case center = "inset.filled.center.rectangle"
         case checkmark
         case checkmarkCircle = "checkmark.circle"
@@ -76,7 +77,9 @@
         case musicNote = "music.note"
         case musicNoteSlash = "music.note.slash"
         case musicPages = "music.pages"
+        case nosign
         case openDocument = "arrow.up.forward.square"
+        case paintPaletteFill = "paintpalette.fill"
         case paste = "document.on.clipboard"
         case pause = "stop.fill"
         case performMiniaturize = "minus.rectangle"
