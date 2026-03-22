@@ -27,7 +27,7 @@ public enum ColorName: String, CaseIterable, Sendable {
         }
 
         // Very light, desaturated colors
-        if saturation < 0.1 && brightness > 0.85 {
+        if saturation < 0.1, brightness > 0.85 {
             self = .white
             return
         }
@@ -39,7 +39,7 @@ public enum ColorName: String, CaseIterable, Sendable {
         }
 
         // Brown: low-to-medium brightness in the orange-yellow hue range
-        if saturation > 0.2 && brightness < 0.55 && (hue < 45 || hue >= 345) {
+        if saturation > 0.2, brightness < 0.55, hue < 45 || hue >= 345 {
             self = .brown
             return
         }
@@ -77,7 +77,7 @@ extension HexColor {
 
         // Achromatic — no qualifier needed, the name itself implies lightness
         if b < 0.15 { return "Black" }
-        if s < 0.1 && b > 0.85 { return "White" }
+        if s < 0.1, b > 0.85 { return "White" }
         if s < 0.15 { return b < 0.5 ? "Black" : "Gray" }
 
         // For chromatic colors, derive the hue name directly so that
@@ -89,23 +89,24 @@ extension HexColor {
         // saturated colors read as blue.
         let bluePurpleBoundary: CGFloat = s < 0.5 ? 235 : 245
 
-        let hueName: String = switch h {
-        case 0 ..< 15: "Red"
-        case 15 ..< 45: "Orange"
-        case 45 ..< 70: "Yellow"
-        case 70 ..< 160: "Green"
-        case 160 ..< 195: "Cyan"
-        case 195 ..< bluePurpleBoundary: "Blue"
-        case bluePurpleBoundary ..< 290: "Purple"
-        case 290 ..< 345: "Pink"
-        default: "Red" // 345-360 wraps back to red
-        }
+        let hueName: String =
+            switch h {
+            case 0 ..< 15: "Red"
+            case 15 ..< 45: "Orange"
+            case 45 ..< 70: "Yellow"
+            case 70 ..< 160: "Green"
+            case 160 ..< 195: "Cyan"
+            case 195 ..< bluePurpleBoundary: "Blue"
+            case bluePurpleBoundary ..< 290: "Purple"
+            case 290 ..< 345: "Pink"
+            default: "Red" // 345-360 wraps back to red
+            }
 
         if b < 0.6 {
             return "Dark \(hueName)"
-        } else if s < 0.35 && b > 0.7 {
+        } else if s < 0.35, b > 0.7 {
             return "Pale \(hueName)"
-        } else if b > 0.8 && s > 0.15 && s < 0.65 {
+        } else if b > 0.8, s > 0.15, s < 0.65 {
             return "Light \(hueName)"
         }
 
