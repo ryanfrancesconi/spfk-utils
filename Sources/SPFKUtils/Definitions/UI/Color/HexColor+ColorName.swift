@@ -51,8 +51,8 @@ public enum ColorName: String, CaseIterable, Sendable {
         case 45 ..< 70: self = .yellow
         case 70 ..< 160: self = .green
         case 160 ..< 195: self = .cyan
-        case 195 ..< 255: self = .blue
-        case 255 ..< 290: self = .purple
+        case 195 ..< 245: self = .blue
+        case 245 ..< 290: self = .purple
         case 290 ..< 345: self = .pink
         default: self = .red // 345-360 wraps back to red
         }
@@ -65,5 +65,50 @@ extension HexColor {
     public var colorName: ColorName {
         let (h, s, b) = hsb
         return ColorName(hue: h, saturation: s, brightness: b)
+    }
+
+    /// A display-friendly color name with lightness/saturation qualifiers.
+    ///
+    /// Returns strings like "Dark Red", "Light Blue", "Pale Green", or just "Red"
+    /// for mid-range colors. Achromatic colors (black, white, gray) are returned
+    /// without qualifiers since their names already imply lightness.
+    public var colorDisplayName: String {
+        let (h, s, b) = hsb
+
+        // Achromatic — no qualifier needed, the name itself implies lightness
+        if b < 0.15 { return "Black" }
+        if s < 0.1 && b > 0.85 { return "White" }
+        if s < 0.15 { return b < 0.5 ? "Black" : "Gray" }
+
+        // For chromatic colors, derive the hue name directly so that
+        // dark warm colors (which colorName classifies as "brown") get
+        // proper qualifiers like "Dark Red" instead of just "Brown".
+        //
+        // The blue/purple boundary is saturation-dependent: at hue ~240,
+        // desaturated colors (lavender, periwinkle) read as purple while
+        // saturated colors read as blue.
+        let bluePurpleBoundary: CGFloat = s < 0.5 ? 235 : 245
+
+        let hueName: String = switch h {
+        case 0 ..< 15: "Red"
+        case 15 ..< 45: "Orange"
+        case 45 ..< 70: "Yellow"
+        case 70 ..< 160: "Green"
+        case 160 ..< 195: "Cyan"
+        case 195 ..< bluePurpleBoundary: "Blue"
+        case bluePurpleBoundary ..< 290: "Purple"
+        case 290 ..< 345: "Pink"
+        default: "Red" // 345-360 wraps back to red
+        }
+
+        if b < 0.6 {
+            return "Dark \(hueName)"
+        } else if s < 0.35 && b > 0.7 {
+            return "Pale \(hueName)"
+        } else if b > 0.8 && s > 0.15 && s < 0.65 {
+            return "Light \(hueName)"
+        }
+
+        return hueName
     }
 }
