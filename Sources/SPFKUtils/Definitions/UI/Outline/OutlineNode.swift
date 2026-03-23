@@ -74,58 +74,6 @@
         }
     }
 
-    extension OutlineNode: Codable, Serializable {
-        enum CodingKeys: String, CodingKey {
-            case title
-            case isEditable
-            case symbolName
-            case hexColor
-            case children
-            case isExpanded
-            case nodeIdentifier
-            case sortIndex
-        }
-
-        public init(from decoder: any Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            // SwiftData may create an empty container for nil optional OutlineNode values.
-            // Use decodeIfPresent so individual fields tolerate missing keys, but throw when
-            // no keys are present at all so callers using try? correctly get nil.
-            let decodedTitle = try container.decodeIfPresent(String.self, forKey: .title)
-            let decodedNodeId = try container.decodeIfPresent(NodeIdentifier.self, forKey: .nodeIdentifier)
-
-            guard decodedTitle != nil || decodedNodeId != nil else {
-                throw DecodingError.valueNotFound(
-                    OutlineNode.self,
-                    .init(codingPath: container.codingPath, debugDescription: "Empty container for optional OutlineNode")
-                )
-            }
-
-            title = decodedTitle ?? ""
-            nodeIdentifier = decodedNodeId ?? NodeIdentifier(id: UUID())
-            isEditable = try container.decodeIfPresent(Bool.self, forKey: .isEditable) ?? true
-            children = try container.decodeIfPresent([OutlineNode].self, forKey: .children) ?? []
-            isExpanded = try container.decodeIfPresent(Bool.self, forKey: .isExpanded) ?? false
-
-            symbolName = try container.decodeIfPresent(String.self, forKey: .symbolName)
-            sortIndex = try container.decodeIfPresent(Int.self, forKey: .sortIndex)
-            hexColor = try? container.decodeIfPresent(HexColor.self, forKey: .hexColor)
-        }
-
-        public func encode(to encoder: any Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(title, forKey: .title)
-            try container.encode(isEditable, forKey: .isEditable)
-            try container.encode(children, forKey: .children)
-            try container.encode(isExpanded, forKey: .isExpanded)
-            try container.encode(nodeIdentifier, forKey: .nodeIdentifier)
-
-            try container.encodeIfPresent(symbolName, forKey: .symbolName)
-            try container.encodeIfPresent(sortIndex, forKey: .sortIndex)
-            try container.encodeIfPresent(hexColor, forKey: .hexColor)
-        }
-    }
+    extension OutlineNode: Codable, Serializable {}
 
 #endif

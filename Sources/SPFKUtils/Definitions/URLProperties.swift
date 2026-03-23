@@ -44,34 +44,21 @@
 
         public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            // Guard against SwiftData nil-materialization producing an empty container
-            let decodedURL = try? container.decodeIfPresent(URL.self, forKey: .url)
-            guard let decodedURL else {
-                throw DecodingError.valueNotFound(
-                    Self.self,
-                    .init(codingPath: container.codingPath, debugDescription: "Empty URLProperties container")
-                )
-            }
-
-            url = decodedURL
-            finderTags = (try? container.decodeIfPresent(FinderTagGroup.self, forKey: .finderTags)) ?? FinderTagGroup()
-            creationDate = try? container.decodeIfPresent(Date.self, forKey: .creationDate)
-            modificationDate = try? container.decodeIfPresent(Date.self, forKey: .modificationDate)
-            fileSize = try? container.decodeIfPresent(UInt64.self, forKey: .fileSize)
-
+            url = try container.decode(URL.self, forKey: .url)
+            finderTags = try container.decodeIfPresent(FinderTagGroup.self, forKey: .finderTags) ?? FinderTagGroup()
+            creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
+            modificationDate = try container.decodeIfPresent(Date.self, forKey: .modificationDate)
+            fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
             initialize()
         }
 
         public func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-
             try container.encode(url, forKey: .url)
             try container.encode(finderTags, forKey: .finderTags)
-
-            try? container.encodeIfPresent(creationDate, forKey: .creationDate)
-            try? container.encodeIfPresent(modificationDate, forKey: .modificationDate)
-            try? container.encodeIfPresent(fileSize, forKey: .fileSize)
+            try container.encodeIfPresent(creationDate, forKey: .creationDate)
+            try container.encodeIfPresent(modificationDate, forKey: .modificationDate)
+            try container.encodeIfPresent(fileSize, forKey: .fileSize)
         }
     }
 

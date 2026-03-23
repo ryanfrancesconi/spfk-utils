@@ -43,23 +43,12 @@ public struct NodeIdentifier: Sendable, Hashable, Equatable, Codable, CustomStri
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        // SwiftData may create an empty container for nil optional Codable values.
-        // Throw when id is missing so callers using try? correctly get nil.
-        guard let decodedId = try container.decodeIfPresent(UUID.self, forKey: .id) else {
-            throw DecodingError.valueNotFound(
-                NodeIdentifier.self,
-                .init(codingPath: container.codingPath, debugDescription: "Empty container for optional NodeIdentifier")
-            )
-        }
-
-        id = decodedId
+        id = try container.decode(UUID.self, forKey: .id)
         parentId = try container.decodeIfPresent(UUID.self, forKey: .parentId)
     }
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-
         try container.encode(id, forKey: .id)
         try container.encodeIfPresent(parentId, forKey: .parentId)
     }
