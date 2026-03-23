@@ -74,6 +74,18 @@
         }
     }
 
-    extension OutlineNode: Codable, Serializable {}
+    extension OutlineNode: Codable, Serializable {
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+            isEditable = try container.decodeIfPresent(Bool.self, forKey: .isEditable) ?? true
+            symbolName = try container.decodeIfPresent(String.self, forKey: .symbolName)
+            hexColor = try container.decodeIfPresent(HexColor.self, forKey: .hexColor)
+            nodeIdentifier = try container.decodeIfPresent(NodeIdentifier.self, forKey: .nodeIdentifier) ?? NodeIdentifier(id: UUID())
+            children = try container.decodeIfPresent([OutlineNode].self, forKey: .children) ?? []
+            isExpanded = try container.decodeIfPresent(Bool.self, forKey: .isExpanded) ?? false
+            sortIndex = try container.decodeIfPresent(Int.self, forKey: .sortIndex)
+        }
+    }
 
 #endif

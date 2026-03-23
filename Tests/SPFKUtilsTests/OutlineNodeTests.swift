@@ -13,7 +13,6 @@
 
     @Suite
     final class OutlineNodeTests: TestCaseModel {
-
         // MARK: - Computed Properties
 
         @Test func isLeafRequiresParentAndNoChildren() {
@@ -246,13 +245,18 @@
             #expect(decoded.parentId == nil)
         }
 
-        @Test func codableThrowsForEmptyContainer() throws {
-            // SwiftData empty container scenario — empty JSON object
+        @Test func codableEmptyJSONDecodesToDefaults() throws {
             let json = "{}"
 
-            #expect(throws: DecodingError.self) {
-                try JSONDecoder().decode(OutlineNode.self, from: Data(json.utf8))
-            }
+            let decoded = try JSONDecoder().decode(OutlineNode.self, from: Data(json.utf8))
+
+            #expect(decoded.title == "")
+            #expect(decoded.isEditable == true)
+            #expect(decoded.children.isEmpty)
+            #expect(decoded.isExpanded == false)
+            #expect(decoded.symbolName == nil)
+            #expect(decoded.sortIndex == nil)
+            #expect(decoded.hexColor == nil)
         }
 
         @Test func codableDecodesWithTitleOnlyNoNodeIdentifier() throws {
@@ -284,7 +288,6 @@
 
     @Suite
     final class NodeIdentifierTests: TestCaseModel {
-
         // MARK: - Init
 
         @Test func initWithDefaults() {
