@@ -2,6 +2,7 @@
 
 #if os(macOS)
     import AppKit
+    import SPFKBase
 
     extension NSColor {
         public static var random: NSColor {
