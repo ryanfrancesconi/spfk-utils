@@ -124,7 +124,7 @@
                 children[i].nodeIdentifier.parentId = parentId
             }
 
-            if Self.insertChildren(children, in: parentId, atIndex: atIndex, nodes: &self.nodes) {
+            if Self.insertChildren(children, in: parentId, atIndex: atIndex, nodes: &nodes) {
                 updateSortIndexes()
                 let ids = children.map(\.id)
                 return lookup(uuids: ids)
