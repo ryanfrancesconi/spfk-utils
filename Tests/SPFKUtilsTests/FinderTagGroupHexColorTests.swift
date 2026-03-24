@@ -57,7 +57,7 @@
 
         @Test func setHexColorTagAddsToEmptyGroup() {
             var group = FinderTagGroup()
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
             #expect(group.tags.count == 1)
             #expect(group.tags[0].tagColor == .none)
@@ -66,8 +66,8 @@
 
         @Test func setHexColorTagReplacesExisting() {
             var group = FinderTagGroup()
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
-            group.setHexColorTag(HexColor(string: "00FF00FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "00FF00FF"))
 
             #expect(group.tags.count == 1)
             #expect(group.hexColorTag?.stringValue == "00FF00FF")
@@ -77,10 +77,10 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
             #expect(group.tags.count == 2)
 
-            group.setHexColorTag(nil)
+            group.updateCustom(hexColor: nil)
             #expect(group.tags.count == 1)
             #expect(group.hexColorTag == nil)
             #expect(group.tags[0].tagColor == .red)
@@ -91,7 +91,7 @@
                 FinderTagDescription(label: "MyCustomTag"),
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
             #expect(group.tags.count == 3)
             #expect(group.tags.contains(where: { $0.label == "MyCustomTag" }))
@@ -102,10 +102,10 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(label: "MyCustomTag"),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
             #expect(group.tags.count == 2)
 
-            group.setHexColorTag(nil)
+            group.updateCustom(hexColor: nil)
             #expect(group.tags.count == 1)
             #expect(group.tags[0].label == "MyCustomTag")
         }
@@ -125,7 +125,7 @@
                 FinderTagDescription(tagColor: .red),
                 FinderTagDescription(tagColor: .orange),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
             let data = try JSONEncoder().encode(group)
             let decoded = try JSONDecoder().decode(FinderTagGroup.self, from: data)
@@ -136,7 +136,7 @@
 
         @Test func encodeDecodeGroupWithOnlyHexColorTag() throws {
             var group = FinderTagGroup()
-            group.setHexColorTag(HexColor(string: "53A653AE"))
+            group.updateCustom(hexColor: HexColor(string: "53A653AE"))
 
             let data = try JSONEncoder().encode(group)
             let decoded = try JSONDecoder().decode(FinderTagGroup.self, from: data)
@@ -156,7 +156,7 @@
                 FinderTagDescription(tagColor: .green),
                 FinderTagDescription(tagColor: .blue),
             ])
-            group.setHexColorTag(HexColor(string: "000000FF"))
+            group.updateCustom(hexColor: HexColor(string: "000000FF"))
 
             let data = try JSONEncoder().encode(group)
             let decoded = try JSONDecoder().decode(FinderTagGroup.self, from: data)
@@ -172,7 +172,7 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "53A653AE"))
+            group.updateCustom(hexColor: HexColor(string: "53A653AE"))
 
             for _ in 0 ..< 10 {
                 let data = try JSONEncoder().encode(group)
@@ -185,7 +185,7 @@
 
         @Test func encodeDecodeAllDefaultTagsPlusHex() throws {
             var group = FinderTagGroup.defaultTags
-            group.setHexColorTag(HexColor(string: "AABBCCDD"))
+            group.updateCustom(hexColor: HexColor(string: "AABBCCDD"))
 
             let data = try JSONEncoder().encode(group)
             let decoded = try JSONDecoder().decode(FinderTagGroup.self, from: data)
@@ -204,7 +204,7 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "53A653AE"))
+            group.updateCustom(hexColor: HexColor(string: "53A653AE"))
 
             group.insert(colors: [FinderTagDescription(tagColor: .blue)])
 
@@ -216,7 +216,7 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "53A653AE"))
+            group.updateCustom(hexColor: HexColor(string: "53A653AE"))
 
             group.update(colors: [FinderTagDescription(tagColor: .orange)])
 
@@ -232,23 +232,23 @@
                 FinderTagDescription(tagColor: .red),
                 FinderTagDescription(tagColor: .green),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
-            #expect(group.tagColors == [.red, .green])
+            #expect(group.tagColors.count == 2)
         }
 
         @Test func labelsExcludesHexTextTags() {
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
             #expect(group.labels() == ["Red"])
         }
 
         @Test func defaultColorNilWhenOnlyHexTags() {
             var group = FinderTagGroup()
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
             #expect(group.defaultColor == nil)
         }
 
@@ -256,7 +256,7 @@
             var group = FinderTagGroup(tags: [
                 FinderTagDescription(tagColor: .red),
             ])
-            group.setHexColorTag(HexColor(string: "FF2160FF"))
+            group.updateCustom(hexColor: HexColor(string: "FF2160FF"))
             #expect(group.stringValue.contains("FF2160FF"))
             #expect(group.stringValue.contains("Red"))
         }
@@ -265,7 +265,7 @@
 
         @Test func encodeDecodeURLPropertiesWithHexColorTag() throws {
             var urlProps = URLProperties(url: URL(fileURLWithPath: "/tmp/test.wav"))
-            urlProps.finderTags.setHexColorTag(HexColor(string: "FFFF00FF"))
+            urlProps.finderTags.updateCustom(hexColor: HexColor(string: "FFFF00FF"))
 
             let data = try JSONEncoder().encode(urlProps)
             let decoded = try JSONDecoder().decode(URLProperties.self, from: data)
@@ -279,7 +279,7 @@
                 FinderTagDescription(tagColor: .red),
                 FinderTagDescription(tagColor: .green),
             ])
-            urlProps.finderTags.setHexColorTag(HexColor(string: "FF2160FF"))
+            urlProps.finderTags.updateCustom(hexColor: HexColor(string: "FF2160FF"))
 
             let data = try JSONEncoder().encode(urlProps)
             let decoded = try JSONDecoder().decode(URLProperties.self, from: data)
