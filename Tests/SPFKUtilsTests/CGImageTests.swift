@@ -4,13 +4,14 @@
     import AppKit
     import CoreGraphics
     import Foundation
-import SPFKBase
+    import SPFKBase
     import SPFKTesting
     import Testing
     import UniformTypeIdentifiers
 
     @testable import SPFKUtils
 
+    @Suite(.serialized)
     class CGImageTests: BinTestCase {
         @Test func cgImageDataRoundtrip() async throws {
             let url = TestBundleResources.shared.sharksandwich
@@ -91,6 +92,74 @@ import SPFKBase
             #expect(scaledImage.height == 32)
 
             try scaledImage.pngRepresentation?.write(to: bin.appendingPathComponent("test.png"))
+        }
+
+        // MARK: - Export
+
+        @Test func exportJPEG() async throws {
+            deleteBinOnExit = true
+            let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
+            let outputURL = bin.appendingPathComponent("export.jpg")
+
+            try original.export(utType: .jpeg, to: outputURL)
+
+            let data = try Data(contentsOf: outputURL)
+            let reloaded = try CGImage.create(from: data)
+
+            #expect(reloaded.width == original.width)
+            #expect(reloaded.height == original.height)
+        }
+
+        @Test func exportPNG() async throws {
+            deleteBinOnExit = true
+            let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
+            let outputURL = bin.appendingPathComponent("export.png")
+
+            try original.export(utType: .png, to: outputURL)
+
+            let data = try Data(contentsOf: outputURL)
+            let reloaded = try CGImage.create(from: data)
+
+            #expect(reloaded.width == original.width)
+            #expect(reloaded.height == original.height)
+        }
+
+        @Test func exportTIFF() async throws {
+            deleteBinOnExit = true
+            let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
+            let outputURL = bin.appendingPathComponent("export.tiff")
+
+            try original.export(utType: .tiff, to: outputURL)
+
+            let data = try Data(contentsOf: outputURL)
+            let reloaded = try CGImage.create(from: data)
+
+            #expect(reloaded.width == original.width)
+            #expect(reloaded.height == original.height)
+        }
+
+        @Test func exportUnsupportedTypeThrows() async throws {
+            let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
+            let outputURL = bin.appendingPathComponent("export.gif")
+
+            #expect(throws: (any Error).self) {
+                try original.export(utType: .gif, to: outputURL)
+            }
+        }
+
+        @Test func exportOverwritesExistingFile() async throws {
+            deleteBinOnExit = true
+            let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
+            let outputURL = bin.appendingPathComponent("overwrite.jpg")
+
+            // Write twice — second should overwrite without error
+            try original.export(utType: .jpeg, to: outputURL)
+            let firstSize = try Data(contentsOf: outputURL).count
+
+            try original.export(utType: .jpeg, to: outputURL)
+            let secondSize = try Data(contentsOf: outputURL).count
+
+            #expect(firstSize == secondSize)
         }
     }
 #endif
