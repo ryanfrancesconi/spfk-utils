@@ -83,6 +83,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case performMiniaturize = "minus.rectangle"
     case performZoom = "square.arrowtriangle.4.outward"
     case person
+    case photo
     case piano = "pianokeys.inverse"
     case play
     case playFill = "play.fill"
