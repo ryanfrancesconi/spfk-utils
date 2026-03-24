@@ -79,6 +79,12 @@
             }
         }
 
+        public mutating func update(nodes: [OutlineNode]) throws {
+            for node in nodes {
+                try update(node: node)
+            }
+        }
+
         public mutating func update(node: OutlineNode) throws {
             if Self.update(node: node, in: &nodes) { return }
             throw NSError(description: "Failed to find \(node) in data")
