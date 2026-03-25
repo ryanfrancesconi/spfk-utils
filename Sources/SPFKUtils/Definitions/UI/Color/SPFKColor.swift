@@ -1,12 +1,11 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
+// swiftformat:disable consecutiveSpaces
 
 #if os(macOS)
 
     import AppKit
     import Foundation
     import SPFKBase
-
-    // swiftformat:disable consecutiveSpaces
 
     public enum SPFKColor {
         case controlAccentColor
@@ -23,6 +22,7 @@
         case schemeColor
         case schemeColorAlternate
 
+        // TODO: pending dark/light switch
         public func value(for scheme: SPFKColorScheme) -> NSColor {
             switch self {
             case .controlAccentColor:           scheme == .dark ? Self.xcPreprocessor : Self.xcPreprocessor
@@ -49,18 +49,37 @@
     // MARK: Dark Mode Code Colors
 
     extension SPFKColor {
-        public static let xcAttribute =     #colorLiteral(red: 0.7238948941, green: 0.5747394562, blue: 0.4295355082, alpha: 1)
-        public static let xcCharacter =     #colorLiteral(red: 0.8802540898, green: 0.8195596337, blue: 0.5590798259, alpha: 1)
-        public static let xcClass =         #colorLiteral(red: 0.7232261896, green: 0.9541102052, blue: 0.9142815471, alpha: 1)
-        public static let xcComments =      #colorLiteral(red: 0.4976361394, green: 0.6253806949, blue: 0.4622306824, alpha: 1)
-        public static let xcKeyword =       #colorLiteral(red: 0.8808391094, green: 0.5707122684, blue: 0.6889952421, alpha: 1)
-        public static let xcOther =         #colorLiteral(red: 0.4524430037, green: 0.7576714158, blue: 0.7977759242, alpha: 1)
-        public static let xcPreprocessor =  #colorLiteral(red: 1, green: 0.6314829588, blue: 0.309850961, alpha: 1)
-        public static let xcRegEx =         #colorLiteral(red: 0.9234126806, green: 0.5465388894, blue: 0.4782198668, alpha: 1)
-        public static let xcString =        #colorLiteral(red: 0.7784311771, green: 0.5900088549, blue: 0.5077829957, alpha: 1)
-        public static let xcType =          #colorLiteral(red: 0.496894896, green: 0.8131126761, blue: 0.9852605462, alpha: 1)
-        public static let xcURL =           #colorLiteral(red: 0.4614251852, green: 0.6554939747, blue: 0.9696692824, alpha: 1)
-        public static let xcPurple =        #colorLiteral(red: 0.6859937906, green: 0.4683517218, blue: 0.9155258536, alpha: 1)
+        // MARK: Xcode Dark Mode
+
+        public static let xcPreprocessor =      #colorLiteral(red: 1, green: 0.6314829588, blue: 0.309850961, alpha: 1)
+        public static let xcRegEx =             #colorLiteral(red: 0.9234126806, green: 0.5465388894, blue: 0.4782198668, alpha: 1)
+        public static let xcKeyword =           #colorLiteral(red: 0.8808391094, green: 0.5707122684, blue: 0.6889952421, alpha: 1)
+        public static let xcString =            #colorLiteral(red: 0.7784311771, green: 0.5900088549, blue: 0.5077829957, alpha: 1)
+        public static let xcAttribute =         #colorLiteral(red: 0.7238948941, green: 0.5747394562, blue: 0.4295355082, alpha: 1)
+        public static let xcCharacter =         #colorLiteral(red: 0.8802540898, green: 0.8195596337, blue: 0.5590798259, alpha: 1)
+        public static let xcComments =          #colorLiteral(red: 0.4976361394, green: 0.6253806949, blue: 0.4622306824, alpha: 1)
+        public static let xcClass =             #colorLiteral(red: 0.7232261896, green: 0.9541102052, blue: 0.9142815471, alpha: 1)
+        public static let xcType =              #colorLiteral(red: 0.496894896, green: 0.8131126761, blue: 0.9852605462, alpha: 1)
+        public static let xcOther =             #colorLiteral(red: 0.4524430037, green: 0.7576714158, blue: 0.7977759242, alpha: 1)
+        public static let xcURL =               #colorLiteral(red: 0.4614251852, green: 0.6554939747, blue: 0.9696692824, alpha: 1)
+        public static let xcPurple =            #colorLiteral(red: 0.6859937906, green: 0.4683517218, blue: 0.9155258536, alpha: 1)
+    }
+
+    extension SPFKColor {
+        // MARK: Final Cut Pro Role Colors
+
+        public static let fcpFootsteps =        #colorLiteral(red: 0.3490821421, green: 0.1138016656, blue: 0.192650944, alpha: 1)
+        public static let fcpMusic2 =           #colorLiteral(red: 0.5345640779, green: 0.2465824187, blue: 0.08071980625, alpha: 1)
+        public static let fcpSoundDesign =      #colorLiteral(red: 0.5058107972, green: 0.3126704097, blue: 0.08611684293, alpha: 1)
+        public static let fcpAdjustmentClips1 = #colorLiteral(red: 0.5058107972, green: 0.3126704097, blue: 0.08611684293, alpha: 1)
+        public static let fcpAdjustmentClips2 = #colorLiteral(red: 0.683828339, green: 0.4227131728, blue: 0.1164252285, alpha: 1)
+        public static let fcpFoley1 =           #colorLiteral(red: 0.3768741899, green: 0.5601573603, blue: 0.1064454123, alpha: 1)
+        public static let fcpFoley2 =           #colorLiteral(red: 0.2555211484, green: 0.3797873557, blue: 0.07217011601, alpha: 1)
+        public static let fcpMusic1 =           #colorLiteral(red: 0.07852575928, green: 0.3265568018, blue: 0.1685996056, alpha: 1)
+        public static let fcpEffects =          #colorLiteral(red: 0.09073310345, green: 0.342267096, blue: 0.361043334, alpha: 1)
+        public static let fcpVocalizations =    #colorLiteral(red: 0.09079078585, green: 0.3421320617, blue: 0.2794510722, alpha: 1)
+        public static let fcpDialogue =         #colorLiteral(red: 0.1128803566, green: 0.2022444606, blue: 0.3314594924, alpha: 1)
+        public static let fcpTitles =           #colorLiteral(red: 0.3136634827, green: 0.2073241472, blue: 0.5196961164, alpha: 1)
     }
 
     // MARK: Some static defaults
@@ -68,24 +87,47 @@
     extension SPFKColor {
         public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
         public static let alphaWhite02 = NSColor.white.withAlphaComponent(0.02)
-
         public static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
         public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.6)
-
         public static let defaultControlSelected = Self.xcPreprocessor.withAlphaComponent(0.3)
         public static let defaultControlUnselected = alphaWhite06
         public static let defaultControlStrokeSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark)
         public static let defaultControlStrokeUnselected = SPFKColor.textColor.value(for: .dark)
 
-        public static let xcHexColors: [HexColor] = [
-            xcAttribute, xcCharacter, xcClass, xcComments, xcKeyword,
-            xcOther, xcPreprocessor, xcRegEx, xcString, xcType, xcURL,
-            xcPurple
+        public static let customSwatchColors: [HexColor] = [
+            xcPreprocessor,
+            xcRegEx,
+            xcKeyword,
+            xcString,
+            xcAttribute,
+            xcCharacter,
+            xcComments,
+            xcClass,
+            xcType,
+            xcOther,
+            xcURL,
+            xcPurple,
+            //
+            fcpFootsteps,
+            fcpMusic2,
+            fcpSoundDesign,
+            fcpAdjustmentClips1,
+            fcpAdjustmentClips2,
+            fcpFoley1,
+            fcpFoley2,
+            fcpMusic1,
+            fcpEffects,
+            fcpVocalizations,
+            fcpDialogue,
+            fcpTitles
         ].compactMap {
             HexColor(nsColor: $0)
         }
+
+        public static func random() -> HexColor? {
+            customSwatchColors.randomElement()
+        }
     }
 
-    // swiftformat:enable consecutiveSpaces
-
 #endif
+// swiftformat:enable consecutiveSpaces
