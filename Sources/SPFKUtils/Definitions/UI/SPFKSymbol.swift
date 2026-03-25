@@ -6,7 +6,7 @@ import Foundation
 /// or images.
 ///
 /// SPFKSymbol.arrowClockwise.tinted(color: .lightGray)
-/// SPFKSymbol.arrowClockwise.tinted(color: .white)
+/// SPFKSymbol.arrowClockwise.tinted()
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowClockwise = "arrow.clockwise"
@@ -166,6 +166,11 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
                 named: rawValue,
                 tinted: color
             )
+        }
+
+        @MainActor
+        public func tinted(currentScheme: SPFKColorScheme = .currentScheme) -> NSImage? {
+            tinted(color: SPFKColor.schemeColor.value(for: currentScheme))
         }
     }
 

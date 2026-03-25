@@ -20,6 +20,8 @@
         case secondaryLabelColor
         case selectedTextColor
         case textColor
+        case schemeColor
+        case schemeColorAlternate
 
         public func value(for scheme: SPFKColorScheme) -> NSColor {
             switch self {
@@ -34,6 +36,8 @@
             case .secondaryLabelColor:          scheme == .dark ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5490196078) : #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5490196078)
             case .selectedTextColor:            scheme == .dark ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1) : #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .textColor:                    scheme == .dark ? #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1) : #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
+            case .schemeColor:                  scheme == .dark ? #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1) : #colorLiteral(red: 0.1600990295, green: 0.1600990295, blue: 0.1600990295, alpha: 1)
+            case .schemeColorAlternate:         scheme == .dark ? #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1) : #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
             }
         }
 
