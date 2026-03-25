@@ -60,6 +60,7 @@
         public static let xcString =        #colorLiteral(red: 0.7784311771, green: 0.5900088549, blue: 0.5077829957, alpha: 1)
         public static let xcType =          #colorLiteral(red: 0.496894896, green: 0.8131126761, blue: 0.9852605462, alpha: 1)
         public static let xcURL =           #colorLiteral(red: 0.4614251852, green: 0.6554939747, blue: 0.9696692824, alpha: 1)
+        public static let xcPurple =        #colorLiteral(red: 0.6859937906, green: 0.4683517218, blue: 0.9155258536, alpha: 1)
     }
 
     // MARK: Some static defaults
@@ -75,6 +76,14 @@
         public static let defaultControlUnselected = alphaWhite06
         public static let defaultControlStrokeSelected = SPFKColor.controlActiveBackgroundColor.value(for: .dark)
         public static let defaultControlStrokeUnselected = SPFKColor.textColor.value(for: .dark)
+
+        public static let xcHexColors: [HexColor] = [
+            xcAttribute, xcCharacter, xcClass, xcComments, xcKeyword,
+            xcOther, xcPreprocessor, xcRegEx, xcString, xcType, xcURL,
+            xcPurple
+        ].compactMap {
+            HexColor(nsColor: $0)
+        }
     }
 
     // swiftformat:enable consecutiveSpaces
