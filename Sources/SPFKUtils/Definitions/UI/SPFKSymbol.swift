@@ -27,6 +27,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case chevronMarkup = "chevron.left.forwardslash.chevron.right"
     case chevronRight = "chevron.right"
     case chevronUp = "chevron.up"
+    case circle
+    case circleFill = "circle.fill"
     case clock
     case copy = "document.on.document"
     case cut = "scissors"
