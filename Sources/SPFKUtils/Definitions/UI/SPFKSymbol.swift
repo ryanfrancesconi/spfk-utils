@@ -150,6 +150,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case waveformSimple = "waveform.path.ecg"
     case wrenchAndScrewdriver = "wrench.and.screwdriver"
     case xmark
+    case xCircleFill = "x.circle.fill"
 
     public var systemSymbolName: String { rawValue }
 }
