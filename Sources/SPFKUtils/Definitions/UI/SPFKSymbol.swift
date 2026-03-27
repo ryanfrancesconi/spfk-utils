@@ -86,6 +86,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case photo
     case piano = "pianokeys.inverse"
     case play
+    case pencil
+    case squareAndPencil = "square.and.pencil"
     case playFill = "play.fill"
     case playlist = "music.note.list"
     case playSquareStack = "play.square.stack"
@@ -104,7 +106,6 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case rewindFill = "backward.fill"
     case save = "square.and.arrow.down"
     case saveMultiple = "square.and.arrow.down.on.square"
-    case searchSparkle = "sparkle.magnifyingglass"
     case selectAll = "character.textbox"
     case selectNext = "arrowtriangle.down.fill"
     case selectPrevious = "arrowtriangle.up.fill"
@@ -114,6 +115,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sliderHorizontal = "slider.horizontal.3"
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
+    case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
     case speakerWave3 = "speaker.wave.3"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"
@@ -134,6 +136,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case triangle
     case tuningfork
     case undo = "arrow.uturn.backward"
+    case wandAndSparkles = "wand.and.sparkles"
     case warning = "exclamationmark.triangle"
     case warningCircle = "exclamationmark.circle"
     case warningCircleFill = "exclamationmark.circle.fill"
