@@ -15,3 +15,16 @@ extension NSAttributedString {
         )
     }
 }
+
+extension NSAttributedString {
+    public func height(withConstrainedWidth width: CGFloat) -> CGFloat {
+        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
+        let boundingBox = boundingRect(
+            with: constraintRect,
+            options: [.usesLineFragmentOrigin, .usesFontLeading], // Required for multi-line and font-specific calc
+            context: nil
+        )
+
+        return ceil(boundingBox.height)
+    }
+}
