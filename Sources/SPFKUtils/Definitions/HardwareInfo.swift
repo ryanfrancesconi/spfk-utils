@@ -65,7 +65,7 @@ public enum HardwareInfo {
         var info = "macOS \(os)\n"
         info += "\(chipname ?? "?"), "
         info += "\(ProcessInfo.processInfo.activeProcessorCount) cores. "
-        info += "\(memory).\n\n"
+        info += "\(memory)."
 
         return info
     }()
