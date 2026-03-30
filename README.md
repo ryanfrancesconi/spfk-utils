@@ -25,7 +25,7 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 ### UI
 
 - **HexColor / RGBAColor** — Hex string and RGBA representations for cross-platform color handling.
-- **SPFKColor / ComponentColor** — Platform-agnostic color types bridging AppKit and UIKit.
+- **SPFKColor /  CustomComponentColor ** — Platform-agnostic color types bridging AppKit and UIKit.
 - **AppearanceObserver** — Observe system appearance (light/dark mode) changes via Combine.
 - **StateImage** — Associate images with on/off/disabled control states.
 - **FirstResponder** — Utilities for managing first responder status in AppKit.

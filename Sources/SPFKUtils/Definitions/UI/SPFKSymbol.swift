@@ -114,6 +114,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case settings = "gear"
     case shield
     case showAll = "rectangle.on.rectangle"
+    case sidebarLeading = "sidebar.leading"
+    case sidebarTrailing = "sidebar.trailing"
     case sliderHorizontal = "slider.horizontal.3"
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
@@ -151,6 +153,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case waveformSimple = "waveform.path.ecg"
     case wrenchAndScrewdriver = "wrench.and.screwdriver"
     case xmark
+    case xCircle = "x.circle"
     case xCircleFill = "x.circle.fill"
 
     public var systemSymbolName: String { rawValue }
@@ -178,7 +181,15 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
 
         @MainActor
         public func tinted(currentScheme: SPFKColorScheme = .currentScheme) -> NSImage? {
-            tinted(color: SPFKColor.schemeColor.value(for: currentScheme))
+            let appearanceName: NSAppearance.Name = currentScheme == .dark ? .darkAqua : .aqua
+            let appearance = NSAppearance(named: appearanceName) ?? NSAppearance.currentDrawing()
+            var color: NSColor = SPFKColor.schemeColor.nsColor
+            appearance.performAsCurrentDrawingAppearance {
+                if let resolved = NSColor(cgColor: SPFKColor.schemeColor.cgColor) {
+                    color = resolved
+                }
+            }
+            return tinted(color: color)
         }
     }
 

@@ -18,8 +18,8 @@
         }
 
         public func stateImage(
-            offColor: NSColor = .lightGray,
-            onColor: NSColor = .white,
+            offColor: NSColor = SPFKColor.secondaryLabelColor.nsColor,
+            onColor: NSColor = SPFKColor.selectedLabelColor.nsColor,
             size: NSSize? = nil
         ) -> StateImage {
             guard let on = nsImageAlternate?.tinted(color: onColor),

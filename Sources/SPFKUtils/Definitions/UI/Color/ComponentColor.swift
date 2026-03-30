@@ -1,41 +1,41 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 #if os(macOS)
-
-    // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
-
     import Foundation
 
-    public struct ComponentColor {
+    public struct CustomComponentColor {
         public enum Key: CaseIterable {
             case background
             case text
             case stroke
         }
 
-        public var collection: [Key: SelectedColor] = {
-            var collection = [Key: SelectedColor]()
+        public var collection: [Key: StateColor] = {
+            var collection = [Key: StateColor]()
 
-            collection[.background] = SelectedColor(
-                selected: SPFKColor.controlActiveBackgroundColor.value(for: .dark),
-                unselected: SPFKColor.controlAlphaBackgroundColor.value(for: .dark)
+            collection[.background] = StateColor(
+                selected: SPFKColor.controlActiveBackgroundColor.nsColor,
+                unselected: SPFKColor.controlAlphaBackgroundColor.nsColor,
+                disabled: SPFKColor.controlAlphaBackgroundColor.nsColor
             )
 
-            collection[.text] = SelectedColor(
-                selected: SPFKColor.selectedTextColor.value(for: .dark),
-                unselected: SPFKColor.textColor.value(for: .dark)
+            collection[.text] = StateColor(
+                selected: SPFKColor.selectedLabelColor.nsColor,
+                unselected: SPFKColor.labelColor.nsColor,
+                disabled: SPFKColor.disabledLabelColor.nsColor
             )
 
-            collection[.stroke] = SelectedColor(
-                selected: SPFKColor.controlAccentColor.value(for: .dark),
-                unselected: SPFKColor.controlAlphaBackgroundColor.value(for: .dark)
+            collection[.stroke] = StateColor(
+                selected: SPFKColor.controlAccentColor.nsColor,
+                unselected: SPFKColor.controlAlphaBackgroundColor.nsColor,
+                disabled: SPFKColor.controlAlphaBackgroundColor.nsColor
             )
 
             return collection
         }()
 
-        public subscript(key: Key) -> SelectedColor {
-            get { collection[key] ?? SelectedColor() }
+        public subscript(key: Key) -> StateColor {
+            get { collection[key] ?? StateColor() }
             set {
                 collection[key] = newValue
             }
