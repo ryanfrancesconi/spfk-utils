@@ -81,10 +81,10 @@
             case .windowBackgroundColor:        .windowBackgroundColor
                 
             case .controlAccentColor:           Self.fcpAdjustmentClips2
-            case .controlActiveBackgroundColor: Self.fcpAdjustmentClips2.withAlphaComponent(0.3)
+            case .controlActiveBackgroundColor: Self.fcpAdjustmentClips2.withAlphaComponent(0.6)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.6)
-            case .controlDarkBackgroundColor:   #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 0.7)
+            case .controlDarkBackgroundColor:   .black.withAlphaComponent(0.06)
             case .defaultWaveformColor:         Self.fcpMusic2
             case .gridBackgroundColor:          #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             case .gridColor:                    #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
@@ -94,7 +94,7 @@
             case .selectedLabelColor:           #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .disabledLabelColor:            .disabledControlTextColor
             case .headerLabelColor:             .labelColor.withAlphaComponent(0.75)
-            case .schemeColor:                  #colorLiteral(red: 0.1600990295, green: 0.1600990295, blue: 0.1600990295, alpha: 1)
+            case .schemeColor:                  #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
             case .schemeColorAlternate:         #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
             }
         }
