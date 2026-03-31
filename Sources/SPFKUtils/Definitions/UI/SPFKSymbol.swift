@@ -16,6 +16,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case audioUnit = "dot.radiowaves.left.and.right"
     case barcode
     case bookmark
+    case bubbleLeft = "bubble.left"
     case cCircle = "c.circle"
     case cCircleFill = "c.circle.fill"
     case circleSlash = "circle.slash"
