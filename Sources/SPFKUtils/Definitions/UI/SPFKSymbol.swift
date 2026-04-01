@@ -53,6 +53,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case folderGearBadge = "folder.badge.gearshape"
     case forward
     case forwardFill = "forward.fill"
+    case gauge = "gauge.medium"
     case gearshape
     case hammer
     case headphones
