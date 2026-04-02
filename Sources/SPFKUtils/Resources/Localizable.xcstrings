@@ -2,7 +2,74 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Please allow access to this directory by choosing Open..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erlauben Sie den Zugriff auf dieses Verzeichnis durch Auswahl von Öffnen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please allow access to this directory by choosing Open..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, concede acceso a este directorio eligiendo Abrir..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez autoriser l'accès à ce dossier en choisissant Ouvrir..."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti l'accesso a questa cartella scegliendo Apri..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「開く」を選択してこのディレクトリへのアクセスを許可してください..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "열기를 선택하여 이 디렉토리에 대한 접근을 허용하세요..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sta toegang toe tot deze map door Openen te kiezen..."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, conceda acesso a este diretório escolhendo Abrir..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешите доступ к этой папке, выбрав «Открыть»..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请通过选择「打开」来允许访问此目录..."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
