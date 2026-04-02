@@ -11,6 +11,7 @@ import Foundation
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowClockwise = "arrow.clockwise"
     case arrowRightArrowLeft = "arrow.right.arrow.left"
+    case arrowLeftAndRight = "arrow.left.and.right"
     case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
     case arrowTurnDownLeft = "arrow.turn.down.left"
     case audioUnit = "dot.radiowaves.left.and.right"
@@ -34,6 +35,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case copy = "document.on.document"
     case cut = "scissors"
     case dialHigh = "dial.high"
+    case document
     case documentBadgePlus = "document.badge.plus"
     case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
     case dragHandle = "line.3.horizontal"
@@ -59,8 +61,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case headphones
     case hide = "rectangle.dashed"
     case hideOthers = "rectangle.on.rectangle.dashed"
-    case horizontalPanelMaximize = "square.bottomhalf.filled"
-    case horizontalPanelMinimize = "square.tophalf.filled"
+    case horizontalPanelMaximized = "inset.filled.topthird.rectangle"
+    case horizontalPanelMinimized = "inset.filled.bottomthird.rectangle"
     case infoBubble = "info.bubble"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
@@ -148,7 +150,9 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case warningCircleFill = "exclamationmark.circle.fill"
     case warningFill = "exclamationmark.triangle.fill"
     case waveform = "waveform.path"
+    case waveformMid = "waveform.mid"
     case waveformBadgePlus = "waveform.badge.plus"
+    case waveformBadgeCheckmark = "waveform.badge.checkmark"
     case waveformCircle = "waveform.circle"
     case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
     case waveformRectangle = "waveform.path.ecg.rectangle"
