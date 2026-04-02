@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "spfk-utils",
+    defaultLocalization: "en",
     platforms: [.macOS(.v13), .iOS(.v16),],
     products: [
         .library(
@@ -27,7 +28,8 @@ let package = Package(
                 .product(name: "SPFKFileSystem", package: "spfk-filesystem"),
                 .product(name: "AEXML", package: "AEXML"),
                 .product(name: "Checksum", package: "Checksum"),
-            ]
+            ],
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "SPFKUtilsTests",

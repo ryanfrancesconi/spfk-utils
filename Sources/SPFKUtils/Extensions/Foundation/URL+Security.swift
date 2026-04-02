@@ -32,7 +32,7 @@ extension URL {
         @MainActor
         public func authorize() throws {
             let panel = NSOpenPanel()
-            panel.message = "Please allow access to this directory by choosing Open..."
+            panel.message = String(localized: "Please allow access to this directory by choosing Open...", bundle: .module)
             panel.canChooseDirectories = true
             panel.canChooseFiles = false
             panel.directoryURL = isDirectory ? self : deletingLastPathComponent()
