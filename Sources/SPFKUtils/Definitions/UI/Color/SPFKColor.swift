@@ -142,7 +142,7 @@
         public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
         public static let alphaWhite02 = NSColor.white.withAlphaComponent(0.02)
         public static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
-        public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.6)
+        public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.8)
 
         /// Dynamic: selected control fill color. Re-resolves per appearance context.
         public static var defaultControlSelected: NSColor {
