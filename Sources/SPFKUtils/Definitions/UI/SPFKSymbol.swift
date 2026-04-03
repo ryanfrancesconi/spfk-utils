@@ -59,6 +59,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case gauge = "gauge.medium"
     case gearshape
     case hammer
+    case handWave = "hand.wave"
     case headphones
     case hide = "rectangle.dashed"
     case hideOthers = "rectangle.on.rectangle.dashed"
