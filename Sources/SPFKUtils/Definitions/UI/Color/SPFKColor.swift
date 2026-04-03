@@ -10,7 +10,7 @@
     public enum SPFKColor {
         case clear
         case windowBackgroundColor
-        
+
         case controlAccentColor
         case controlActiveBackgroundColor
         case controlAlphaBackgroundColor
@@ -53,7 +53,6 @@
             switch self {
             case .clear:                        .clear
             case .windowBackgroundColor:        .windowBackgroundColor
-                
             case .controlAccentColor:           Self.xcPreprocessor
             case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.3)
             case .controlAlphaBackgroundColor:  .white.withAlphaComponent(0.06)
@@ -79,7 +78,6 @@
             switch self {
             case .clear:                        .clear
             case .windowBackgroundColor:        .windowBackgroundColor
-                
             case .controlAccentColor:           Self.xcPreprocessor
             case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.5)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
@@ -141,9 +139,10 @@
     extension SPFKColor {
         public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
         public static let alphaWhite02 = NSColor.white.withAlphaComponent(0.02)
-        public static let alphaBlack02 = NSColor.black.withAlphaComponent(0.2)
-        public static let alphaYellow = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.8)
-        public static let errorRed = NSColor(red: 0.75, green: 0.25, blue: 0.15, alpha: 1)
+        public static let alphaBlack20 = NSColor.black.withAlphaComponent(0.2)
+
+        public static let yellowWarning = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.8)
+        public static let redError = NSColor(red: 0.75, green: 0.25, blue: 0.15, alpha: 1)
 
         /// Dynamic: selected control fill color. Re-resolves per appearance context.
         public static var defaultControlSelected: NSColor {
