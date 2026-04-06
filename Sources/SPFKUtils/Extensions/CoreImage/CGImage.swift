@@ -5,6 +5,23 @@ import CoreImage
 import Foundation
 
 extension CGImage {
+    /// Fast content fingerprint using image dimensions and the first 256 bytes of raw pixel data.
+    /// Handles the common case of identical album artwork embedded in multiple tracks.
+    public var fingerprint: Int? {
+        var hasher = Hasher()
+        hasher.combine(width)
+        hasher.combine(height)
+
+        guard let cfData = dataProvider?.data else { return nil }
+
+        let data = cfData as Data
+        hasher.combine(
+            data.prefix(256)
+        )
+
+        return hasher.finalize()
+    }
+
     public func scaled(to size: CGSize) -> CGImage? {
         let width: Int = Int(size.width)
         let height: Int = Int(size.height)
