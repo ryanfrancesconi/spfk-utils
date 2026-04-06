@@ -74,7 +74,7 @@ final class ColorNameTests {
 
     @Test func darkGray() throws {
         let color = try #require(HexColor(string: "333333"))
-        #expect(color.colorName == .black)
+        #expect(color.colorName == .gray)
     }
 
     @Test func lightGray() throws {
