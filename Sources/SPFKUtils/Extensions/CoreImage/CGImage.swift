@@ -15,9 +15,7 @@ extension CGImage {
         guard let cfData = dataProvider?.data else { return nil }
 
         let data = cfData as Data
-        hasher.combine(
-            data.prefix(256)
-        )
+        hasher.combine(data.prefix(256))
 
         return hasher.finalize()
     }
