@@ -147,6 +147,32 @@
             }
         }
 
+        // MARK: - Fingerprint
+
+        @Test func fingerprintIsConsistentForSameImageLoadedTwice() async throws {
+            let url = TestBundleResources.shared.sharksandwich
+
+            let first = try #require(NSImage(contentsOf: url)?.cgImage)
+            let second = try #require(NSImage(contentsOf: url)?.cgImage)
+
+            let fp1 = try #require(first.fingerprint)
+            let fp2 = try #require(second.fingerprint)
+
+            #expect(fp1 == fp2)
+        }
+
+        @Test func fingerprintDiffersForDistinctImages() async throws {
+            let url = TestBundleResources.shared.sharksandwich
+
+            let original = try #require(NSImage(contentsOf: url)?.cgImage)
+            let scaled = try #require(original.scaled(to: CGSize(equal: 64)))
+
+            let fp1 = try #require(original.fingerprint)
+            let fp2 = try #require(scaled.fingerprint)
+
+            #expect(fp1 != fp2)
+        }
+
         @Test func exportOverwritesExistingFile() async throws {
             deleteBinOnExit = true
             let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
