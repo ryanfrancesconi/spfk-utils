@@ -142,6 +142,7 @@
         public static let alphaBlack20 = NSColor.black.withAlphaComponent(0.2)
 
         public static let yellowWarning = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.8)
+        public static let darkYellowWarning = #colorLiteral(red: 0.8179681825, green: 0.6191367307, blue: 0.06488587422, alpha: 1).withAlphaComponent(0.6)
         public static let redError = NSColor(red: 0.75, green: 0.25, blue: 0.15, alpha: 1)
 
         /// Dynamic: selected control fill color. Re-resolves per appearance context.
