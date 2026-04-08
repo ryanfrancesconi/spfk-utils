@@ -79,7 +79,7 @@
             case .clear:                        .clear
             case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAccentColor:           Self.xcPreprocessor
-            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.7)
+            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.6)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.6)
             case .controlDarkBackgroundColor:   .black.withAlphaComponent(0.06)
