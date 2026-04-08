@@ -79,7 +79,7 @@
             case .clear:                        .clear
             case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAccentColor:           Self.xcPreprocessor
-            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.5)
+            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.7)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.6)
             case .controlDarkBackgroundColor:   .black.withAlphaComponent(0.06)
@@ -139,6 +139,7 @@
     extension SPFKColor {
         public static let alphaWhite06 = NSColor.white.withAlphaComponent(0.06)
         public static let alphaWhite02 = NSColor.white.withAlphaComponent(0.02)
+        public static let alphaBlack06 = NSColor.black.withAlphaComponent(0.06)
         public static let alphaBlack20 = NSColor.black.withAlphaComponent(0.2)
 
         public static let yellowWarning = #colorLiteral(red: 0.9686274529, green: 0.7471076061, blue: 0.1296119144, alpha: 1).withAlphaComponent(0.8)
