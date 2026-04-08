@@ -130,6 +130,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sort = "arrow.up.arrow.down"
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
     case speakerWave3 = "speaker.wave.3"
+    case speakerWaveBubble = "speaker.wave.2.bubble"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"
     case star
