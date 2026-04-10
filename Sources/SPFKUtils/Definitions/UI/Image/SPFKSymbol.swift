@@ -47,6 +47,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case ellipsisCircle = "ellipsis.circle"
     case eraser
     case eraserLineDashed = "eraser.line.dashed"
+    case escape
     case export = "square.and.arrow.up"
     case exportMultiple = "square.and.arrow.up.on.square"
     case eye
