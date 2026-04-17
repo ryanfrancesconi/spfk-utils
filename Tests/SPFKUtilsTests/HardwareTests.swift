@@ -13,4 +13,9 @@ class HardwareTests {
 
         Log.debug(HardwareInfo.description)
     }
+
+    @Test func uuid() async throws {
+        let uuid = try #require(HardwareInfo.hardwareUUID)
+        Log.debug("hardwareUUID:", uuid)
+    }
 }

@@ -2,6 +2,7 @@
 
 import Darwin
 import Foundation
+import IOKit
 
 /// Only accounting for macOS
 public enum HardwareInfo {
@@ -11,8 +12,8 @@ public enum HardwareInfo {
 
         public var description: String {
             switch self {
-            case .arm64: return "Apple Silicon"
-            case .x86_64: return "Intel"
+            case .arm64: "Apple Silicon"
+            case .x86_64: "Intel"
             }
         }
     }
@@ -68,5 +69,21 @@ public enum HardwareInfo {
         info += "\(memory)."
 
         return info
+    }()
+
+    public static let hardwareUUID: String? = {
+        let platformExpert = IOServiceGetMatchingService(
+            kIOMainPortDefault,
+            IOServiceMatching("IOPlatformExpertDevice")
+        )
+
+        defer { IOObjectRelease(platformExpert) }
+
+        return IORegistryEntryCreateCFProperty(
+            platformExpert,
+            "IOPlatformUUID" as CFString,
+            kCFAllocatorDefault,
+            0
+        )?.takeRetainedValue() as? String
     }()
 }
