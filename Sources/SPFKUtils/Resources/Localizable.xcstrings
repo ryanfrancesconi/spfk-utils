@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Please allow access to this directory by choosing Open..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

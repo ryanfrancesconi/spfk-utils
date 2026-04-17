@@ -8,14 +8,7 @@
     extension FileSystem {
         @MainActor
         public static func authorizedFileURLs(at url: URL, showOpenPanel: Bool = true) async throws -> [URL] {
-            if showOpenPanel {
-                try url.authorize() // will open panel to select
-            }
-
-            return FileSystem.enumerateFiles(
-                in: url,
-                recursive: true
-            ).filter(\.isAuthorized)
+            return FileSystem.enumerateFiles(in: url, recursive: true)
         }
 
         @MainActor
