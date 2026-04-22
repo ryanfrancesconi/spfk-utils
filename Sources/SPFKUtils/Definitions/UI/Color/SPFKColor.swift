@@ -19,6 +19,7 @@
         case defaultWaveformColor
         case gridBackgroundColor
         case gridColor
+        case gridAlphaColor
 
         case labelColor
         case secondaryLabelColor
@@ -61,6 +62,7 @@
             case .defaultWaveformColor:         Self.xcPreprocessor
             case .gridBackgroundColor:          Self.alphaWhite02
             case .gridColor:                    #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1)
+            case .gridAlphaColor:               #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1).withAlphaComponent(0.04)
             case .labelColor:                   .labelColor
             case .secondaryLabelColor:          .secondaryLabelColor
             case .tertiaryLabelColor:           .tertiaryLabelColor
@@ -86,6 +88,7 @@
             case .defaultWaveformColor:         Self.fcpMusic2
             case .gridBackgroundColor:          Self.alphaBlack06
             case .gridColor:                    #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
+            case .gridAlphaColor:               #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1).withAlphaComponent(0.04)
             case .labelColor:                   .labelColor
             case .secondaryLabelColor:          .secondaryLabelColor
             case .tertiaryLabelColor:           .tertiaryLabelColor
