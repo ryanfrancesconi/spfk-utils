@@ -35,6 +35,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case circle
     case circleFill = "circle.fill"
     case clock
+    case clockArrowCirclepath = "clock.arrow.circlepath"
     case copy = "document.on.document"
     case cut = "scissors"
     case dialHigh = "dial.high"
