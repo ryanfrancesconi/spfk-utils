@@ -54,6 +54,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case eye
     case eyeSlash = "eye.slash"
     case fill = "inset.filled.rectangle"
+    case film
     case finder
     case flag
     case folder
@@ -86,10 +87,12 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case metronomeFill = "metronome.fill"
     case minus
     case minusDiamond = "minus.diamond"
+    case movieclapper
     case musicNote = "music.note"
     case musicNoteSlash = "music.note.slash"
     case musicPages = "music.pages"
     case nosign
+    case numbers
     case openDocument = "arrow.up.forward.square"
     case paintPaletteFill = "paintpalette.fill"
     case paste = "document.on.clipboard"
@@ -118,6 +121,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case rewindAll = "backward.end"
     case rewindAllFill = "backward.end.fill"
     case rewindFill = "backward.fill"
+    case ruler
     case save = "square.and.arrow.down"
     case saveMultiple = "square.and.arrow.down.on.square"
     case selectAll = "character.textbox"
