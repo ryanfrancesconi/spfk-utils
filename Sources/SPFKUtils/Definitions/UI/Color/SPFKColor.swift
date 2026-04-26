@@ -68,7 +68,7 @@
             case .tertiaryLabelColor:           .tertiaryLabelColor
             case .selectedLabelColor:           #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
             case .disabledLabelColor:            .disabledControlTextColor
-            case .headerLabelColor:             .labelColor.withAlphaComponent(0.75)
+            case .headerLabelColor:             .labelColor.withAlphaComponent(0.6)
             case .schemeColor:                  #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1)
             case .schemeColorAlternate:         #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
             }
@@ -94,7 +94,7 @@
             case .tertiaryLabelColor:           .tertiaryLabelColor
             case .selectedLabelColor:           #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .disabledLabelColor:            .disabledControlTextColor
-            case .headerLabelColor:             .labelColor.withAlphaComponent(0.75)
+            case .headerLabelColor:             .labelColor.withAlphaComponent(0.6)
             case .schemeColor:                  #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
             case .schemeColorAlternate:         #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
             }
