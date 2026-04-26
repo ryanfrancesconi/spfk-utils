@@ -84,7 +84,7 @@
             case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.6)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.8192069575)
-            case .controlDarkBackgroundColor:   #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1).withAlphaComponent(0.3)
+            case .controlDarkBackgroundColor:   #colorLiteral(red: 0.9742538333, green: 0.9742538333, blue: 0.9742538333, alpha: 1)
             case .defaultWaveformColor:         Self.fcpMusic2
             case .gridBackgroundColor:          Self.alphaBlack06
             case .gridColor:                    #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
