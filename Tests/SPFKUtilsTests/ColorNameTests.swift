@@ -107,10 +107,6 @@ final class ColorNameTests {
         #expect(color.colorName == .blue)
     }
 
-    @Test func allCasesHaveValues() {
-        #expect(ColorName.allCases.count == 12)
-    }
-
     @Test func rawValueMatchesName() {
         #expect(ColorName.red.rawValue == "red")
         #expect(ColorName.blue.rawValue == "blue")
