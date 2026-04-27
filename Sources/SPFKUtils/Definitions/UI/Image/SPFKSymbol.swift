@@ -144,6 +144,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case stopwatch
     case tablecells
     case tablecellsFill = "tablecells.fill"
+    case tablecellBadgeEllipse = "tablecells.badge.ellipsis"
     case tag
     case tagFill = "tag.fill"
     case tagSlash = "tag.slash"
