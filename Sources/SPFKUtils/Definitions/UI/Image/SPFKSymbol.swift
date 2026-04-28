@@ -18,6 +18,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case barcode
     case bell
     case bookmark
+    case bookmarkSlash = "bookmark.slash"
     case bubbleLeft = "bubble.left"
     case calendar
     case cart
@@ -39,6 +40,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case copy = "document.on.document"
     case cut = "scissors"
     case dialHigh = "dial.high"
+    case diamond
     case document
     case documentBadgePlus = "document.badge.plus"
     case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
