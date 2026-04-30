@@ -151,6 +151,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case tagFill = "tag.fill"
     case tagSlash = "tag.slash"
     case tagSlashFill = "tag.slash.fill"
+    case textAlignLeft = "text.alignleft"
+    case textAlignRight = "text.alignright"
     case textBadgePlus = "text.badge.plus"
     case textDocumentMagnifyingGlass = "text.page.badge.magnifyingglass"
     case textMagnifyingGlass = "text.magnifyingglass"
