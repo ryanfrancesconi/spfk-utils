@@ -22,4 +22,17 @@
         }
     }
 
+    extension NSTextField {
+        public var textSize: NSSize {
+            guard let font else {
+                return frame.size
+            }
+
+            let fontAttributes = [NSAttributedString.Key.font: font]
+            let size = stringValue.size(withAttributes: fontAttributes)
+
+            return size
+        }
+    }
+
 #endif
