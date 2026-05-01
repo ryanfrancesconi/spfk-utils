@@ -72,6 +72,7 @@
             return nil
         }
 
+        @discardableResult
         public mutating func update(node: OutlineNode, isExpanded: Bool) -> Bool {
             for i in 0 ..< nodes.count where nodes[i] == node {
                 nodes[i].isExpanded = isExpanded
