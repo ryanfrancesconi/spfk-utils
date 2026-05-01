@@ -72,11 +72,13 @@
             return nil
         }
 
-        public mutating func update(node: OutlineNode, isExpanded: Bool) {
+        public mutating func update(node: OutlineNode, isExpanded: Bool) -> Bool {
             for i in 0 ..< nodes.count where nodes[i] == node {
                 nodes[i].isExpanded = isExpanded
-                Log.debug(nodes[i].title, isExpanded)
+                return true
             }
+
+            return false
         }
 
         public mutating func update(nodes: [OutlineNode]) throws {
@@ -186,6 +188,8 @@
 
             if let occupyingNode = self[index: atIndex], !occupyingNode.isEditable {
                 atIndex += 1
+
+                Log.debug("atIndex+1 now is", atIndex)
             }
 
             guard nodes.indices.contains(atIndex) else {

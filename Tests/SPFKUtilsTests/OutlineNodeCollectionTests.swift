@@ -431,6 +431,139 @@
             #expect(collection.nodes[1].title == "Inserted Group")
         }
 
+        // MARK: - Drag Drop Index Adjustment
+
+        // Exercises the full drag pipeline: given NSOutlineView's proposedChildIndex
+        // (pre-removal coordinate), compute adjustedAtIndex, then call insert(groupNodes:atIndex:).
+        // The adjustment formula: adjustedAtIndex = proposedChildIndex - count(dragged nodes
+        // whose current index < proposedChildIndex).
+        @Test func dragDropIndexAdjustment() throws {
+            func adjusted(proposedChildIndex: Int, draggedIndex: Int) -> Int {
+                let removedBefore = draggedIndex < proposedChildIndex ? 1 : 0
+                return max(0, proposedChildIndex - removedBefore)
+            }
+
+            func check(proposed: Int, draggedIndex: Int, expectedOrder: [Int], file: String = #filePath, line: Int = #line) throws {
+                var collection = try createFourGroups()
+                let ids = collection.nodes.map(\.id)
+                let dragged = collection.nodes[draggedIndex]
+                collection.insert(groupNodes: [dragged], atIndex: adjusted(proposedChildIndex: proposed, draggedIndex: draggedIndex))
+                #expect(collection.nodes.map(\.id) == expectedOrder.map { ids[$0] }, sourceLocation: .init(fileID: file, filePath: file, line: line, column: 1))
+            }
+
+            // [G0, G1, G2, G3]
+            // drag G2 (index=2) to front: proposed=0, removedBefore=0, adjusted=0 → [G2,G0,G1,G3]
+            try check(proposed: 0, draggedIndex: 2, expectedOrder: [2, 0, 1, 3])
+            // drag G1 (index=1) past G2: proposed=3, removedBefore=1, adjusted=2 → [G0,G2,G1,G3]
+            try check(proposed: 3, draggedIndex: 1, expectedOrder: [0, 2, 1, 3])
+            // drag G0 (index=0) to end: proposed=4, removedBefore=1, adjusted=3 → [G1,G2,G3,G0]
+            try check(proposed: 4, draggedIndex: 0, expectedOrder: [1, 2, 3, 0])
+            // drag G2 (index=2) to end: proposed=4, removedBefore=1, adjusted=3 → [G0,G1,G3,G2]
+            try check(proposed: 4, draggedIndex: 2, expectedOrder: [0, 1, 3, 2])
+            // drag G3 (index=3) one step back: proposed=2, removedBefore=0, adjusted=2 → [G0,G1,G3,G2]
+            try check(proposed: 2, draggedIndex: 3, expectedOrder: [0, 1, 3, 2])
+            // drag G3 (index=3) to second slot: proposed=1, removedBefore=0, adjusted=1 → [G0,G3,G1,G2]
+            try check(proposed: 1, draggedIndex: 3, expectedOrder: [0, 3, 1, 2])
+        }
+
+        // MARK: - Group Reorder (Move Existing)
+
+        // These tests cover moving a group that is ALREADY in the collection to a new position.
+        // The input `atIndex` is the pre-adjusted value that the drag handler computes
+        // (rawProposedChildIndex minus the count of dragged nodes whose current index is
+        // before the target). The collection's remove-then-insert must land the node at the
+        // correct final position.
+
+        // Helper: 4 groups with no children.
+        // uuids[0]=G0, uuids[1]=G1, uuids[2]=G2, uuids[3]=G3
+        func createFourGroups() throws -> OutlineNodeCollection {
+            try create(nodeCount: 4, childrenCount: 0)
+        }
+
+        @Test func reorderMoveBackwardToFront() throws {
+            // [G0, G1, G2, G3] → drag G2 to front (proposedChildIndex=0, adjustedAtIndex=0)
+            // G2's index (2) >= 0, so no adjustment → adjustedAtIndex = 0
+            // Expected: [G2, G0, G1, G3]
+            var collection = try createFourGroups()
+            let g2 = try #require(collection[uuid: uuids[2]])
+
+            collection.insert(groupNodes: [g2], atIndex: 0)
+
+            #expect(collection.nodes[0].id == uuids[2])
+            #expect(collection.nodes[1].id == uuids[0])
+            #expect(collection.nodes[2].id == uuids[1])
+            #expect(collection.nodes[3].id == uuids[3])
+        }
+
+        @Test func reorderMoveBackwardOneStep() throws {
+            // [G0, G1, G2, G3] → drag G2 to before G1 (proposedChildIndex=1, adjustedAtIndex=1)
+            // G2's index (2) >= 1 → adjustedAtIndex = 1
+            // Expected: [G0, G2, G1, G3]
+            var collection = try createFourGroups()
+            let g2 = try #require(collection[uuid: uuids[2]])
+
+            collection.insert(groupNodes: [g2], atIndex: 1)
+
+            #expect(collection.nodes[0].id == uuids[0])
+            #expect(collection.nodes[1].id == uuids[2])
+            #expect(collection.nodes[2].id == uuids[1])
+            #expect(collection.nodes[3].id == uuids[3])
+        }
+
+        @Test func reorderMoveForwardOneStep() throws {
+            // [G0, G1, G2, G3] → drag G1 to between G2 and G3 (proposedChildIndex=3)
+            // G1's index (1) < 3 → adjustedAtIndex = 3 - 1 = 2
+            // Expected: [G0, G2, G1, G3]
+            var collection = try createFourGroups()
+            let g1 = try #require(collection[uuid: uuids[1]])
+
+            collection.insert(groupNodes: [g1], atIndex: 2)
+
+            #expect(collection.nodes[0].id == uuids[0])
+            #expect(collection.nodes[1].id == uuids[2])
+            #expect(collection.nodes[2].id == uuids[1])
+            #expect(collection.nodes[3].id == uuids[3])
+        }
+
+        @Test func reorderMoveForwardToEnd() throws {
+            // [G0, G1, G2, G3] → drag G0 to end (proposedChildIndex=4)
+            // G0's index (0) < 4 → adjustedAtIndex = 4 - 1 = 3
+            // Expected: [G1, G2, G3, G0]
+            var collection = try createFourGroups()
+            let g0 = try #require(collection[uuid: uuids[0]])
+
+            collection.insert(groupNodes: [g0], atIndex: 3)
+
+            #expect(collection.nodes[0].id == uuids[1])
+            #expect(collection.nodes[1].id == uuids[2])
+            #expect(collection.nodes[2].id == uuids[3])
+            #expect(collection.nodes[3].id == uuids[0])
+        }
+
+        @Test func reorderSortIndexesUpdatedAfterMove() throws {
+            // After a reorder, sortIndexes must reflect new positions.
+            var collection = try createFourGroups()
+            let g3 = try #require(collection[uuid: uuids[3]])
+
+            collection.insert(groupNodes: [g3], atIndex: 0) // move last to front
+
+            for i in 0 ..< collection.nodes.count {
+                #expect(collection.nodes[i].sortIndex == i)
+            }
+        }
+
+        @Test func reorderExpandedStatePreservedAfterMove() throws {
+            // Expanded state must survive a reorder.
+            // [G0, G1, G2, G3] → drag G1 to end (proposedChildIndex=4, adjustedAtIndex=3)
+            var collection = try createFourGroups()
+            collection.update(node: collection[uuid: uuids[1]]!, isExpanded: true)
+
+            let g1 = try #require(collection[uuid: uuids[1]])
+            collection.insert(groupNodes: [g1], atIndex: 3)
+
+            #expect(collection[uuid: uuids[1]]?.isExpanded == true)
+        }
+
         @Test func insertGroupNodesFallsBackToAppend() throws {
             var collection = try create(nodeCount: 2, childrenCount: 1)
 
