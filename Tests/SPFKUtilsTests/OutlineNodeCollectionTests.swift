@@ -466,6 +466,58 @@
             try check(proposed: 1, draggedIndex: 3, expectedOrder: [0, 3, 1, 2])
         }
 
+        // MARK: - Leaf Reorder (Move Existing within same group)
+
+        // These tests cover the remove-then-insert offset for leaf nodes.
+        // NSOutlineView reports childIndex in pre-removal coordinates. The drag handler
+        // must subtract the count of same-group nodes being removed whose index < childIndex.
+
+        @Test func leafReorderForwardOneStep() throws {
+            // [C0, C1, C2] → drag C0 to between C1 and C2 (proposed childIndex=2)
+            // C0 is at index 0, which is < 2 → removedBefore=1, adjustedIndex=1
+            // Expected: [C1, C0, C2]
+            var collection = try create(nodeCount: 1, childrenCount: 3)
+            let parentId = uuids[0]
+            let c0id = uuids[1], c1id = uuids[2], c2id = uuids[3]
+
+            let c0 = try #require(collection[uuid: c0id])
+            let removedBefore = [c0].filter { $0.parentId == parentId }
+                .compactMap { collection.indexOf(node: $0) }
+                .filter { $0 < 2 }.count
+            let adjustedIndex = max(0, 2 - removedBefore)
+
+            try collection.remove(nodes: [c0])
+            try collection.insert(nodes: [c0], in: parentId, atIndex: adjustedIndex)
+
+            let parent = try #require(collection[uuid: parentId])
+            #expect(parent.children[0].id == c1id)
+            #expect(parent.children[1].id == c0id)
+            #expect(parent.children[2].id == c2id)
+        }
+
+        @Test func leafReorderBackwardOneStep() throws {
+            // [C0, C1, C2] → drag C2 to between C0 and C1 (proposed childIndex=1)
+            // C2 is at index 2, which is NOT < 1 → removedBefore=0, adjustedIndex=1
+            // Expected: [C0, C2, C1]
+            var collection = try create(nodeCount: 1, childrenCount: 3)
+            let parentId = uuids[0]
+            let c0id = uuids[1], c1id = uuids[2], c2id = uuids[3]
+
+            let c2 = try #require(collection[uuid: c2id])
+            let removedBefore = [c2].filter { $0.parentId == parentId }
+                .compactMap { collection.indexOf(node: $0) }
+                .filter { $0 < 1 }.count
+            let adjustedIndex = max(0, 1 - removedBefore)
+
+            try collection.remove(nodes: [c2])
+            try collection.insert(nodes: [c2], in: parentId, atIndex: adjustedIndex)
+
+            let parent = try #require(collection[uuid: parentId])
+            #expect(parent.children[0].id == c0id)
+            #expect(parent.children[1].id == c2id)
+            #expect(parent.children[2].id == c1id)
+        }
+
         // MARK: - Group Reorder (Move Existing)
 
         // These tests cover moving a group that is ALREADY in the collection to a new position.
