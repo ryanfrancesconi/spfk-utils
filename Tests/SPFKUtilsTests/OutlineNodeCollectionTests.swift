@@ -564,6 +564,26 @@
             #expect(collection[uuid: uuids[1]]?.isExpanded == true)
         }
 
+        @Test func reorderPreservesExpansionOfNonDraggedGroups() throws {
+            // A group that is NOT being dragged must keep its expanded state.
+            // Regression: if the drag handler captures nodeState after spring-loading
+            // has mutated data, non-dragged groups can lose their expansion.
+            // [G0(expanded), G1, G2, G3] → drag G2 to position 1
+            // G0 must still be expanded after the insert.
+            var collection = try createFourGroups()
+            collection.update(node: collection[uuid: uuids[0]]!, isExpanded: true)
+
+            let g2 = try #require(collection[uuid: uuids[2]])
+            collection.insert(groupNodes: [g2], atIndex: 1)
+
+            // G2 should be at position 1
+            #expect(collection.nodes[1].id == uuids[2])
+            // G0 must still be expanded
+            #expect(collection[uuid: uuids[0]]?.isExpanded == true)
+            // G2 (dragged) should not have been auto-expanded
+            #expect(collection[uuid: uuids[2]]?.isExpanded == false)
+        }
+
         @Test func insertGroupNodesFallsBackToAppend() throws {
             var collection = try create(nodeCount: 2, childrenCount: 1)
 

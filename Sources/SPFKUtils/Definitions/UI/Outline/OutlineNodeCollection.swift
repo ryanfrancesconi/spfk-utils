@@ -187,10 +187,8 @@
 
             var atIndex = atIndex ?? nodes.count
 
-            if let occupyingNode = self[index: atIndex], !occupyingNode.isEditable {
+            while let occupyingNode = self[index: atIndex], !occupyingNode.isEditable {
                 atIndex += 1
-
-                Log.debug("atIndex+1 now is", atIndex)
             }
 
             guard nodes.indices.contains(atIndex) else {
