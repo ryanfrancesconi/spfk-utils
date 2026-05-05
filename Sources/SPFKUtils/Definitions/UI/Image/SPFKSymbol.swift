@@ -12,6 +12,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowClockwise = "arrow.clockwise"
     case arrowRightArrowLeft = "arrow.right.arrow.left"
     case arrowLeftAndRight = "arrow.left.and.right"
+    case arrowLeftAndRightSquare = "arrow.left.and.right.square"
     case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
     case arrowTurnDownLeft = "arrow.turn.down.left"
     case audioUnit = "dot.radiowaves.left.and.right"
@@ -89,6 +90,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case metronomeFill = "metronome.fill"
     case minus
     case minusDiamond = "minus.diamond"
+    case minusPlusLines = "minus.plus.lines.measurement.horizontal.aligned.bottom"
     case movieclapper
     case musicNote = "music.note"
     case musicNoteSlash = "music.note.slash"
