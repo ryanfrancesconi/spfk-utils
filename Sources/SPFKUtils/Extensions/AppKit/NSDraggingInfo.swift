@@ -14,16 +14,16 @@
                 throw NSError(description: "pasteboardItems is empty")
             }
 
+            guard types.contains(.fileURL) else {
+                Log.error("types must be .fileURL, types: \(types)")
+                throw NSError(description: "Unknown file found")
+            }
+
             var urls = [URL]()
 
             for item in items {
                 guard let type = item.availableType(from: types) else {
                     Log.error("Failed to determine availableType for", item)
-                    continue
-                }
-
-                guard type == .fileURL else {
-                    Log.error("type must be .fieURL but is \(type)")
                     continue
                 }
 
