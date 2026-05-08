@@ -264,9 +264,11 @@
             var removed: [OutlineNode] = []
 
             for id in ids {
-                try removed.append(
-                    remove(id: id)
-                )
+                // A node may already be absent if its parent was removed earlier
+                // in this loop (parent removal takes children with it). Skip silently.
+                if let node = Self.remove(id: id, from: &nodes) {
+                    removed.append(node)
+                }
             }
 
             return removed
