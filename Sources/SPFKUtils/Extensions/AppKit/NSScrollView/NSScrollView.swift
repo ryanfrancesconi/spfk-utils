@@ -25,7 +25,7 @@ extension NSScrollView {
         let visibleOrigin = documentVisibleRect.origin
 
         if onlyIfNeeded,
-           x > visibleOrigin.x, x < visibleOrigin.x + visibleWidth,
+           x >= visibleOrigin.x,
            x < visibleOrigin.x + visibleWidth {
             // Log.debug("In view, no scroll needed")
             return
