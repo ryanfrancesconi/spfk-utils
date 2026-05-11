@@ -122,6 +122,7 @@
         }
 
         /// Updates parentId and sortIndex, finding the parent at any depth
+        @discardableResult
         public mutating func insert(
             nodes children: [OutlineNode],
             in parentId: UUID,
@@ -171,7 +172,7 @@
         public mutating func append(groupNodes incoming: [OutlineNode]) {
             let nodeState = nodes
 
-            _ = try? remove(nodes: incoming)
+            remove(nodes: incoming)
             nodes.append(contentsOf: incoming)
             updateSortIndexes()
 
@@ -196,7 +197,7 @@
                 return
             }
 
-            _ = try? remove(nodes: incoming)
+            remove(nodes: incoming)
 
             nodes.insert(contentsOf: incoming, at: atIndex)
             updateSortIndexes()
@@ -250,13 +251,13 @@
         }
 
         @discardableResult
-        public mutating func remove(nodes: [OutlineNode]) throws -> [OutlineNode] {
+        public mutating func remove(nodes: [OutlineNode]) -> [OutlineNode] {
             let ids = nodes.compactMap(\.id)
-            return try remove(ids: ids)
+            return remove(ids: ids)
         }
 
         @discardableResult
-        public mutating func remove(ids: [UUID]) throws -> [OutlineNode] {
+        public mutating func remove(ids: [UUID]) -> [OutlineNode] {
             defer {
                 updateSortIndexes()
             }

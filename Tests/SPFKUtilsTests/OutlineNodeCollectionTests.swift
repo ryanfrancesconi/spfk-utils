@@ -116,7 +116,7 @@
         @Test func removeNodes() throws {
             var collection = try create(nodeCount: 2, childrenCount: 2)
 
-            let removedNodes = try collection.remove(nodes: [collection[uuid: uuids[1]]!, collection[uuid: uuids[2]]!])
+            let removedNodes = collection.remove(nodes: [collection[uuid: uuids[1]]!, collection[uuid: uuids[2]]!])
             #expect(removedNodes.count == 2)
 
             let group0 = collection.lookup(uuid: uuids[0])
@@ -184,12 +184,10 @@
             }
         }
 
-        @Test func removeNonExistentIdsThrows() throws {
+        @Test func removeNonExistentIdsIsEmpty() throws {
             var collection = try create(nodeCount: 1, childrenCount: 1)
 
-            #expect(throws: Error.self) {
-                try collection.remove(ids: [UUID()])
-            }
+            #expect(collection.remove(ids: [UUID()]) == [])
         }
 
         // MARK: - Expanded Elements
@@ -230,7 +228,7 @@
             var collection = try create(nodeCount: 3, childrenCount: 1)
 
             // Remove the middle group (index 1) via the public batch API which updates sort indexes
-            try collection.remove(ids: [uuids[2]])
+            collection.remove(ids: [uuids[2]])
 
             // Remaining nodes should have updated sort indexes
             #expect(collection.nodes[0].sortIndex == 0)
@@ -483,10 +481,10 @@
             let c0 = try #require(collection[uuid: c0id])
             let removedBefore = [c0].filter { $0.parentId == parentId }
                 .compactMap { collection.indexOf(node: $0) }
-                .filter { $0 < 2 }.count
+                .count(where: { $0 < 2 })
             let adjustedIndex = max(0, 2 - removedBefore)
 
-            try collection.remove(nodes: [c0])
+            collection.remove(nodes: [c0])
             try collection.insert(nodes: [c0], in: parentId, atIndex: adjustedIndex)
 
             let parent = try #require(collection[uuid: parentId])
@@ -506,10 +504,10 @@
             let c2 = try #require(collection[uuid: c2id])
             let removedBefore = [c2].filter { $0.parentId == parentId }
                 .compactMap { collection.indexOf(node: $0) }
-                .filter { $0 < 1 }.count
+                .count(where: { $0 < 1 })
             let adjustedIndex = max(0, 1 - removedBefore)
 
-            try collection.remove(nodes: [c2])
+            collection.remove(nodes: [c2])
             try collection.insert(nodes: [c2], in: parentId, atIndex: adjustedIndex)
 
             let parent = try #require(collection[uuid: parentId])
