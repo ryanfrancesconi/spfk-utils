@@ -15,8 +15,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ryanfrancesconi/spfk-audio-base", from: "1.0.1"),
-        .package(url: "https://github.com/ryanfrancesconi/spfk-filesystem", from: "0.0.1"),
-        .package(url: "https://github.com/ryanfrancesconi/spfk-testing", from: "0.0.9"),
+        .package(url: "https://github.com/ryanfrancesconi/spfk-filesystem", from: "1.0.0"),
+        .package(url: "https://github.com/ryanfrancesconi/spfk-testing", from: "1.0.1"),
         .package(url: "https://github.com/tadija/AEXML", from: "4.6.0"),
         .package(url: "https://github.com/rnine/Checksum", from: "1.0.2"),
     ],
