@@ -36,12 +36,12 @@ extension CALayer {
         add(anim, forKey: "opacity")
     }
 
-    public func alignHorizontal(with otherFrame: NSRect) {
+    public func alignHorizontal(with otherFrame: CGRect) {
         let value = (otherFrame.width / 2) - (frame.width / 2)
         frame.origin.x = otherFrame.origin.x + value
     }
 
-    public func alignVertical(with otherFrame: NSRect) {
+    public func alignVertical(with otherFrame: CGRect) {
         let value = (otherFrame.height / 2) - (frame.height / 2)
         frame.origin.y = otherFrame.origin.y + value
     }
