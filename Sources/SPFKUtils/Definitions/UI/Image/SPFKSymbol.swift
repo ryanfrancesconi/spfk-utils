@@ -178,6 +178,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
     case waveformRectangle = "waveform.path.ecg.rectangle"
     case waveformSimple = "waveform.path.ecg"
+    case waveformSlash = "waveform.slash"
     case wrenchAndScrewdriver = "wrench.and.screwdriver"
     case xmark
     case xCircle = "x.circle"
