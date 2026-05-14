@@ -127,6 +127,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case rewindFill = "backward.fill"
     case ruler
     case save = "square.and.arrow.down"
+    case saveFill = "square.and.arrow.down.fill"
     case saveMultiple = "square.and.arrow.down.on.square"
     case selectAll = "character.textbox"
     case selectNext = "arrowtriangle.down.fill"
@@ -165,7 +166,6 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case triangleFill = "triangle.fill"
     case triangleLeftHalfFilled = "triangle.lefthalf.filled"
     case triangleRightHalfFilled = "triangle.righthalf.filled"
-
     case tuningfork
     case undo = "arrow.uturn.backward"
     case wandAndSparkles = "wand.and.sparkles"
