@@ -162,6 +162,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
     case trash
     case triangle
+    case triangleLeftHalfFilled = "triangle.lefthalf.filled"
     case tuningfork
     case undo = "arrow.uturn.backward"
     case wandAndSparkles = "wand.and.sparkles"
