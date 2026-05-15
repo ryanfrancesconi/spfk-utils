@@ -5,18 +5,36 @@
     import SPFKBase
 
     extension NSFont {
+        /// The font's natural line height (no string required). Use for row heights, text field
+        /// sizing, and anywhere you need a consistent vertical metric for a given font.
+        /// Result is pixel-rounded (`.int.cgFloat`).
         public var fontHeight: CGFloat {
             boundingRectForFont.size.height.int.cgFloat
         }
 
+        /// The single-line pixel size of a string at this font. Use when you need both width and
+        /// height for a specific string. Not rounded — use the raw value for layout math, or
+        /// `width(for:)` when you only need the width.
         public func size(for string: String) -> CGSize {
             string.size(withAttributes: [.font: self])
         }
 
+        /// Convenience for `size(for:).width`, pixel-rounded. Use for column sizing and label
+        /// widths where the height is already known from `fontHeight`.
         public func width(for string: String) -> CGFloat {
             size(for: string).width.int.cgFloat
         }
 
+        /// The height a string needs when word-wrapped at a fixed pixel width. Use for
+        /// notification rows, tooltips, or any view that must fit multi-line text.
+        /// Delegates to `NSAttributedString.height(withConstrainedWidth:)`.
+        public func wrappedTextHeight(for string: String, width: CGFloat) -> CGFloat {
+            NSAttributedString(string: string, attributes: [.font: self])
+                .height(withConstrainedWidth: width)
+        }
+    }
+
+    extension NSFont {
         /// Utility to create a font from a URL such as inside a package
         ///
         /// - Parameters:
