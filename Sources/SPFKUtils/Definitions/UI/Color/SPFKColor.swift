@@ -10,7 +10,6 @@
     public enum SPFKColor {
         case clear
         case windowBackgroundColor
-
         case controlAccentColor
         case controlActiveBackgroundColor
         case controlAlphaBackgroundColor
@@ -20,14 +19,12 @@
         case gridBackgroundColor
         case gridColor
         case gridAlphaColor
-
         case labelColor
         case secondaryLabelColor
         case tertiaryLabelColor
         case selectedLabelColor
         case disabledLabelColor
         case headerLabelColor
-
         case schemeColor
         case schemeColorAlternate
 
@@ -81,7 +78,7 @@
             case .clear:                        .clear
             case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAccentColor:           Self.xcPreprocessor
-            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.6)
+            case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.65)
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.8192069575)
             case .controlDarkBackgroundColor:   #colorLiteral(red: 0.9742538333, green: 0.9742538333, blue: 0.9742538333, alpha: 1)
