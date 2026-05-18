@@ -40,7 +40,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
     case copy = "document.on.document"
-    case cut = "scissors"
+    case crop
     case dialHigh = "dial.high"
     case diamond
     case document
@@ -132,6 +132,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case save = "square.and.arrow.down"
     case saveFill = "square.and.arrow.down.fill"
     case saveMultiple = "square.and.arrow.down.on.square"
+    case scissors
+    case scissorsBadgeEllipsis = "scissors.badge.ellipsis"
     case selectAll = "character.textbox"
     case selectNext = "arrowtriangle.down.fill"
     case selectPrevious = "arrowtriangle.up.fill"
