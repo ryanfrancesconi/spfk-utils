@@ -311,19 +311,6 @@
         }
     }
 
-    extension CGImage {
-        public static func contentsOf(
-            url: URL,
-            priority: TaskPriority = .medium
-        ) async throws -> CGImage? {
-            let task = Task<CGImage?, Error>(priority: priority) {
-                NSImage(contentsOf: url)?.cgImage
-            }
-
-            return try await task.value
-        }
-    }
-
     extension NSImage {
         @inline(__always) @_disfavoredOverload
         public var cgImage: CGImage? {

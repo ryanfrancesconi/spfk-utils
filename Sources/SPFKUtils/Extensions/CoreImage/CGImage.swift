@@ -43,7 +43,6 @@ extension CGImage {
 
         context.interpolationQuality = .high
 
-        // [Internal] Thread running at User-initiated quality-of-service class waiting on a thread without a QoS class specified (base priority 0). Investigate ways to avoid priority inversions
         context.draw(
             self,
             in: CGRect(x: 0, y: 0, width: width, height: height)
@@ -82,5 +81,9 @@ extension CGImage {
         }
 
         return cgImage
+    }
+
+    public static func contentsOf(url: URL) throws -> CGImage {
+        try create(from: Data(contentsOf: url))
     }
 }
