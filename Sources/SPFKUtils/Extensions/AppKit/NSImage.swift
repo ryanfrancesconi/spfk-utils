@@ -325,7 +325,7 @@
     }
 
     extension CGImage {
-        @inline(__always) @_disfavoredOverload
+        @inline(__always)
         public var nsImage: NSImage? {
             NSImage(
                 cgImage: self,

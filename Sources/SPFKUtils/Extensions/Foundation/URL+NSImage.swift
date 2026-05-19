@@ -5,14 +5,14 @@
 
     extension URL {
         /// Low resolution finder image
-        @_disfavoredOverload public var finderIcon: NSImage? {
+        public var finderIcon: NSImage? {
             guard isFileURL, exists else { return nil }
 
             return NSWorkspace.shared.icon(forFile: path)
         }
 
         /// Higher resolution finder image
-        @_disfavoredOverload public var bestImageRepresentation: NSImage? {
+        public var bestImageRepresentation: NSImage? {
             guard isFileURL, exists else { return nil }
 
             let size = NSSize(equal: 1024)
@@ -32,7 +32,6 @@
             return image
         }
 
-        @_disfavoredOverload
         public var contentTypeIcon: NSImage? {
             guard isFileURL, exists, let utType else { return nil }
 
