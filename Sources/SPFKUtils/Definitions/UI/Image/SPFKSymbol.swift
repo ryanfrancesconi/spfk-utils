@@ -111,6 +111,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case photo
     case piano = "pianokeys.inverse"
     case play
+    case playSlash = "play.slash"
     case pencil
     case squareAndPencil = "square.and.pencil"
     case playFill = "play.fill"
