@@ -143,6 +143,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case shield
     case showAll = "rectangle.on.rectangle"
     case shippingbox
+    case shuffle
     case sidebarLeading = "sidebar.leading"
     case sidebarTrailing = "sidebar.trailing"
     case sliderHorizontal = "slider.horizontal.3"
