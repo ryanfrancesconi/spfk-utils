@@ -58,14 +58,10 @@
 
         /// Load a HEIC image twice and verify pixel data comparison works.
         @Test func hasEqualPixelDataWithHEICLoadedTwice() async throws {
-            let url = URL(fileURLWithPath: "/Users/rf/Desktop/_picts/BirthdayPricess.HEIC")
-            guard FileManager.default.fileExists(atPath: url.path) else {
-                Issue.record("HEIC test file not found — skipping")
-                return
-            }
+            let url = TestBundleResources.shared.sharksandwich_heic
 
-            let first = try #require(NSImage(contentsOf: url)?.cgImage)
-            let second = try #require(NSImage(contentsOf: url)?.cgImage)
+            let first = try CGImage.contentsOf(url: url)
+            let second = try CGImage.contentsOf(url: url)
 
             let firstData = first.dataProvider?.data as Data?
             let secondData = second.dataProvider?.data as Data?
