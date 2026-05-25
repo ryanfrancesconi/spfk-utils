@@ -102,6 +102,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case nosign
     case numbers
     case openDocument = "arrow.up.forward.square"
+    case paintpalette
     case paintPaletteFill = "paintpalette.fill"
     case paste = "document.on.clipboard"
     case pause = "stop.fill"
@@ -113,6 +114,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case play
     case playSlash = "play.slash"
     case pencil
+    case pencilCircle = "pencil.circle"
     case squareAndPencil = "square.and.pencil"
     case playFill = "play.fill"
     case playlist = "music.note.list"
@@ -225,7 +227,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
             let appearanceName: NSAppearance.Name = currentScheme == .dark ? .darkAqua : .aqua
             let appearance = NSAppearance(named: appearanceName) ?? NSAppearance.currentDrawing()
             var color: NSColor = SPFKColor.schemeColor.nsColor
-            
+
             appearance.performAsCurrentDrawingAppearance {
                 if let resolved = NSColor(cgColor: SPFKColor.schemeColor.cgColor) {
                     color = resolved
