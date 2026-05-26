@@ -63,6 +63,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case finder
     case flag
     case folder
+    case folderBadgePlus = "folder.badge.plus"
     case folderGearBadge = "folder.badge.gearshape"
     case forward
     case forwardAll = "forward.end"
@@ -78,6 +79,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case horizontalPanelMaximized = "inset.filled.topthird.rectangle"
     case horizontalPanelMinimized = "inset.filled.bottomthird.rectangle"
     case infoBubble = "info.bubble"
+    case `import` = "tray.and.arrow.down"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
     case linesDecrease = "line​.3​.horizontal​.decrease"
