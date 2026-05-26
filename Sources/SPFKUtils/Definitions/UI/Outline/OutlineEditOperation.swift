@@ -10,7 +10,7 @@
         case renamed(source: OutlineNode, destination: OutlineNode)
         case removed(nodes: [OutlineNode])
         case sort(nodes: [OutlineNode])
-        case append(urls: [URL], destination: OutlineNode?)
+        case append(urls: [URL], destination: OutlineNode?, atIndex: Int?)
         /// Fired after a group drag completes. `groups` is the full ordered list of
         /// top-level nodes reflecting the new group order.
         case reorderGroups(groups: [OutlineNode])
