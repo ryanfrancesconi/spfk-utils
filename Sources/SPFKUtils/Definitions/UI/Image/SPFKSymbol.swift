@@ -38,6 +38,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case chevronUp = "chevron.up"
     case circle
     case circleFill = "circle.fill"
+    case circleBadgeFill = "circlebadge.fill"
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
     case copy = "document.on.document"
