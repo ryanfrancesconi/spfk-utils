@@ -16,6 +16,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
     case arrowTurnDownLeft = "arrow.turn.down.left"
     case arrowsCross = "arrow.up.and.down.and.arrow.left.and.right"
+    case arrowTrianglesRightAndLeft = "arrowtriangle.right.and.line.vertical.and.arrowtriangle.left"
     case arrowUpToLine = "arrow.up.to.line"
     case audioUnit = "dot.radiowaves.left.and.right"
     case barcode
@@ -128,6 +129,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case quarterNote = "music.quarternote.3"
     case questionmarkCircle = "questionmark.circle"
     case quit = "xmark.rectangle"
+    case rectanglePortraitArrowTriangle = "rectangle.portrait.arrowtriangle.2.inward"
     case redo = "arrow.uturn.forward"
     case returnKey = "return"
     case revert = "arrow.counterclockwise"
