@@ -330,6 +330,31 @@
 
             return false
         }
+
+        public mutating func sortGroups() {
+            let readOnlyNodes = nodes.filter { !$0.isEditable && !$0.isLeaf }
+
+            let nodes = nodes.filter { $0.isEditable && !$0.isLeaf }
+
+            self.nodes = readOnlyNodes + nodes.sorted(by: { lhs, rhs in
+                lhs.title.standardCompare(with: rhs.title)
+            })
+
+            updateSortIndexes()
+        }
+
+        /// Reorder editable group nodes to match the given UUID order.
+        /// Read-only groups are preserved at the front; unmatched editable groups follow at the end.
+        public mutating func reorderGroups(order: [UUID]) {
+            let readOnlyNodes = nodes.filter { !$0.isEditable && !$0.isLeaf }
+            let editableGroups = nodes.filter { $0.isEditable && !$0.isLeaf }
+            let lookup = Dictionary(uniqueKeysWithValues: editableGroups.map { ($0.id, $0) })
+            let reordered = order.compactMap { lookup[$0] }
+            let orderSet = Set(order)
+            let unmatched = editableGroups.filter { !orderSet.contains($0.id) }
+            nodes = readOnlyNodes + reordered + unmatched
+            updateSortIndexes()
+        }
     }
 
     extension OutlineNodeCollection: Codable, Serializable {}
