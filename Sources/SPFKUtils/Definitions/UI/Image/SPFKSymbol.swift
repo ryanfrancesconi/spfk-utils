@@ -184,6 +184,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case triangleLeftHalfFilled = "triangle.lefthalf.filled"
     case triangleRightHalfFilled = "triangle.righthalf.filled"
     case tuningfork
+    case uiwindow = "uiwindow.split.2x1"
     case undo = "arrow.uturn.backward"
     case wandAndSparkles = "wand.and.sparkles"
     case warning = "exclamationmark.triangle"
