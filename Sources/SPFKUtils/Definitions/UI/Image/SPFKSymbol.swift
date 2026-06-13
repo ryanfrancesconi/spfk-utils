@@ -28,6 +28,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case cart
     case cCircle = "c.circle"
     case cCircleFill = "c.circle.fill"
+    case checklist
     case circleSlash = "circle.slash"
     case center = "inset.filled.center.rectangle"
     case checkmark
