@@ -126,6 +126,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case playSquareStack = "play.square.stack"
     case plus
     case plusDiamond = "plus.diamond"
+    case plusSquare = "plus.square"
     case power
     case quarterNote = "music.quarternote.3"
     case questionmarkCircle = "questionmark.circle"
