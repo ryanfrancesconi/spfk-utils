@@ -75,7 +75,7 @@
         }
 
         @Test func scale() async throws {
-            deleteBinOnExit = false
+            deleteBinOnExit = true
             let nsImage = try #require(TestBundleResources.shared.cowbell_wav.bestImageRepresentation)
             let cgImage = try #require(nsImage.cgImage)
 
