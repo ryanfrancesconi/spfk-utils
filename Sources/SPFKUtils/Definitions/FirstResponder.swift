@@ -33,6 +33,7 @@
             case moveLeftAndModifySelection
             case moveRight
             case moveRightAndModifySelection
+            case moveToEndOfLine
             case performMiniaturize
             case performZoom
             case arrangeInFront
@@ -83,6 +84,8 @@
                 send(selector: #selector(moveRight(_:)))
             case .moveRightAndModifySelection:
                 send(selector: #selector(moveRightAndModifySelection(_:)))
+            case .moveToEndOfLine:
+                send(selector: #selector(moveToEndOfLine(_:)))
             case .performMiniaturize:
                 send(selector: #selector(performMiniaturize(_:)))
             case .performZoom:
@@ -143,6 +146,7 @@
         @objc fileprivate static func moveRight(_ sender: Any) {} // Right Arrow
         @objc fileprivate static func moveLeftAndModifySelection(_ sender: Any) {} // Shift Left
         @objc fileprivate static func moveRightAndModifySelection(_ sender: Any) {} // Shift Right
+        @objc fileprivate static func moveToEndOfLine(_ sender: Any) {} // CMD Right Arrow
 
         // MARK: - View
 
