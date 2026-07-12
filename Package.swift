@@ -24,7 +24,6 @@ let package = Package(
         .target(
             name: "SPFKUtils",
             dependencies: [
-                .product(name: "SPFKAudioBase", package: "spfk-audio-base"),
                 .product(name: "SPFKFileSystem", package: "spfk-filesystem"),
                 .product(name: "AEXML", package: "AEXML"),
                 .product(name: "Checksum", package: "Checksum"),
@@ -35,6 +34,7 @@ let package = Package(
             name: "SPFKUtilsTests",
             dependencies: [
                 .targetItem(name: "SPFKUtils", condition: nil),
+                .product(name: "SPFKAudioBase", package: "spfk-audio-base"),
                 .product(name: "SPFKTesting", package: "spfk-testing"),
             ]
         ),
