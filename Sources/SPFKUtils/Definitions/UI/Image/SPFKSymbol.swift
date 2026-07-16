@@ -93,6 +93,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case loop = "repeat"
     case macwindow
     case magnifyingGlass = "magnifyingglass"
+    case mapPin = "mappin.and.ellipse"
     case mathFunction = "function"
     case metronome
     case metronomeFill = "metronome.fill"
