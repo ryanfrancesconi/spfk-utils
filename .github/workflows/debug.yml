@@ -1,7 +1,8 @@
 name: Debug Resource Bundle
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [development]
 
 jobs:
   inspect:
