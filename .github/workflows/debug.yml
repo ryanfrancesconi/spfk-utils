@@ -1,0 +1,37 @@
+name: Debug Resource Bundle
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build tests (no run)
+        run: swift build --build-tests
+
+      - name: Inspect resource bundle
+        run: |
+          echo "=== Finding SPFKTesting bundle ==="
+          BUNDLE=$(find . -iname "*SPFKTesting.bundle" -type d | head -1)
+          echo "Bundle path: $BUNDLE"
+          if [ -z "$BUNDLE" ]; then
+            echo "NO BUNDLE FOUND"
+            find . -iname "*.bundle" -type d
+            exit 0
+          fi
+          echo "=== Bundle contents (first 30) ==="
+          ls -la "$BUNDLE" | head -30
+          echo "=== tabla.wav ==="
+          find "$BUNDLE" -iname "tabla.wav" -exec ls -la {} \; -exec file {} \;
+          echo "=== and-oh-how-they-danced.mp3 ==="
+          find "$BUNDLE" -iname "and-oh-how-they-danced.mp3" -exec ls -la {} \; -exec file {} \;
+          echo "=== sharksandwich.heic ==="
+          find "$BUNDLE" -iname "sharksandwich.heic" -exec ls -la {} \; -exec file {} \;
+          echo "=== Total files in bundle ==="
+          find "$BUNDLE" -type f | wc -l
+          echo "=== Any zero-byte files? ==="
+          find "$BUNDLE" -type f -size 0
