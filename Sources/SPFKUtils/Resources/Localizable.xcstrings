@@ -2,7 +2,6 @@
   "sourceLanguage" : "en",
   "strings" : {
     "All" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -143,8 +142,13 @@
         }
       }
     },
+    "Search All" : {
+
+    },
+    "Search Selected" : {
+
+    },
     "Selected" : {
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
