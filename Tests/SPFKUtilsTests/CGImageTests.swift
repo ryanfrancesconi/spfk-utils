@@ -11,7 +11,7 @@
 
     @testable import SPFKUtils
 
-    @Suite(.serialized)
+    @Suite
     class CGImageTests: BinTestCase {
         @Test func cgImageDataRoundtrip() async throws {
             let url = TestBundleResources.shared.sharksandwich

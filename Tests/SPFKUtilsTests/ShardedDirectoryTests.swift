@@ -6,7 +6,7 @@ import SPFKTesting
 import SPFKUtils
 import Testing
 
-@Suite(.serialized, .tags(.file))
+@Suite(.tags(.file))
 final class ShardedDirectoryTests: BinTestCase {
     private func makeDirectory() throws -> URL {
         let url = bin.appendingPathComponent("shards")

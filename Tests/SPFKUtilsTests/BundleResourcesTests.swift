@@ -7,7 +7,7 @@ import SPFKBase
     import SPFKUtils
     import Testing
 
-    @Suite(.serialized)
+    @Suite
     class BundleResourcesTests: BinTestCase {
         var tmpfile: URL?
 

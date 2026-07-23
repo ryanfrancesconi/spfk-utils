@@ -8,7 +8,7 @@ import SPFKBase
     import SPFKUtils
     import Testing
 
-    @Suite(.serialized)
+    @Suite
     class FileSystemTests: BinTestCase {
         @Test func checksum() async throws {
             let url = TestBundleResources.shared.mp3_id3
