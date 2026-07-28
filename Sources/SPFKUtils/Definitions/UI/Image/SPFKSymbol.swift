@@ -63,6 +63,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case eyeSlash = "eye.slash"
     case fill = "inset.filled.rectangle"
     case film
+    case filmStack = "film.stack"
     case finder
     case flag
     case folder
@@ -116,6 +117,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case performZoom = "square.arrowtriangle.4.outward"
     case person
     case photo
+    case photoStack = "photo.stack"
     case piano = "pianokeys.inverse"
     case play
     case playSlash = "play.slash"
