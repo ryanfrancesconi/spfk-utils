@@ -8,25 +8,26 @@
     import SPFKBase
 
     public enum SPFKColor {
-        case clear
-        case windowBackgroundColor
         case controlAccentColor
         case controlActiveBackgroundColor
+        case defaultWaveformColor
+
+        case clear
         case controlAlphaBackgroundColor
         case controlBackgroundColor
         case controlDarkBackgroundColor
-        case defaultWaveformColor
+        case disabledLabelColor
+        case gridAlphaColor
         case gridBackgroundColor
         case gridColor
-        case gridAlphaColor
-        case labelColor
-        case secondaryLabelColor
-        case tertiaryLabelColor
-        case selectedLabelColor
-        case disabledLabelColor
         case headerLabelColor
+        case labelColor
         case schemeColor
         case schemeColorAlternate
+        case secondaryLabelColor
+        case selectedLabelColor
+        case tertiaryLabelColor
+        case windowBackgroundColor
 
         /// Dynamic NSColor that auto-resolves based on the current appearance context.
         /// When assigning to a CALayer property (which requires CGColor), use `.cgColor`
@@ -49,14 +50,14 @@
 
         private var darkColor: NSColor {
             switch self {
-            case .clear:                        .clear
-            case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAccentColor:           Self.xcPreprocessor
             case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.3)
+            case .defaultWaveformColor:         Self.xcPreprocessor
+            case .clear:                        .clear
+            case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAlphaBackgroundColor:  .white.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.2728477716, green: 0.2728477716, blue: 0.2728477716, alpha: 1)
             case .controlDarkBackgroundColor:   #colorLiteral(red: 0.1600990295, green: 0.1600990295, blue: 0.1600990295, alpha: 1)
-            case .defaultWaveformColor:         Self.xcPreprocessor
             case .gridBackgroundColor:          Self.alphaWhite02
             case .gridColor:                    #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1)
             case .gridAlphaColor:               #colorLiteral(red: 0.8974402547, green: 0.8974402547, blue: 0.8974403739, alpha: 1).withAlphaComponent(0.04)
@@ -75,14 +76,14 @@
 
         private var lightColor: NSColor {
             switch self {
-            case .clear:                        .clear
-            case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAccentColor:           Self.xcPreprocessor
             case .controlActiveBackgroundColor: Self.xcPreprocessor.withAlphaComponent(0.65)
+            case .defaultWaveformColor:         Self.fcpMusic2
+            case .clear:                        .clear
+            case .windowBackgroundColor:        .windowBackgroundColor
             case .controlAlphaBackgroundColor:  .black.withAlphaComponent(0.06)
             case .controlBackgroundColor:       #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 0.8192069575)
             case .controlDarkBackgroundColor:   #colorLiteral(red: 0.9742538333, green: 0.9742538333, blue: 0.9742538333, alpha: 1)
-            case .defaultWaveformColor:         Self.fcpMusic2
             case .gridBackgroundColor:          Self.alphaBlack06
             case .gridColor:                    #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1)
             case .gridAlphaColor:               #colorLiteral(red: 0.2605174184, green: 0.2605243921, blue: 0.260520637, alpha: 1).withAlphaComponent(0.04)
