@@ -237,10 +237,10 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         public func tinted(currentScheme: SPFKColorScheme = .currentScheme) -> NSImage? {
             let appearanceName: NSAppearance.Name = currentScheme == .dark ? .darkAqua : .aqua
             let appearance = NSAppearance(named: appearanceName) ?? NSAppearance.currentDrawing()
-            var color: NSColor = SPFKColor.schemeColor.nsColor
+            var color: NSColor = SPFKSchemeColor.primary.nsColor
 
             appearance.performAsCurrentDrawingAppearance {
-                if let resolved = NSColor(cgColor: SPFKColor.schemeColor.cgColor) {
+                if let resolved = NSColor(cgColor: SPFKSchemeColor.primary.cgColor) {
                     color = resolved
                 }
             }
