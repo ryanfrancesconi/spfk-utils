@@ -38,6 +38,19 @@
         public func lighter(by amount: CGFloat = 0.2) -> NSColor {
             highlight(withLevel: amount) ?? self
         }
+
+        /// Keeps the hue and alpha, replacing saturation and brightness.
+        /// Returns `self` unchanged if the color can't be converted to an HSB-capable space.
+        public func with(saturation: CGFloat, brightness: CGFloat) -> NSColor {
+            guard let converted = usingColorSpace(.deviceRGB) else { return self }
+
+            return NSColor(
+                hue: converted.hueComponent,
+                saturation: saturation,
+                brightness: brightness,
+                alpha: converted.alphaComponent
+            )
+        }
     }
 
     extension NSColor {
