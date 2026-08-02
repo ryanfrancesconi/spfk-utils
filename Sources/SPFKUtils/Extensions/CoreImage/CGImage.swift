@@ -88,3 +88,97 @@ extension CGImage {
     }
 }
 
+
+extension CGImage {
+    /// Side length of the grayscale grid a perceptual hash is computed over. 8 rows of 8
+    /// comparisons gives exactly 64 bits.
+    private static let perceptualHashSize = 8
+
+    /// A 64-bit perceptual hash, for deciding whether two images *look* the same.
+    ///
+    /// Distinct from ``fingerprint``, which asks whether two images are byte-identical and is the
+    /// right question for a store deduplicating what it has already written. This asks whether two
+    /// images are the same picture, which is the right question for grouping album artwork: the
+    /// same cover embedded across an album's tracks is routinely a different size in each file, or
+    /// re-encoded by whatever tagger touched it last, and byte identity says those are unrelated.
+    ///
+    /// A difference hash (dHash): the image is reduced to a 9x8 grayscale grid and each pixel is
+    /// compared with its right-hand neighbour, one bit per comparison. Chosen over an average hash
+    /// because it encodes *gradients* rather than brightness relative to a mean, which is what
+    /// keeps predominantly dark or flat covers -- of which there are many -- from collapsing into
+    /// each other.
+    ///
+    /// Scale-independent by construction, since everything is resampled to the same grid first.
+    ///
+    /// Compare with ``perceptualDistance(to:)`` rather than `==`: re-encoding can flip a bit or two
+    /// without changing what the image is.
+    public var perceptualHash: UInt64? {
+        let height = Self.perceptualHashSize
+        // One extra column: each row yields `height` comparisons between adjacent pixels.
+        let width = height + 1
+
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0, // let CoreGraphics choose an aligned stride
+            space: CGColorSpaceCreateDeviceGray(),
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        ) else {
+            return nil
+        }
+
+        // Deliberately not `.high`: heavier interpolation makes the result depend more on the
+        // source resolution, which is exactly what this has to be independent of.
+        context.interpolationQuality = .medium
+        context.draw(self, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        guard let data = context.data else { return nil }
+
+        let stride = context.bytesPerRow
+        let pixels = data.bindMemory(to: UInt8.self, capacity: stride * height)
+
+        var hash: UInt64 = 0
+        var bit = 0
+
+        for y in 0 ..< height {
+            let row = y * stride
+            for x in 0 ..< (width - 1) {
+                if pixels[row + x] > pixels[row + x + 1] {
+                    hash |= (1 << UInt64(bit))
+                }
+                bit += 1
+            }
+        }
+
+        return hash
+    }
+
+    /// Number of differing bits between two images' perceptual hashes, or `nil` if either could not
+    /// be hashed. `0` means the two reduce to an identical gradient grid.
+    public func perceptualDistance(to other: CGImage) -> Int? {
+        guard let a = perceptualHash, let b = other.perceptualHash else { return nil }
+        return (a ^ b).nonzeroBitCount
+    }
+
+    /// Largest ``perceptualDistance(to:)`` still treated as the same picture.
+    ///
+    /// Measured against the test fixtures rather than picked from a reference: the same image as
+    /// JPEG, HEIC and WebP lands at 0-1, and rescaled between 512px and 32px at 1-3, while two
+    /// genuinely different images sit at 34-36. Ten is an order of magnitude clear of the noise and
+    /// nowhere near the signal, so the exact value is not load-bearing -- there is simply nothing
+    /// in between.
+    public static let perceptualTolerance = 10
+
+    /// Whether two images are the same picture, allowing for re-encoding and resizing.
+    ///
+    /// The question album-artwork grouping needs to ask: the same cover across an album's tracks is
+    /// routinely a different size in each file, or re-encoded by whatever tagger touched it last.
+    /// `nil` hashes (an image whose pixels cannot be read) compare as not similar, so an unreadable
+    /// image never silently merges into a group.
+    public func isPerceptuallySimilar(to other: CGImage, tolerance: Int = perceptualTolerance) -> Bool {
+        guard let distance = perceptualDistance(to: other) else { return false }
+        return distance <= tolerance
+    }
+}
