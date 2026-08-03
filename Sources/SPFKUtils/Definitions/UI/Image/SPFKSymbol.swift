@@ -75,6 +75,12 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case forwardAllFill = "forward.end.fill"
     case forwardFill = "forward.fill"
     case gauge = "gauge.medium"
+    /// Needle positions, for showing a rate on a dial rather than only naming it.
+    case gaugeNeedle0 = "gauge.with.dots.needle.0percent"
+    case gaugeNeedle33 = "gauge.with.dots.needle.33percent"
+    case gaugeNeedle50 = "gauge.with.dots.needle.50percent"
+    case gaugeNeedle67 = "gauge.with.dots.needle.67percent"
+    case gaugeNeedle100 = "gauge.with.dots.needle.100percent"
     case gearshape
     case hammer
     case handWave = "hand.wave"
