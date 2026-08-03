@@ -16,6 +16,10 @@
         public func tinted(color: NSColor) -> NSImage? {
             nsImage?.tinted(color: color)
         }
+        
+        public func tinted() -> NSImage? {
+            tinted(color: SPFKSchemeColor.primary.nsColor)
+        }
 
         public func stateImage(
             offColor: NSColor = SPFKSchemeColor.alternate.nsColor,

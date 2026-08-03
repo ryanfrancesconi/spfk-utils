@@ -10,6 +10,7 @@ import Foundation
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowClockwise = "arrow.clockwise"
+    case arrowDownCircle = "arrow.down.circle"
     case arrowRightArrowLeft = "arrow.right.arrow.left"
     case arrowLeftAndRight = "arrow.left.and.right"
     case arrowLeftAndRightSquare = "arrow.left.and.right.square"
@@ -155,6 +156,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case shield
     case showAll = "rectangle.on.rectangle"
     case shippingbox
+    case shippingboxAndArrow = "shippingbox.and.arrow.backward"
     case shuffle
     case sidebarLeading = "sidebar.leading"
     case sidebarTrailing = "sidebar.trailing"
