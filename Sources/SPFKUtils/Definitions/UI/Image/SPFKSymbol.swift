@@ -170,7 +170,17 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
+    /// The volume ladder, for showing a level rather than only naming it.
+    case speaker
+    case speakerSlash = "speaker.slash"
+    case speakerWave1 = "speaker.wave.1"
+    case speakerWave2 = "speaker.wave.2"
     case speakerWave3 = "speaker.wave.3"
+    case speakerFill = "speaker.fill"
+    case speakerSlashFill = "speaker.slash.fill"
+    case speakerWave1Fill = "speaker.wave.1.fill"
+    case speakerWave2Fill = "speaker.wave.2.fill"
+    case speakerWave3Fill = "speaker.wave.3.fill"
     case speakerWaveBubble = "speaker.wave.2.bubble"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"

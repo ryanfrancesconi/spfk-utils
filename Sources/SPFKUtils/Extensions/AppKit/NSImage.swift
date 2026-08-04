@@ -124,6 +124,34 @@
         ///  - parameter size: The size of the new image.
         ///
         ///  - returns: The resized copy of the given image.
+        /// Draws this image centered inside a larger canvas, without scaling it.
+        ///
+        /// Unlike ``copy(size:)``, which stretches the image to fill, this pads. Use it to give a
+        /// set of images identical bounds when their natural widths differ -- SF Symbol families
+        /// are a common case: `speaker.wave.1.fill` through `.3.fill` are 16, 19 and 22 points
+        /// wide, so scaling each to a common box makes the wider ones render smaller and the icon
+        /// appears to change size as it changes state.
+        ///
+        /// Returns `nil` if the canvas is smaller than the image in either axis, which would crop.
+        public func centered(in canvas: NSSize) -> NSImage? {
+            guard canvas.width >= size.width, canvas.height >= size.height else { return nil }
+
+            let padded = NSImage(size: canvas)
+            padded.lockFocus()
+            draw(
+                in: NSRect(
+                    x: ((canvas.width - size.width) / 2).rounded(),
+                    y: ((canvas.height - size.height) / 2).rounded(),
+                    width: size.width,
+                    height: size.height
+                )
+            )
+            padded.unlockFocus()
+
+            padded.isTemplate = isTemplate
+            return padded
+        }
+
         public func copy(size: NSSize) -> NSImage? {
             // Create a new rect with given width and height
             let frame = NSMakeRect(0, 0, size.width, size.height)
