@@ -131,6 +131,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case pencil
     case pencilCircle = "pencil.circle"
     case squareAndPencil = "square.and.pencil"
+    case pipExit = "pip.exit"
+    case pipEnter = "pip.enter"
     case playFill = "play.fill"
     case playlist = "music.note.list"
     case playSquareStack = "play.square.stack"
@@ -201,6 +203,11 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case textMagnifyingGlass = "text.magnifyingglass"
     case textSparkle = "character.textbox.badge.sparkles"
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
+
+    /// The counterpart to ``toggleFullScreen`` -- arrows pointing inward, for a control shown
+    /// while full screen is already up.
+    case exitFullScreen = "arrow.down.right.and.arrow.up.left"
+
     case trash
     case triangle
     case triangleFill = "triangle.fill"
