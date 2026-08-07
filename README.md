@@ -26,7 +26,8 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 ### UI
 
 - **HexColor / RGBAColor** — Hex string and RGBA representations for cross-platform color handling.
-- **SPFKColor /  CustomComponentColor ** — Platform-agnostic color types bridging AppKit and UIKit.
+- **SPFKSchemeColor** — The two neutral grays used as default arguments by `SPFKSymbol.tinted()` and `NSImageConvertible.stateImage()`. It stays here rather than moving to `spfk-ui` with the rest of the color layer, because data packages reach it and `spfk-ui` already depends on them — the reverse edge would be a cycle.
+- **SPFKSymbol** — SF Symbol definitions with tinting and state images. Here for the same reason.
 - **AppearanceObserver** — Observe system appearance (light/dark mode) changes via Combine.
 - **StateImage** — Associate images with on/off/disabled control states.
 - **FirstResponder** — Utilities for managing first responder status in AppKit.
