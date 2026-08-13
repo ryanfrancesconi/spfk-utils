@@ -69,12 +69,15 @@
             creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
             fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
 
-            // Data written before the split carries one collapsed date. Seeding both sides with it
-            // is deliberately conservative: the collapsed value is the *later* of the two, so a
-            // file whose attributes were touched more recently than its contents can read as a
-            // content change on the first comparison after upgrading. That costs one needless
-            // re-read of that file and is then correct forever, where guessing the other way would
-            // silently skip a real content change.
+            // Data written before the split carries one collapsed date, which was the *later* of
+            // the two. Only the content side is seeded from it: the attribute side stays nil so
+            // `isClassifiable` is false and the first comparison after upgrading falls back to
+            // comparing collapsed against collapsed -- the only comparison that value supports.
+            //
+            // **Do not seed both sides with it.** That makes the record look classifiable and
+            // compares each half against a date it was never equal to, reporting a change for
+            // every file whose two dates differ -- which is any file that was copied, tagged, or
+            // quarantined. One persist replaces this with the real split values.
             let legacy = try container.decodeIfPresent(Date.self, forKey: .modificationDate)
 
             modificationState = FileModificationState(
@@ -83,7 +86,7 @@
                 ) ?? legacy,
                 attributeModificationDate: try container.decodeIfPresent(
                     Date.self, forKey: .attributeModificationDate
-                ) ?? legacy
+                )
             )
 
             initialize()
