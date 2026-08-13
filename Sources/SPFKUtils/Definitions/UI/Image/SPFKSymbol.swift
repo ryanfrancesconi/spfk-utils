@@ -9,6 +9,7 @@ import Foundation
 /// SPFKSymbol.arrowClockwise.tinted()
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
+    
     case arrowClockwise = "arrow.clockwise"
     case arrowDownCircle = "arrow.down.circle"
     case arrowRightArrowLeft = "arrow.right.arrow.left"
@@ -44,6 +45,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case circleBadgeFill = "circlebadge.fill"
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
+    case clockArrows = "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
     case copy = "document.on.document"
     case crop
     case dialHigh = "dial.high"
