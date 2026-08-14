@@ -49,6 +49,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case documentOnDocument = "document.on.document"
     case documentOnDocumentFill = "document.on.document.fill"
     case crop
+    case curlybraces
+    case curlybracesEllipsis = "ellipsis.curlybraces"
     case dialHigh = "dial.high"
     case diamond
     case document
