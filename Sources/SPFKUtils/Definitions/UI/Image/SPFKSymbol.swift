@@ -46,7 +46,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
     case clockArrows = "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
-    case copy = "document.on.document"
+    case documentOnDocument = "document.on.document"
+    case documentOnDocumentFill = "document.on.document.fill"
     case crop
     case dialHigh = "dial.high"
     case diamond
