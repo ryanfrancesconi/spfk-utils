@@ -18,6 +18,33 @@
 
             /// A base type for abstract image data.
             public static let image: NSImage? = NSWorkspace.shared.icon(for: .image)
+
+            @MainActor
+            private static var byPathExtension: [String: NSImage] = [:]
+
+            /// The system icon for a URL's file type, cached by path extension.
+            ///
+            /// Resolved from the extension's `UTType` rather than the file itself, so this touches
+            /// no file system and is safe to call per row per reload. `icon(forFile:)` returns the
+            /// same image for any file without a custom icon; a file that has one shows its type's
+            /// icon here instead.
+            @MainActor
+            public static func fileType(for url: URL) -> NSImage? {
+                let pathExtension = url.pathExtension.lowercased()
+
+                guard pathExtension.isEmpty == false else { return nil }
+
+                if let cached = byPathExtension[pathExtension] {
+                    return cached
+                }
+
+                guard let utType = UTType(filenameExtension: pathExtension) else { return nil }
+
+                let icon = NSWorkspace.shared.icon(for: utType)
+                byPathExtension[pathExtension] = icon
+
+                return icon
+            }
         }
 
         public static func showInFinder(urls: [URL]) {
