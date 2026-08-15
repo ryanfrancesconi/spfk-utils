@@ -54,6 +54,12 @@
             frame.origin.y = otherFrame.origin.y + value
         }
 
+        /// Centers on `otherFrame` in both axes, leaving this view's size alone.
+        public func alignCenter(with otherFrame: NSRect) {
+            alignHorizontal(with: otherFrame)
+            alignVertical(with: otherFrame)
+        }
+
         @objc
         open func convertEventToSuperview(event: NSEvent) -> NSPoint {
             let localPoint = convert(event.locationInWindow, from: nil)

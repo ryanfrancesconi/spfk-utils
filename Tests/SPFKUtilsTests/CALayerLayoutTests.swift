@@ -46,6 +46,21 @@ final class CALayerLayoutTests {
         #expect(layer.frame.origin.y == 20)
     }
 
+    // MARK: - alignCenter
+
+    @Test func alignCenterCentersOnBothAxes() {
+        let layer = CALayer()
+        layer.frame = CGRect(x: 10, y: 0, width: 20, height: 10)
+
+        let reference = CGRect(x: 50, y: 20, width: 100, height: 40)
+        layer.alignCenter(with: reference)
+
+        #expect(layer.frame.midX == reference.midX)
+        #expect(layer.frame.midY == reference.midY)
+        // the size is left alone
+        #expect(layer.frame.size == CGSize(width: 20, height: 10))
+    }
+
     // MARK: - alignHorizontal
 
     @Test func alignHorizontalCentersWithReferenceFrame() {

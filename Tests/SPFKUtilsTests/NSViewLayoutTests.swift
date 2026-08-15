@@ -11,6 +11,20 @@
     @Suite
     @MainActor
     final class NSViewLayoutTests {
+        // MARK: - alignCenter
+
+        @Test func alignCenterCentersOnBothAxes() {
+            let view = NSView(frame: NSRect(x: 10, y: 0, width: 20, height: 10))
+
+            let reference = NSRect(x: 50, y: 20, width: 100, height: 40)
+            view.alignCenter(with: reference)
+
+            #expect(view.frame.midX == reference.midX)
+            #expect(view.frame.midY == reference.midY)
+            // the size is left alone
+            #expect(view.frame.size == NSSize(width: 20, height: 10))
+        }
+
         // MARK: - alignVertical
 
         @Test func alignVerticalCentersWithReferenceFrame() {

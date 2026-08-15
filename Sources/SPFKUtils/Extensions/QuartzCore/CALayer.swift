@@ -46,6 +46,12 @@ extension CALayer {
         frame.origin.y = otherFrame.origin.y + value
     }
 
+    /// Centers on `otherFrame` in both axes, leaving this layer's size alone.
+    public func alignCenter(with otherFrame: CGRect) {
+        alignHorizontal(with: otherFrame)
+        alignVertical(with: otherFrame)
+    }
+
     public func centerInSuperlayer() {
         guard let superlayer else { return }
 
