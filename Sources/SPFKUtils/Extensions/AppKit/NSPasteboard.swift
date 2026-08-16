@@ -16,9 +16,19 @@ extension NSPasteboard {
     public func write(paths urls: [URL]) {
         guard urls.isNotEmpty else { return }
 
+        write(string: urls.map(\.path).joined(separator: "\n"))
+    }
+
+    /// Replaces the contents with `string` as plain text.
+    ///
+    /// Writes nothing for an empty string, for the same reason ``write(paths:)`` does: a copy with
+    /// nothing to copy must leave whatever the user already had on the clipboard alone.
+    public func write(string: String) {
+        guard string.isNotEmpty else { return }
+
         clearContents()
         declareTypes([.string], owner: nil)
-        setString(urls.map(\.path).joined(separator: "\n"), forType: .string)
+        setString(string, forType: .string)
     }
 }
 #endif
