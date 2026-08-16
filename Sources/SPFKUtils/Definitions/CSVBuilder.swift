@@ -22,9 +22,12 @@ public enum CSVBuilder {
     }
 
     /// RFC 4180 CSV field escaping: quote fields containing commas, quotes, or newlines.
+    ///
+    /// The newline test is per-`Character` rather than a substring search for `"\n"`: CRLF is a
+    /// single grapheme cluster in Swift and matches neither half on its own.
     public static func escapeField(_ field: String) -> String {
         let needsQuoting = field.contains(",") || field.contains("\"") ||
-            field.contains("\n") || field.contains("\r")
+            field.contains(where: \.isNewline)
 
         guard needsQuoting else { return field }
 
