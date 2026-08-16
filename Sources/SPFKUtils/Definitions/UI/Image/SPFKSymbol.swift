@@ -9,7 +9,6 @@ import Foundation
 /// SPFKSymbol.arrowClockwise.tinted()
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
-    
     case arrowClockwise = "arrow.clockwise"
     case arrowDownCircle = "arrow.down.circle"
     case arrowRightArrowLeft = "arrow.right.arrow.left"
@@ -80,8 +79,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case forwardAllFill = "forward.end.fill"
     case forwardFill = "forward.fill"
     case gauge = "gauge.medium"
-    /// Needle positions, for showing a rate on a dial rather than only naming it.
-    case gaugeNeedle0 = "gauge.with.dots.needle.0percent"
+    case gaugeNeedle0 = "gauge.with.dots.needle.0percent" // Needle positions, for showing a rate on a dial rather than only naming it.
     case gaugeNeedle33 = "gauge.with.dots.needle.33percent"
     case gaugeNeedle50 = "gauge.with.dots.needle.50percent"
     case gaugeNeedle67 = "gauge.with.dots.needle.67percent"
@@ -177,7 +175,6 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
-    /// The volume ladder, for showing a level rather than only naming it.
     case speaker
     case speakerSlash = "speaker.slash"
     case speakerWave1 = "speaker.wave.1"
@@ -208,11 +205,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case textMagnifyingGlass = "text.magnifyingglass"
     case textSparkle = "character.textbox.badge.sparkles"
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
-
-    /// The counterpart to ``toggleFullScreen`` -- arrows pointing inward, for a control shown
-    /// while full screen is already up.
     case exitFullScreen = "arrow.down.right.and.arrow.up.left"
-
     case trash
     case triangle
     case triangleFill = "triangle.fill"
