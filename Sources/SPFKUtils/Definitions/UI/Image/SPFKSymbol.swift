@@ -188,6 +188,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case speakerWaveBubble = "speaker.wave.2.bubble"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"
+    case squareStack3dFill = "square.stack.3d.up.fill"
     case star
     case starFill = "star.fill"
     case stopwatch
