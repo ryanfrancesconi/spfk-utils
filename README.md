@@ -55,7 +55,6 @@ Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) l
 | [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions |
 | [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
 | [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
-| [Checksum](https://github.com/rnine/Checksum) | File checksum utilities |
 
 ## About
 

@@ -18,7 +18,6 @@ let package = Package(
         .package(url: "https://github.com/ryanfrancesconi/spfk-filesystem", from: "1.2.2"),
         .package(url: "https://github.com/ryanfrancesconi/spfk-testing", from: "1.1.0"),
         .package(url: "https://github.com/tadija/AEXML", from: "4.6.0"),
-        .package(url: "https://github.com/rnine/Checksum", from: "1.0.2"),
     ],
     targets: [
         .target(
@@ -26,7 +25,6 @@ let package = Package(
             dependencies: [
                 .product(name: "SPFKFileSystem", package: "spfk-filesystem"),
                 .product(name: "AEXML", package: "AEXML"),
-                .product(name: "Checksum", package: "Checksum"),
             ],
             resources: [.process("Resources")]
         ),
