@@ -360,8 +360,8 @@
     extension OutlineNodeCollection: Codable, Serializable {}
 
     extension [OutlineNode] {
-        public func duplicate() -> [OutlineNode] {
-            map { $0.duplicate() }
+        public func duplicate(siblingTitles: Set<String>) -> [OutlineNode] {
+            map { $0.duplicate(siblingTitles: siblingTitles) }
         }
     }
 

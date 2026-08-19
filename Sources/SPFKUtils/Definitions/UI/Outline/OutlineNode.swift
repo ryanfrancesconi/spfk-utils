@@ -58,17 +58,39 @@
             self.children = children
         }
 
-        public func duplicate() -> OutlineNode {
+        /// A copy of the whole subtree, every node carrying a fresh identity and an `originalId`
+        /// naming what it came from.
+        ///
+        /// Children are re-parented onto the copy. Anything resolving a copied node against a
+        /// store keys off `originalId`, so a child without one is silently skipped there.
+        ///
+        /// - Parameter siblingTitles: the titles already present where the copy is going. The
+        ///   "Copy of" prefix is applied only when this holds the title, so a paste into another
+        ///   group keeps the name the user gave it. No default: only the caller knows the
+        ///   destination, and one that has not thought about it renames every paste. Children are
+        ///   unaffected -- a child's siblings all travel with it, so nothing new collides.
+        public func duplicate(siblingTitles: Set<String>) -> OutlineNode {
+            let title = siblingTitles.contains(title) ? "Copy of \(title)" : title
+
+            return duplicate(title: title, parentId: nodeIdentifier.parentId)
+        }
+
+        private func duplicate(title: String, parentId: UUID?) -> OutlineNode {
+            let newId = UUID()
+
             var result = OutlineNode(
-                title: "Copy of \(title)",
+                title: title,
                 isEditable: isEditable,
                 symbolName: symbolName,
                 hexColor: hexColor,
-                nodeIdentifier: .init(parentId: nodeIdentifier.parentId, id: UUID()),
-                children: children
+                nodeIdentifier: .init(parentId: parentId, id: newId),
+                children: children.map { $0.duplicate(title: $0.title, parentId: newId) }
             )
 
             result.nodeIdentifier.originalId = id
+
+            // A group that arrives collapsed hides everything the copy just produced.
+            result.isExpanded = isExpanded
 
             return result
         }

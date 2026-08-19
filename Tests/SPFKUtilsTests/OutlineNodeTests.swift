@@ -133,11 +133,11 @@
 
         // MARK: - Duplicate
 
-        @Test func duplicateCreatesNewIdAndPrefixesTitle() {
+        @Test func duplicateCreatesNewIdAndPrefixesACollidingTitle() {
             let parentId = UUID()
             let original = OutlineNode(title: "Beat", isEditable: true, symbolName: "waveform", hexColor: HexColor(string: "FF0000"), nodeIdentifier: .init(parentId: parentId, id: UUID()))
 
-            let copy = original.duplicate()
+            let copy = original.duplicate(siblingTitles: ["Beat"])
 
             #expect(copy.id != original.id)
             #expect(copy.title == "Copy of Beat")
@@ -148,16 +148,53 @@
             #expect(copy.nodeIdentifier.originalId == original.id)
         }
 
-        @Test func duplicatePreservesChildren() {
+        /// A paste into a group that holds no such title is not a duplicate of anything there, so
+        /// the name survives the trip.
+        @Test func duplicateKeepsTheTitleWhereNothingCollides() {
+            let original = OutlineNode(title: "Beat", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: UUID(), id: UUID()))
+
+            let copy = original.duplicate(siblingTitles: ["Bass", "Drums"])
+
+            #expect(copy.title == "Beat")
+            #expect(copy.id != original.id)
+            #expect(copy.nodeIdentifier.originalId == original.id)
+        }
+
+        /// A copied group's children have to be copies too. Keeping the source ids gives two
+        /// nodes claiming one playlist, and keeping the source `parentId` leaves them naming the
+        /// group they were copied out of.
+        @Test func duplicateReIdentifiesAndReParentsChildren() throws {
             let groupId = UUID()
             let child = OutlineNode(title: "Child", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: groupId, id: UUID()))
             let group = OutlineNode(title: "Group", isEditable: true, symbolName: "folder", nodeIdentifier: .init(id: groupId), children: [child])
 
-            let copy = group.duplicate()
+            let copy = group.duplicate(siblingTitles: [])
 
             #expect(copy.children.count == 1)
-            // Children are shallow-copied (same child objects)
-            #expect(copy.children[0].id == child.id)
+
+            let copiedChild = try #require(copy.children.first)
+            #expect(copiedChild.id != child.id)
+            #expect(copiedChild.parentId == copy.id)
+            #expect(copiedChild.nodeIdentifier.originalId == child.id)
+            #expect(copiedChild.title == child.title)
+        }
+
+        /// Depth is not special-cased anywhere, so the re-identification has to hold all the way
+        /// down.
+        @Test func duplicateReachesGrandchildren() throws {
+            let innerId = UUID()
+            let grandchild = OutlineNode(title: "Leaf", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: innerId, id: UUID()))
+            let inner = OutlineNode(title: "Inner", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: UUID(), id: innerId), children: [grandchild])
+            let outer = OutlineNode(title: "Outer", isEditable: true, symbolName: nil, nodeIdentifier: .init(id: UUID()), children: [inner])
+
+            let copy = outer.duplicate(siblingTitles: [])
+
+            let copiedInner = try #require(copy.children.first)
+            let copiedGrandchild = try #require(copiedInner.children.first)
+
+            #expect(copiedGrandchild.id != grandchild.id)
+            #expect(copiedGrandchild.parentId == copiedInner.id)
+            #expect(copiedGrandchild.nodeIdentifier.originalId == grandchild.id)
         }
 
         @Test func duplicateArrayOfNodes() {
@@ -165,7 +202,7 @@
                 OutlineNode(title: "Node \(i)", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: UUID(), id: UUID()))
             }
 
-            let copies = nodes.duplicate()
+            let copies = nodes.duplicate(siblingTitles: Set(nodes.map(\.title)))
 
             #expect(copies.count == 3)
             for i in 0 ..< 3 {
