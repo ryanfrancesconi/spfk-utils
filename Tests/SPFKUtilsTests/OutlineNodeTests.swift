@@ -131,6 +131,38 @@
             #expect(a != b)
         }
 
+        // MARK: - Hashable
+
+        /// `==` is identity, so hashing has to be too. `row(forItem:)` on an outline view is a hash
+        /// lookup, and every store mutation hands back a node whose title, children or sort index
+        /// have moved on from the one the caller is holding.
+        @Test func equalNodesHashEqually() {
+            let identifier = NodeIdentifier(parentId: UUID(), id: UUID())
+
+            let node = OutlineNode(title: "Alpha", isEditable: true, symbolName: nil, nodeIdentifier: identifier)
+
+            var mutated = node
+            mutated.title = "Renamed"
+            mutated.sortIndex = 7
+            mutated.isExpanded = true
+            mutated.children = [
+                OutlineNode(title: "Child", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: identifier.id, id: UUID()))
+            ]
+
+            #expect(node == mutated)
+            #expect(node.hashValue == mutated.hashValue)
+        }
+
+        @Test func nodesWithDifferentIdentitiesHashApart() {
+            let parentId = UUID()
+
+            let one = OutlineNode(title: "Same", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: parentId, id: UUID()))
+            let two = OutlineNode(title: "Same", isEditable: true, symbolName: nil, nodeIdentifier: .init(parentId: parentId, id: UUID()))
+
+            #expect(one != two)
+            #expect(Set([one, two]).count == 2)
+        }
+
         // MARK: - Duplicate
 
         @Test func duplicateCreatesNewIdAndPrefixesACollidingTitle() {
@@ -502,6 +534,25 @@
             #expect(throws: DecodingError.self) {
                 try JSONDecoder().decode(NodeIdentifier.self, from: Data(json.utf8))
             }
+        }
+
+        // MARK: - Hashable
+
+        /// `NodeIdentifier` compares on `parentId` and `id` alone, so the two tracking fields it
+        /// carries cannot reach the hash either. `previousParentId` moves on every re-parent.
+        @Test func identifiersEqualOnParentAndIdHashEqually() {
+            let parentId = UUID()
+            let id = UUID()
+
+            let identifier = NodeIdentifier(parentId: parentId, id: id)
+
+            var tracked = identifier
+            tracked.originalId = UUID()
+            tracked.parentId = UUID()
+            tracked.parentId = parentId
+
+            #expect(identifier == tracked)
+            #expect(identifier.hashValue == tracked.hashValue)
         }
     }
 

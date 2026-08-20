@@ -12,6 +12,13 @@
             lhs.nodeIdentifier == rhs.nodeIdentifier
         }
 
+        /// Identity, matching `==`. Without this, Swift synthesizes a hash over every stored
+        /// property, so a node whose title, children or sort index have moved on hashes apart from
+        /// the one it equals -- and `NSOutlineView.row(forItem:)` is a hash lookup.
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(nodeIdentifier)
+        }
+
         public var title: String
         public var isEditable: Bool = true
         public var symbolName: String?

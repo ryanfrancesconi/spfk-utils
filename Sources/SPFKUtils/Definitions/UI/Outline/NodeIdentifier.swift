@@ -8,6 +8,13 @@ public struct NodeIdentifier: Sendable, Hashable, Equatable, Codable, CustomStri
             lhs.id == rhs.id
     }
 
+    /// Matching `==`: the tracking fields below are transient and would otherwise put two equal
+    /// identifiers in different hash buckets.
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(parentId)
+        hasher.combine(id)
+    }
+
     /// Leaf nodes have a parentId but a top level group node does not
     public var parentId: UUID? {
         willSet {
