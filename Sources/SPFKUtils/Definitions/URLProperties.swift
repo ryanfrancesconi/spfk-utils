@@ -42,6 +42,30 @@
             initialize()
         }
 
+        /// Rebuilds a previously captured set of properties without touching the file.
+        ///
+        /// For a store that persists these as columns rather than as an encoded document: every
+        /// stored property here is `private(set)`, so a backend outside this module has no other
+        /// way to put the values back. ``init(url:)`` is not a substitute — it re-reads the file,
+        /// which answers the wrong question for a file on a volume that is no longer mounted.
+        ///
+        /// `fileSizeString` is derived from `fileSize` here, exactly as it is on every other path.
+        public init(
+            url: URL,
+            finderTags: FinderTagGroup,
+            creationDate: Date?,
+            fileSize: UInt64?,
+            modificationState: FileModificationState
+        ) {
+            self.url = url
+            self.finderTags = finderTags
+            self.creationDate = creationDate
+            self.fileSize = fileSize
+            self.modificationState = modificationState
+
+            initialize()
+        }
+
         private mutating func initialize() {
             if let fileSize {
                 fileSizeString = ByteCount.toString(fileSize.int64)
