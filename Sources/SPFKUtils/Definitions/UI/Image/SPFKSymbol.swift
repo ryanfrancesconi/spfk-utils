@@ -115,6 +115,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case movieclapper
     case musicNote = "music.note"
     case musicNoteSlash = "music.note.slash"
+    case musicNoteSquareStack = "music.note.square.stack" // os 26+
     case musicPages = "music.pages"
     case nosign
     case numbers
