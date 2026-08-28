@@ -96,10 +96,11 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case `import` = "tray.and.arrow.down"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
-    case linesDecrease = "line​.3​.horizontal​.decrease"
+    case linesDecrease = "line.3.horizontal.decrease"
     case listAndFilm = "list.and.film"
     case listBullet = "list.bullet"
     case lock
+    case lockOpen = "lock.open"
     case lockSquareStack = "lock.square.stack"
     case loop = "repeat"
     case macwindow
