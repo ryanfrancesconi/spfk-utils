@@ -87,5 +87,35 @@
             #expect(decoded.modificationState.isClassifiable)
             #expect(decoded.modification == nil)
         }
+
+        // MARK: - Lock state
+
+        @Test func lockStateIsReadFromTheFileAndRoundTrips() throws {
+            let url = bin.appendingPathComponent("locked.txt")
+            try Data("content".utf8).write(to: url)
+            defer { try? url.unlock() }
+
+            try url.lock()
+
+            let properties = URLProperties(url: url)
+            #expect(properties.lockState == .locked)
+
+            let decoded = try JSONDecoder().decode(
+                URLProperties.self,
+                from: JSONEncoder().encode(properties)
+            )
+
+            #expect(decoded.lockState == .locked)
+        }
+
+        /// A record written before the field existed carries no key, and `.writable` is what that
+        /// means: nothing was known to be in the way.
+        @Test func aLegacyRecordDecodesAsWritable() throws {
+            let url = try makeFileWithLaterAttributeDate(named: "legacy-lock.txt")
+
+            let decoded = try JSONDecoder().decode(URLProperties.self, from: legacyData(for: url))
+
+            #expect(decoded.lockState == .writable)
+        }
     }
 #endif

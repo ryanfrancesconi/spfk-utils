@@ -21,6 +21,14 @@
         /// between reading an xattr and re-decoding EXIF, XMP and a video track.
         public private(set) var modificationState: FileModificationState
 
+        /// Why the file refuses a write, or that it does not.
+        ///
+        /// Recorded here so a row on an unmounted volume still shows what the library last knew.
+        /// **Never the value a write guard consults** -- that re-reads the file through
+        /// `URL.lockState`, so a stale record can neither let a bad write through nor block a good
+        /// one.
+        public private(set) var lockState: FileLockState
+
         /// When the file last changed, of either kind. Unchanged in meaning from when this was a
         /// stored property, so every existing display and sort call site reads the same value.
         public var modificationDate: Date? { modificationState.modificationDate }
@@ -38,6 +46,7 @@
             modificationState = FileModificationState(url: url)
             finderTags = FinderTagGroup(url: url)
             fileSize = url.regularFileAllocatedSize
+            lockState = url.lockState
 
             initialize()
         }
@@ -55,15 +64,25 @@
             finderTags: FinderTagGroup,
             creationDate: Date?,
             fileSize: UInt64?,
-            modificationState: FileModificationState
+            modificationState: FileModificationState,
+            lockState: FileLockState
         ) {
             self.url = url
             self.finderTags = finderTags
             self.creationDate = creationDate
             self.fileSize = fileSize
             self.modificationState = modificationState
+            self.lockState = lockState
 
             initialize()
+        }
+
+        /// Re-reads the lock state from the file, leaving everything else as it is.
+        ///
+        /// Narrower than rebuilding through ``init(url:)`` on purpose: that also replaces
+        /// `finderTags`, which is where a pending color edit lives until it is saved.
+        public mutating func refreshLockState() {
+            lockState = url.lockState
         }
 
         private mutating func initialize() {
@@ -84,6 +103,7 @@
             case contentModificationDate
             case attributeModificationDate
             case fileSize
+            case lockState
         }
 
         public init(from decoder: any Decoder) throws {
@@ -92,6 +112,12 @@
             finderTags = try container.decodeIfPresent(FinderTagGroup.self, forKey: .finderTags) ?? FinderTagGroup()
             creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
             fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
+
+            // Absent from every record written before the lock state existed, and `.writable` is
+            // the right reading of that: nothing was known to be in the way. The value is a
+            // display cache -- a write guard re-reads the file -- so a wrong one costs a stale row
+            // rather than a lost or admitted write.
+            lockState = try container.decodeIfPresent(FileLockState.self, forKey: .lockState) ?? .writable
 
             // Data written before the split carries one collapsed date, which was the *later* of
             // the two. Only the content side is seeded from it: the attribute side stays nil so
@@ -122,6 +148,7 @@
             try container.encode(finderTags, forKey: .finderTags)
             try container.encodeIfPresent(creationDate, forKey: .creationDate)
             try container.encodeIfPresent(fileSize, forKey: .fileSize)
+            try container.encode(lockState, forKey: .lockState)
 
             // The collapsed `modificationDate` key is deliberately not written back. It is
             // recoverable from either of these, and a library this size pays for every redundant
