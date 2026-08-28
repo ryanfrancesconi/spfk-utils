@@ -23,11 +23,15 @@
 
         /// Why the file refuses a write, or that it does not.
         ///
-        /// Recorded here so a row on an unmounted volume still shows what the library last knew.
-        /// **Never the value a write guard consults** -- that re-reads the file through
-        /// `URL.lockState`, so a stale record can neither let a bad write through nor block a good
-        /// one.
-        public private(set) var lockState: FileLockState
+        /// Mutable, like ``finderTags`` and unlike everything else here, because it is edited
+        /// rather than only observed: a `var` holds the state the user has asked for, and the save
+        /// applies it. Between the edit and the save this differs from the file, which is the same
+        /// contract every other pending edit has.
+        ///
+        /// Recorded so a row on an unmounted volume still shows what the library last knew.
+        /// **Never the value a write guard consults** -- `URL.lockState` re-reads the file, so a
+        /// pending or stale value can neither let a bad write through nor block a good one.
+        public var lockState: FileLockState
 
         /// When the file last changed, of either kind. Unchanged in meaning from when this was a
         /// stored property, so every existing display and sort call site reads the same value.
@@ -75,14 +79,6 @@
             self.lockState = lockState
 
             initialize()
-        }
-
-        /// Re-reads the lock state from the file, leaving everything else as it is.
-        ///
-        /// Narrower than rebuilding through ``init(url:)`` on purpose: that also replaces
-        /// `finderTags`, which is where a pending color edit lives until it is saved.
-        public mutating func refreshLockState() {
-            lockState = url.lockState
         }
 
         private mutating func initialize() {
