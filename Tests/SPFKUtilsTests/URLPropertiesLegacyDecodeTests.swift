@@ -108,6 +108,28 @@
             #expect(decoded.lockState == .locked)
         }
 
+        /// The app writes the lock itself, so the record has to absorb the date that write moved --
+        /// otherwise the element claims a date the file no longer has, and the next observer scan
+        /// reports the app's own change as an external one. For a row also holding an unsaved
+        /// colour that becomes a false conflict, since a pending Finder tag edit conflicts rather
+        /// than refreshes.
+        @Test func refreshingTheLockAbsorbsTheDateTheWriteMoved() throws {
+            let url = bin.appendingPathComponent("refreshed.txt")
+            try Data("content".utf8).write(to: url)
+            defer { try? url.unlock() }
+
+            var properties = URLProperties(url: url)
+            #expect(properties.modification == nil)
+
+            try url.lock()
+
+            // The flag alone is what a narrower refresh would update.
+            properties.refreshLockState()
+
+            #expect(properties.lockState == .locked)
+            #expect(properties.modification == nil, "the app's own lock must not read back as an external change")
+        }
+
         /// A record written before the field existed carries no key, and `.writable` is what that
         /// means: nothing was known to be in the way.
         @Test func aLegacyRecordDecodesAsWritable() throws {

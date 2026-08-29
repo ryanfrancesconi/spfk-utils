@@ -23,15 +23,15 @@
 
         /// Why the file refuses a write, or that it does not.
         ///
-        /// Mutable, like ``finderTags`` and unlike everything else here, because it is edited
-        /// rather than only observed: a `var` holds the state the user has asked for, and the save
-        /// applies it. Between the edit and the save this differs from the file, which is the same
-        /// contract every other pending edit has.
+        /// Observed, not edited: the lock is applied to the file immediately rather than becoming
+        /// a pending change, so this always describes what the file was last seen to be. Deferring
+        /// it was tried and reverted -- a write barrier cannot share a commit boundary with the
+        /// data it guards, since applying it would first write everything else pending.
         ///
         /// Recorded so a row on an unmounted volume still shows what the library last knew.
         /// **Never the value a write guard consults** -- `URL.lockState` re-reads the file, so a
-        /// pending or stale value can neither let a bad write through nor block a good one.
-        public var lockState: FileLockState
+        /// stale value can neither let a bad write through nor block a good one.
+        public private(set) var lockState: FileLockState
 
         /// When the file last changed, of either kind. Unchanged in meaning from when this was a
         /// stored property, so every existing display and sort call site reads the same value.
@@ -79,6 +79,20 @@
             self.lockState = lockState
 
             initialize()
+        }
+
+        /// Re-reads the lock state from the file, and the dates the write that changed it moved.
+        ///
+        /// Narrower than rebuilding through ``init(url:)`` on purpose: that also replaces
+        /// `finderTags`, which is where a colour edit lives until it is saved.
+        ///
+        /// **``modificationState`` is not optional here.** Toggling the flag moves the attribute
+        /// date, so refreshing the lock alone leaves the record claiming a date the file no longer
+        /// has -- which the next observer scan reports as an external change, and turns into a
+        /// false conflict for any element also holding a pending Finder tag edit.
+        public mutating func refreshLockState() {
+            lockState = url.lockState
+            modificationState = FileModificationState(url: url)
         }
 
         private mutating func initialize() {
