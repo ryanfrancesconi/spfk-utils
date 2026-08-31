@@ -22,6 +22,38 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 - **HardwareInfo** — System hardware queries (model identifier, machine name).
 - **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
 - **StereoState** — Enumeration of stereo routing states (stereo, mono, left, right, swapped).
+- **ByteCount** — Binary size constants and human-readable file-size formatting.
+- **SearchScope** — Whether a search covers everything in scope or only the current selection.
+- **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
+- **CSVBuilder** — RFC 4180 CSV text from a header row and a per-row value provider.
+- **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path.
+- **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
+- **Email** — Composing a mail message.
+
+### Concurrency
+
+- **batchMap** — Bounded-concurrency map over a collection. For CPU-bound work set the batch size near the core count, since a task holds a thread while it runs; for suspending work it is a resource knob rather than a throughput one, because a suspended task holds no thread.
+
+### Caching
+
+- **ImageDataStore / ImageDataStoreAccess / CachedImageType** — A disk cache for decoded images, and the narrow protocol a data layer exposes it through.
+- **ShardedDirectory** — A 2-hex-character prefix scheme (256 shards) laid out as `<root>/<key[0..<2]>/<key><suffix>`, so a large library does not pay flat-directory enumeration costs.
+- **FlatToShardedMigration** — Moves a legacy flat cache into that layout, owning where the old directory was and how to prune orphans during the migration window. The store itself knows nothing about any prior location.
+
+### Timers
+
+- **BasicTimer / RepeatingTimer / OneShotTimer** — Simple timers behind one `TimerModel` protocol, with `TimerType` and `TimerState`.
+- **DisplayLinkTimer / LegacyDisplayLinkTimer** — Screen-refresh-synced timing for playhead and transport updates.
+
+### Outline and table state
+
+- **OutlineNode / OutlineNodeCollection / NodeIdentifier** — The sidebar tree's node model and its stable identifier.
+- **OutlineState** — Expansion state, persisted.
+- **OutlineEditOperation** — One edit to that tree.
+- **NavigationHistory** — Back/forward through sidebar selections.
+- **TableColumnState** — One column's title, stable identifier, width and visibility, saved independently of AppKit's autosave. The identifier is always the matching key; old saves predating the title/identifier split fall back to using the title as the identifier.
+- **TableColumnPreset / TableSortState / SortValue** — A named column layout, and how a table is sorted.
+- **PasteboardCopyable** — What a type does to put itself on the pasteboard.
 
 ### UI
 
@@ -55,6 +87,7 @@ Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) l
 | [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions |
 | [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
 | [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
+| [spfk-testing](https://github.com/ryanfrancesconi/spfk-testing) | Test infrastructure (test target only) |
 
 ## About
 
