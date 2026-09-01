@@ -5,17 +5,19 @@ import CoreImage
 import Foundation
 
 extension CGImage {
-    /// Fast content fingerprint using image dimensions and the first 256 bytes of raw pixel data.
-    /// Handles the common case of identical album artwork embedded in multiple tracks.
+    /// A content hash over the image's geometry and its whole pixel buffer, for deduplicating
+    /// images a store has already written.
+    ///
+    /// The buffer goes through `combine(bytes:)` rather than `combine(_: Data)`, which hashes
+    /// only a leading slice — covers sharing a plain band above the artwork collide under it.
     public var fingerprint: Int? {
+        guard let data = dataProvider?.data as Data? else { return nil }
+
         var hasher = Hasher()
         hasher.combine(width)
         hasher.combine(height)
-
-        guard let cfData = dataProvider?.data else { return nil }
-
-        let data = cfData as Data
-        hasher.combine(data.prefix(256))
+        hasher.combine(bytesPerRow)
+        data.withUnsafeBytes { hasher.combine(bytes: $0) }
 
         return hasher.finalize()
     }

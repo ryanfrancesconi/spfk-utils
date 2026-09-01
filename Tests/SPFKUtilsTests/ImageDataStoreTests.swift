@@ -325,4 +325,48 @@ final class ImageDataStoreTests: BinTestCase {
         #expect(inode2 != nil)
         #expect(inode1 != inode2)
     }
+
+    /// Two same-size images whose leading rows match must not be deduplicated. Album covers
+    /// with a white band above the artwork are the real case: hardlinking them serves one
+    /// album's cover for another's, and a `fetch` cannot tell that it happened.
+    @Test func imagesSharingLeadingRowsAreNotDeduplicated() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let imageA = try bandedImage(bodyRed: 1)
+        let imageB = try bandedImage(bodyRed: 0)
+        let url1 = fakeURL(index: 206)
+        let url2 = fakeURL(index: 207)
+
+        try await store.insert(.thumbnail, cgImage: imageA, for: url1)
+        try await store.insert(.thumbnail, cgImage: imageB, for: url2)
+
+        let fetchedA = try #require(await store.fetch(.thumbnail, for: url1))
+        let fetchedB = try #require(await store.fetch(.thumbnail, for: url2))
+
+        #expect(fetchedA.hasEqualPixelData(imageA))
+        #expect(fetchedB.hasEqualPixelData(imageB))
+    }
+
+    /// A 200x200 PNG with a white top band and a solid body of the given red component.
+    /// Round-tripped losslessly so the decoded leading rows stay byte-identical between the two.
+    private func bandedImage(bodyRed: CGFloat) throws -> CGImage {
+        let side = 200
+        let context = try #require(CGContext(
+            data: nil,
+            width: side,
+            height: side,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ))
+
+        context.setFillColor(red: 1, green: 1, blue: 1, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: side, height: side))
+        context.setFillColor(red: bodyRed, green: 0, blue: 0, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: side, height: side - 20))
+
+        let raw = try #require(context.makeImage())
+        return try CGImage.create(from: raw.dataRepresentation(utType: .png))
+    }
 }

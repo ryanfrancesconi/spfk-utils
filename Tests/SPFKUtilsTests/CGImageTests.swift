@@ -169,6 +169,45 @@
             #expect(fp1 != fp2)
         }
 
+        /// Two covers of the same size whose leading rows match — a white band above the
+        /// artwork, which is a common layout — must still fingerprint differently.
+        /// `ImageDataStore` hardlinks on fingerprint equality, so a match here serves one
+        /// album's artwork for another's.
+        @Test func fingerprintDiffersWhenOnlyLaterRowsDiffer() async throws {
+            let first = try #require(Self.bandedImage(bodyRed: 1))
+            let second = try #require(Self.bandedImage(bodyRed: 0))
+
+            let firstBytes = try #require(first.dataProvider?.data as Data?)
+            let secondBytes = try #require(second.dataProvider?.data as Data?)
+
+            // The premise: identical leading bytes, different images.
+            #expect(firstBytes.prefix(256) == secondBytes.prefix(256))
+            #expect(!first.hasEqualPixelData(second))
+
+            #expect(try #require(first.fingerprint) != #require(second.fingerprint))
+        }
+
+        /// A 200x200 image with a white top band and a solid body of the given red component.
+        private static func bandedImage(bodyRed: CGFloat) -> CGImage? {
+            let side = 200
+            guard let context = CGContext(
+                data: nil,
+                width: side,
+                height: side,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else { return nil }
+
+            context.setFillColor(red: 1, green: 1, blue: 1, alpha: 1)
+            context.fill(CGRect(x: 0, y: 0, width: side, height: side))
+            context.setFillColor(red: bodyRed, green: 0, blue: 0, alpha: 1)
+            context.fill(CGRect(x: 0, y: 0, width: side, height: side - 20))
+
+            return context.makeImage()
+        }
+
         @Test func exportOverwritesExistingFile() async throws {
             deleteBinOnExit = true
             let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
