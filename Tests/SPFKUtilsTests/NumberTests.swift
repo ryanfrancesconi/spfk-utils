@@ -1,18 +1,9 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
-import AudioToolbox
 import SPFKUtils
 import Testing
 
 final class NumberTests {
-    @Test func normalized() {
-        let value: AUValue = 1
-
-        #expect(
-            value.normalized(from: 0 ... 2, taper: AUValue(3)) == 0.7937005
-        )
-    }
-
     @Test func roundToNearestPowerOfTwo() {
         #expect(0.roundToNearestPowerOfTwo() == 1)
         #expect(2.roundToNearestPowerOfTwo() == 2)

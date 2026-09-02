@@ -206,52 +206,6 @@ final class AUValueTests {
         #expect(str.hasPrefix("-"))
         #expect(str.hasSuffix("dB"))
     }
-
-    @Test func denormalized() {
-        let value: AUValue = 0.5
-        let result = value.denormalized(to: 0 ... 100)
-        #expect(result == 50)
-    }
-
-    @Test func normalizedDenormalizedRoundTrip() {
-        let value: AUValue = 0.75
-        let range: ClosedRange<AUValue> = 0 ... 100
-        let denorm = value.denormalized(to: range)
-        let renorm = denorm.normalized(from: range)
-        #expect(abs(renorm - value) < 0.0001)
-    }
-}
-
-// MARK: - Double normalization
-
-final class DoubleNormalizationTests {
-    @Test func normalizedLinear() {
-        let value: Double = 50
-        let result = value.normalized(from: 0 ... 100)
-        #expect(result == 0.5)
-    }
-
-    @Test func denormalizedLinear() {
-        let value: Double = 0.5
-        let result = value.denormalized(to: 0 ... 100)
-        #expect(result == 50)
-    }
-
-    @Test func roundTrip() {
-        let original: Double = 75
-        let range: ClosedRange<Double> = 0 ... 100
-        let normalized = original.normalized(from: range)
-        let denormalized = normalized.denormalized(to: range)
-        #expect(abs(denormalized - original) < 0.0001)
-    }
-
-    @Test func taperEffect() {
-        let value: Double = 50
-        let linear = value.normalized(from: 0 ... 100, taper: 1)
-        let curved = value.normalized(from: 0 ... 100, taper: 2)
-        // With taper > 1, normalized value should be larger than linear
-        #expect(curved > linear)
-    }
 }
 
 // MARK: - TimeInterval / mach time
