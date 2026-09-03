@@ -99,6 +99,29 @@ extension ImageDataStore {
         return try? CGImage.create(from: data)
     }
 
+    /// When the cached image for `url` was written, or nil when nothing is cached.
+    ///
+    /// Entries are keyed by URL with no content fingerprint, so a file rewritten at the same path
+    /// keeps serving what was cached for its previous contents. A caller exposed to that -- an
+    /// in-place render, or a library the user edits in other apps -- compares this against the
+    /// file's own modification date and discards the entry when the file is newer.
+    public func cacheDate(_ type: CachedImageType, for url: URL) -> Date? {
+        let key = url.sha256
+
+        let fileURL: URL?
+        switch type {
+        case .thumbnail:
+            let thumbURL = thumbnailURL(for: key)
+            fileURL = FileManager.default.fileExists(atPath: thumbURL.path) ? thumbURL : nil
+        case .fullQuality:
+            fileURL = existingPrimaryURL(for: key)
+        }
+
+        guard let fileURL else { return nil }
+
+        return try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+    }
+
     /// Returns true if a thumbnail exists for the URL (does not load it).
     public func exists(url: URL) -> Bool {
         FileManager.default.fileExists(atPath: thumbnailURL(for: url.sha256).path)
