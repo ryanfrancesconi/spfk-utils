@@ -9,15 +9,16 @@ import Foundation
 /// SPFKSymbol.arrowClockwise.tinted()
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
+    case `import` = "tray.and.arrow.down"
     case arrowClockwise = "arrow.clockwise"
     case arrowDownCircle = "arrow.down.circle"
-    case arrowRightArrowLeft = "arrow.right.arrow.left"
     case arrowLeftAndRight = "arrow.left.and.right"
     case arrowLeftAndRightSquare = "arrow.left.and.right.square"
-    case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
-    case arrowTurnDownLeft = "arrow.turn.down.left"
+    case arrowRightArrowLeft = "arrow.right.arrow.left"
     case arrowsCross = "arrow.up.and.down.and.arrow.left.and.right"
     case arrowTrianglesRightAndLeft = "arrowtriangle.right.and.line.vertical.and.arrowtriangle.left"
+    case arrowTurnDownLeft = "arrow.turn.down.left"
+    case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
     case arrowUpToLine = "arrow.up.to.line"
     case audioUnit = "dot.radiowaves.left.and.right"
     case barcode
@@ -29,9 +30,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case cart
     case cCircle = "c.circle"
     case cCircleFill = "c.circle.fill"
-    case checklist
-    case circleSlash = "circle.slash"
     case center = "inset.filled.center.rectangle"
+    case checklist
     case checkmark
     case checkmarkCircle = "checkmark.circle"
     case chevronDown = "chevron.down"
@@ -40,13 +40,12 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case chevronRight = "chevron.right"
     case chevronUp = "chevron.up"
     case circle
-    case circleFill = "circle.fill"
     case circleBadgeFill = "circlebadge.fill"
+    case circleFill = "circle.fill"
+    case circleSlash = "circle.slash"
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
     case clockArrows = "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
-    case documentOnDocument = "document.on.document"
-    case documentOnDocumentFill = "document.on.document.fill"
     case crop
     case curlybraces
     case curlybracesEllipsis = "ellipsis.curlybraces"
@@ -54,6 +53,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case diamond
     case document
     case documentBadgePlus = "document.badge.plus"
+    case documentOnDocument = "document.on.document"
+    case documentOnDocumentFill = "document.on.document.fill"
     case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
     case dragHandle = "line.3.horizontal"
     case duplicate = "plus.square.on.square"
@@ -62,12 +63,14 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case eraser
     case eraserLineDashed = "eraser.line.dashed"
     case escape
+    case exitFullScreen = "arrow.down.right.and.arrow.up.left"
     case export = "square.and.arrow.up"
     case exportMultiple = "square.and.arrow.up.on.square"
     case eye
     case eyeSlash = "eye.slash"
     case fill = "inset.filled.rectangle"
     case film
+    case filmCircleFill = "film.circle.fill"
     case filmStack = "film.stack"
     case finder
     case flag
@@ -80,10 +83,10 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case forwardFill = "forward.fill"
     case gauge = "gauge.medium"
     case gaugeNeedle0 = "gauge.with.dots.needle.0percent" // Needle positions, for showing a rate on a dial rather than only naming it.
+    case gaugeNeedle100 = "gauge.with.dots.needle.100percent"
     case gaugeNeedle33 = "gauge.with.dots.needle.33percent"
     case gaugeNeedle50 = "gauge.with.dots.needle.50percent"
     case gaugeNeedle67 = "gauge.with.dots.needle.67percent"
-    case gaugeNeedle100 = "gauge.with.dots.needle.100percent"
     case gearshape
     case hammer
     case handWave = "hand.wave"
@@ -93,7 +96,6 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case horizontalPanelMaximized = "inset.filled.topthird.rectangle"
     case horizontalPanelMinimized = "inset.filled.bottomthird.rectangle"
     case infoBubble = "info.bubble"
-    case `import` = "tray.and.arrow.down"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
     case linesDecrease = "line.3.horizontal.decrease"
@@ -125,21 +127,21 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case paintPaletteFill = "paintpalette.fill"
     case paste = "document.on.clipboard"
     case pause = "stop.fill"
+    case pencil
+    case pencilCircle = "pencil.circle"
     case performMiniaturize = "minus.rectangle"
     case performZoom = "square.arrowtriangle.4.outward"
     case person
     case photo
+    case photoCircleFill = "photo.circle.fill"
     case photoStack = "photo.stack"
     case piano = "pianokeys.inverse"
-    case play
-    case playSlash = "play.slash"
-    case pencil
-    case pencilCircle = "pencil.circle"
-    case squareAndPencil = "square.and.pencil"
-    case pipExit = "pip.exit"
     case pipEnter = "pip.enter"
+    case pipExit = "pip.exit"
+    case play
     case playFill = "play.fill"
     case playlist = "music.note.list"
+    case playSlash = "play.slash"
     case playSquareStack = "play.square.stack"
     case plus
     case plusDiamond = "plus.diamond"
@@ -167,9 +169,9 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case selectPrevious = "arrowtriangle.up.fill"
     case settings = "gear"
     case shield
-    case showAll = "rectangle.on.rectangle"
     case shippingbox
     case shippingboxAndArrow = "shippingbox.and.arrow.backward"
+    case showAll = "rectangle.on.rectangle"
     case shuffle
     case sidebarLeading = "sidebar.leading"
     case sidebarTrailing = "sidebar.trailing"
@@ -178,25 +180,26 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sort = "arrow.up.arrow.down"
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
     case speaker
-    case speakerSlash = "speaker.slash"
-    case speakerWave1 = "speaker.wave.1"
-    case speakerWave2 = "speaker.wave.2"
-    case speakerWave3 = "speaker.wave.3"
     case speakerFill = "speaker.fill"
+    case speakerSlash = "speaker.slash"
     case speakerSlashFill = "speaker.slash.fill"
+    case speakerWave1 = "speaker.wave.1"
     case speakerWave1Fill = "speaker.wave.1.fill"
+    case speakerWave2 = "speaker.wave.2"
     case speakerWave2Fill = "speaker.wave.2.fill"
+    case speakerWave3 = "speaker.wave.3"
     case speakerWave3Fill = "speaker.wave.3.fill"
     case speakerWaveBubble = "speaker.wave.2.bubble"
+    case squareAndPencil = "square.and.pencil"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"
     case squareStack3dFill = "square.stack.3d.up.fill"
     case star
     case starFill = "star.fill"
     case stopwatch
+    case tablecellBadgeEllipse = "tablecells.badge.ellipsis"
     case tablecells
     case tablecellsFill = "tablecells.fill"
-    case tablecellBadgeEllipse = "tablecells.badge.ellipsis"
     case tag
     case tagFill = "tag.fill"
     case tagSlash = "tag.slash"
@@ -208,7 +211,6 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case textMagnifyingGlass = "text.magnifyingglass"
     case textSparkle = "character.textbox.badge.sparkles"
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
-    case exitFullScreen = "arrow.down.right.and.arrow.up.left"
     case trash
     case triangle
     case triangleFill = "triangle.fill"
@@ -223,18 +225,18 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case warningCircleFill = "exclamationmark.circle.fill"
     case warningFill = "exclamationmark.triangle.fill"
     case waveform = "waveform.path"
-    case waveformMid = "waveform.mid"
-    case waveformBadgePlus = "waveform.badge.plus"
     case waveformBadgeCheckmark = "waveform.badge.checkmark"
+    case waveformBadgePlus = "waveform.badge.plus"
     case waveformCircle = "waveform.circle"
     case waveformMagnifyingGlass = "waveform.badge.magnifyingglass"
+    case waveformMid = "waveform.mid"
     case waveformRectangle = "waveform.path.ecg.rectangle"
     case waveformSimple = "waveform.path.ecg"
     case waveformSlash = "waveform.slash"
     case wrenchAndScrewdriver = "wrench.and.screwdriver"
-    case xmark
     case xCircle = "x.circle"
     case xCircleFill = "x.circle.fill"
+    case xmark
 
     public var systemSymbolName: String { rawValue }
 }
