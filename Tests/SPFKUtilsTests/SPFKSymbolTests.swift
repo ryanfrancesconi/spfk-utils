@@ -61,6 +61,45 @@
             #expect(SPFKSymbol.play.systemSymbolName == SPFKSymbol.play.rawValue)
         }
 
+        /// A symbol added from a current SF Symbols release resolves on this machine, so nothing
+        /// else here notices that it needs a fallback — simulating an older OS only changes which
+        /// name is requested, not whether the raw value exists. Asks the system what release each
+        /// raw value came from instead of restating a list that would rot.
+        @Test func everySymbolNewerThanTheDeploymentFloorDeclaresAFallback() throws {
+            let availability = try Self.macOSVersionBySymbolName()
+
+            var missing: [String] = []
+
+            for symbol in SPFKSymbol.allCases where symbol.legacySymbolName == nil {
+                guard let introduced = availability[symbol.rawValue] else {
+                    missing.append("\(symbol): '\(symbol.rawValue)' names no known symbol")
+                    continue
+                }
+
+                if introduced > Self.deploymentFloor {
+                    missing.append(
+                        "\(symbol): '\(symbol.rawValue)' needs macOS "
+                            + "\(introduced.majorVersion).\(introduced.minorVersion)"
+                    )
+                }
+            }
+
+            #expect(missing.isEmpty, "symbols needing a legacySymbolName: \(missing)")
+        }
+
+        /// The fallback table and the version gate are separate switches, so an entry added to one
+        /// and not the other is silent: the name exists and is never reached.
+        @Test func everyFallbackIsReachedWhenItsVersionIsUnavailable() {
+            OSVersion.simulatedUnavailableFrom = .macOS14
+            defer { OSVersion.simulatedUnavailableFrom = nil }
+
+            let unreachable = SPFKSymbol.allCases
+                .filter { $0.legacySymbolName != nil && $0.systemSymbolName == $0.rawValue }
+                .map(\.rawValue)
+
+            #expect(unreachable.isEmpty, "legacySymbolName never reached for: \(unreachable)")
+        }
+
         /// The failure mode above, caught at the character level rather than through AppKit: an
         /// invisible character is indistinguishable from a correct name by reading.
         @Test func noSymbolNameCarriesAnInvisibleCharacter() {
@@ -73,6 +112,60 @@
                 }
 
             #expect(offenders.isEmpty, "symbol names with non-ASCII characters: \(offenders)")
+        }
+
+        // MARK: - Helpers
+
+        /// `SPFKUtils` declares `.macOS(.v13)`, which is what `legacySymbolName` promises to reach.
+        private static let deploymentFloor = OperatingSystemVersion(
+            majorVersion: 13, minorVersion: 0, patchVersion: 0
+        )
+
+        /// The macOS release each SF Symbol name was introduced in, read from the glyph bundle the
+        /// system resolves names against. Fails loudly if Apple moves or reshapes it, rather than
+        /// passing on an empty table.
+        private static func macOSVersionBySymbolName() throws -> [String: OperatingSystemVersion] {
+            let url = URL(
+                fileURLWithPath: "/System/Library/CoreServices/CoreGlyphs.bundle"
+                    + "/Contents/Resources/name_availability.plist"
+            )
+
+            let plist = try PropertyListSerialization.propertyList(
+                from: try Data(contentsOf: url), format: nil
+            )
+
+            guard let root = plist as? [String: Any],
+                  let releaseByName = root["symbols"] as? [String: String],
+                  let platformsByRelease = root["year_to_release"] as? [String: [String: String]]
+            else {
+                throw SymbolAvailabilityError.unexpectedLayout(url)
+            }
+
+            return releaseByName.compactMapValues { release in
+                platformsByRelease[release]?["macOS"].flatMap(Self.version)
+            }
+        }
+
+        private static func version(_ string: String) -> OperatingSystemVersion? {
+            let parts = string.split(separator: ".").compactMap { Int($0) }
+            guard let major = parts.first else { return nil }
+
+            return OperatingSystemVersion(
+                majorVersion: major,
+                minorVersion: parts.count > 1 ? parts[1] : 0,
+                patchVersion: parts.count > 2 ? parts[2] : 0
+            )
+        }
+    }
+
+    private enum SymbolAvailabilityError: Error {
+        case unexpectedLayout(URL)
+    }
+
+    extension OperatingSystemVersion {
+        fileprivate static func > (lhs: Self, rhs: Self) -> Bool {
+            (lhs.majorVersion, lhs.minorVersion, lhs.patchVersion)
+                > (rhs.majorVersion, rhs.minorVersion, rhs.patchVersion)
         }
     }
 
