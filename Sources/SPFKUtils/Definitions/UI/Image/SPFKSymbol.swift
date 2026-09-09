@@ -34,6 +34,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case center = "inset.filled.center.rectangle"
     case checklist
     case checkmark
+    case checkmarkDiamond = "checkmark.diamond"
     case checkmarkCircle = "checkmark.circle"
     case chevronDown = "chevron.down"
     case chevronLeft = "chevron.left"
