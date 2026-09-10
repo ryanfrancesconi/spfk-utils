@@ -45,6 +45,14 @@
 
                 return icon
             }
+
+            /// A thumbnail when there is one, else the system icon for the URL's type, else
+            /// `fallback` -- the order every file cell draws in, so a file's image does not depend on
+            /// which table shows it.
+            @MainActor
+            public static func fileImage(for url: URL, thumbnail: NSImage?, fallback: NSImage?) -> NSImage? {
+                thumbnail ?? fileType(for: url) ?? fallback
+            }
         }
 
         public static func showInFinder(urls: [URL]) {
