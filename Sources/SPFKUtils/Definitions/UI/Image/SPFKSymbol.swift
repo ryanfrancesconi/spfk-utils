@@ -11,6 +11,7 @@ import SPFKBase
 ///
 public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case `import` = "tray.and.arrow.down"
+    case arrow2SquarePath = "arrow.2.squarepath"
     case arrowClockwise = "arrow.clockwise"
     case arrowDownCircle = "arrow.down.circle"
     case arrowLeftAndRight = "arrow.left.and.right"
