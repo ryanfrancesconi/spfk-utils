@@ -21,6 +21,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowTurnDownLeft = "arrow.turn.down.left"
     case arrowUpArrowDown = "arrow.up.backward.and.arrow.down.forward"
     case arrowUpToLine = "arrow.up.to.line"
+    case arrowsMagnifyingGlass = "arrow.up.left.and.down.right.magnifyingglass"
     case audioUnit = "dot.radiowaves.left.and.right"
     case barcode
     case bell
