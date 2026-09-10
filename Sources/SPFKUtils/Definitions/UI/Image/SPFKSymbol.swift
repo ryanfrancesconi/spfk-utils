@@ -152,6 +152,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case quarterNote = "music.quarternote.3"
     case questionmarkCircle = "questionmark.circle"
     case quit = "xmark.rectangle"
+    case rectangleCompressVertical = "rectangle.compress.vertical"
+    case rectangleExpandVertical = "rectangle.expand.vertical"
     case rectanglePortraitArrowTriangle = "rectangle.portrait.arrowtriangle.2.inward"
     case redo = "arrow.uturn.forward"
     case returnKey = "return"
