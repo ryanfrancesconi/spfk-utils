@@ -16,6 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ryanfrancesconi/spfk-audio-base", from: "1.6.1"),
         .package(url: "https://github.com/ryanfrancesconi/spfk-filesystem", from: "1.2.2"),
+        .package(url: "https://github.com/ryanfrancesconi/spfk-image", from: "0.1.0"),
         .package(url: "https://github.com/ryanfrancesconi/spfk-testing", from: "1.1.0"),
         .package(url: "https://github.com/tadija/AEXML", from: "4.6.0"),
     ],
@@ -24,6 +25,7 @@ let package = Package(
             name: "SPFKUtils",
             dependencies: [
                 .product(name: "SPFKFileSystem", package: "spfk-filesystem"),
+                .product(name: "SPFKImage", package: "spfk-image"),
                 .product(name: "AEXML", package: "AEXML"),
             ],
             resources: [.process("Resources")]
@@ -32,6 +34,7 @@ let package = Package(
             name: "SPFKUtilsTests",
             dependencies: [
                 .targetItem(name: "SPFKUtils", condition: nil),
+                .product(name: "SPFKImage", package: "spfk-image"),
                 .product(name: "SPFKAudioBase", package: "spfk-audio-base"),
                 .product(name: "SPFKTesting", package: "spfk-testing"),
             ]

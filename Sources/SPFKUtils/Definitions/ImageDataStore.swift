@@ -3,6 +3,7 @@
 import CoreGraphics
 import Foundation
 import SPFKBase
+import SPFKImage
 import UniformTypeIdentifiers
 
 // MARK: - ImageDataStore

@@ -5,6 +5,7 @@
     import CoreGraphics
     import Foundation
     import SPFKBase
+    import SPFKImage
     import SPFKTesting
     import Testing
 
