@@ -64,3 +64,40 @@ public func batchMap<R: Sendable>(
         return results
     }
 }
+
+/// Like ``batchMap(count:batchSize:worker:)``, except that cancelling stops only new work: items already
+/// started run to the end, and every result is returned rather than discarded.
+///
+/// For work that cannot be taken back once started, such as rewriting a file, where losing a finished
+/// result makes the caller repeat it.
+public func batchMapKeepingFinished<R: Sendable>(
+    count: Int,
+    batchSize: Int,
+    worker: @Sendable @escaping (Int) async -> R?
+) async -> [R] {
+    guard count > 0 else { return [] }
+
+    return await withTaskGroup(of: R?.self, returning: [R].self) { taskGroup in
+        var index = 0
+
+        while index < min(batchSize, count), !Task.isCancelled {
+            taskGroup.addTask { [index] in await worker(index) }
+            index += 1
+        }
+
+        var results = [R]()
+
+        for await result in taskGroup {
+            if let result {
+                results.append(result)
+            }
+
+            if index < count, !Task.isCancelled {
+                taskGroup.addTask { [index] in await worker(index) }
+                index += 1
+            }
+        }
+
+        return results
+    }
+}
