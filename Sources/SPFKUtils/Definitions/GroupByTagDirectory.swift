@@ -12,16 +12,20 @@ import SPFKBase
 public struct GroupByTagDirectory {
     public let keys: [String]
 
+    /// Whether a `"/"` in a value nests a folder. When `false` it becomes `"-"`, for values such as a lens's `f/1.8`.
+    public let nestsOnSlash: Bool
+
     /// Creates a resolver with an ordered list of tag keys.
     /// An empty keys list always returns `base` unchanged.
-    public init(_ keys: [String] = []) {
+    public init(_ keys: [String] = [], nestsOnSlash: Bool = true) {
         self.keys = keys
+        self.nestsOnSlash = nestsOnSlash
     }
 
     /// Resolves the output directory, appending subdirectories from each key's tag value.
     ///
     /// Keys with missing or blank values are skipped. Each value is split on `"/"` to
-    /// support nested folder paths.
+    /// support nested folder paths, unless ``nestsOnSlash`` is `false`.
     public func resolve(base: URL, tags: [String: String]) -> URL {
         var result = base
         for key in keys {
@@ -30,8 +34,11 @@ public struct GroupByTagDirectory {
                 !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             else { continue }
 
-            let components = value
-                .components(separatedBy: "/")
+            let segments = nestsOnSlash
+                ? value.components(separatedBy: "/")
+                : [value.replacingOccurrences(of: "/", with: "-")]
+
+            let components = segments
                 .map(\.sanitizedPathComponent)
                 .filter { !$0.isEmpty }
 

@@ -54,6 +54,12 @@ final class GroupByTagDirectoryTests {
         #expect(result.path.hasSuffix("/output/A/B/C"))
     }
 
+    @Test func slashInAFlatValueDoesNotNest() {
+        let result = GroupByTagDirectory(["lens"], nestsOnSlash: false).resolve(base: base, tags: ["lens": "35mm f/1.8"])
+        #expect(result.pathComponents.count == base.pathComponents.count + 1)
+        #expect(result.lastPathComponent == "35mm f-1.8".sanitizedPathComponent)
+    }
+
     // MARK: - Multiple keys
 
     @Test func multipleKeysCreateNestedHierarchy() {
