@@ -32,6 +32,8 @@ public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {
         case segmentRenderOutput
         /// Import Photos Library — the folder holding the `.photoslibrary` last chosen.
         case photosLibrary
+        /// Image format conversion — destination directory.
+        case imageConversion
     }
 
     // MARK: - Storage
