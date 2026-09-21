@@ -26,12 +26,13 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 - **SearchScope** — Whether a search covers everything in scope or only the current selection.
 - **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
 - **CSVBuilder** — RFC 4180 CSV text from a header row and a per-row value provider.
-- **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path.
+- **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path, or, with `nestsOnSlash: false`, keeping each value one folder.
 - **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
 - **Email** — Composing a mail message.
 
 ### Concurrency
 
+- **BatchFileConverter** — Runs a per-file conversion over a batch of `FileConversionWork`: bounded concurrency, unique output names claimed before any file starts, each file's failure kept to that file, and results in input order.
 - **batchMap** — Bounded-concurrency map over a collection. For CPU-bound work set the batch size near the core count, since a task holds a thread while it runs; for suspending work it is a resource knob rather than a throughput one, because a suspended task holds no thread.
 
 ### Caching
