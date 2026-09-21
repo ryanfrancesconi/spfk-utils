@@ -32,7 +32,7 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 
 ### Concurrency
 
-- **BatchFileConverter** — Runs a per-file conversion over a batch of `FileConversionWork`: bounded concurrency, unique output names claimed before any file starts, each file's failure kept to that file, and results in input order.
+- **BatchFileConverter** — Runs a per-file conversion over a batch of `FileConversionWork`: bounded concurrency, every output name settled before any file starts (two outputs sharing a path, compared case-insensitively where the volume is, are numbered apart), each file's failure kept to that file, and results in input order.
 - **batchMap** — Bounded-concurrency map over a collection. For CPU-bound work set the batch size near the core count, since a task holds a thread while it runs; for suspending work it is a resource knob rather than a throughput one, because a suspended task holds no thread.
 
 ### Caching

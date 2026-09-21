@@ -83,6 +83,46 @@ final class BatchFileConverterTests: BinTestCase {
         #expect(results.allSatisfy { $0.work.conflictScheme == .overwrite })
     }
 
+    @Test(arguments: [FileConflictScheme.overwrite, .error])
+    func twoOutputsWithOnePathAreSettledApart(scheme: FileConflictScheme) async throws {
+        let items = [work("song.out", scheme: scheme), work("song.out", scheme: scheme)]
+        let recorder = Recorder()
+
+        let results = try await BatchFileConverter(items).start { item in
+            await recorder.convert(item.output.lastPathComponent)
+            return item
+        }
+
+        #expect(results.map(\.work.output.lastPathComponent) == ["song.out", "song_1.out"])
+        #expect(await recorder.converted.sorted() == ["song.out", "song_1.out"])
+    }
+
+    @Test func outputsDifferingOnlyInCaseAreSettledApartOnACaseInsensitiveVolume() async throws {
+        let values = try bin.resourceValues(forKeys: [.volumeSupportsCaseSensitiveNamesKey])
+        try #require(values.volumeSupportsCaseSensitiveNames == false)
+
+        let items = [work("Kick.wav"), work("kick.wav")]
+
+        let results = try await BatchFileConverter(items).start { $0 }
+        let paths = results.map { $0.work.output.path.lowercased() }
+
+        #expect(Set(paths).count == 2)
+    }
+
+    /// The in-batch rename is about siblings; a file already on disk is still the scheme's call.
+    @Test(arguments: [FileConflictScheme.overwrite, .error])
+    func aFileAlreadyAtTheOutputIsStillHandledByItsScheme(scheme: FileConflictScheme) async throws {
+        let existing = bin.appending(component: "song.out", directoryHint: .notDirectory)
+        try Data().write(to: existing)
+
+        let items = [work("song.out", scheme: scheme), work("song.out", scheme: scheme)]
+
+        let results = try await BatchFileConverter(items).start { $0 }
+
+        #expect(results.map(\.work.output) == [existing, bin.appending(component: "song_1.out")])
+        #expect(results.map(\.work.conflictScheme) == [scheme, .overwrite])
+    }
+
     @Test func aUniqueOutputWhoseFolderCannotBeCreatedFailsWithoutConverting() async throws {
         let blocker = bin.appending(component: "blocker", directoryHint: .notDirectory)
         try Data().write(to: blocker)

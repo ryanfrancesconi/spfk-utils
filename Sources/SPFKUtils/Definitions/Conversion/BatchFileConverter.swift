@@ -6,9 +6,9 @@ import SPFKFileSystem
 
 /// Converts a batch of files concurrently, `batchSize` at a time.
 ///
-/// Owns what is the same for every kind of file: settling `.unique` output names before anything
-/// runs, isolating each file's failure, and returning results in input order. The per-file converter
-/// owns the rest, including refusing an output that is its own input and removing a partial output
+/// Owns what is the same for every kind of file: settling output names before anything runs,
+/// isolating each file's failure, and returning results in input order. The per-file converter owns
+/// the rest, including refusing an output that is its own input and removing a partial output
 /// on cancel.
 public actor BatchFileConverter<Work: FileConversionWork> {
     public typealias Result = BatchFileConversionResult<Work>
@@ -39,7 +39,7 @@ public actor BatchFileConverter<Work: FileConversionWork> {
         finishedCount = 0
 
         let work = work
-        let resolved = Self.resolvingUniqueOutputs(work)
+        let resolved = Self.resolvingOutputs(work)
         let total = resolved.count
 
         // batchMap appends as tasks finish, so each result carries the index it was asked for.
@@ -72,19 +72,37 @@ public actor BatchFileConverter<Work: FileConversionWork> {
         return finishedCount
     }
 
-    /// Settles every `.unique` output before anything converts, since concurrent conversions each
-    /// checking the disk would claim the same free name.
+    /// Settles every output before anything converts, since concurrent conversions each checking
+    /// the disk would claim the same free name.
     ///
-    /// A name is held in memory rather than claimed on disk, so an item the converter later refuses
-    /// leaves nothing behind. Its scheme becomes `.overwrite`, since the slot is now decided.
-    static func resolvingUniqueOutputs(_ work: [Work]) -> [Swift.Result<Work, any Error>] {
-        var claimed: Set<URL> = []
+    /// The first item claiming a path keeps it and its scheme, which decides what happens to a file
+    /// already there. A `.unique` item, or a later one claiming a path already claimed in this batch,
+    /// is numbered instead and its scheme becomes `.overwrite`, since the slot is now decided. A name
+    /// is held in memory rather than claimed on disk, so an item the converter later refuses leaves
+    /// nothing behind.
+    static func resolvingOutputs(_ work: [Work]) -> [Swift.Result<Work, any Error>] {
+        var claimed: Set<String> = []
+        var caseSensitiveFolders: [URL: Bool] = [:]
+
+        func key(_ url: URL) -> String {
+            let folder = url.deletingLastPathComponent().standardizedFileURL
+            let isCaseSensitive = caseSensitiveFolders[folder] ?? {
+                let value = volumeIsCaseSensitive(at: folder)
+                caseSensitiveFolders[folder] = value
+                return value
+            }()
+            let path = url.standardizedFileURL.path
+            return isCaseSensitive ? path : path.lowercased()
+        }
 
         return work.map { item in
-            guard item.conflictScheme == .unique else { return .success(item) }
+            guard item.conflictScheme == .unique || claimed.contains(key(item.output)) else {
+                claimed.insert(key(item.output))
+                return .success(item)
+            }
 
             var item = item
-            let resolved = FileSystem.nextAvailableURL(item.output, excluding: claimed)
+            let resolved = FileSystem.nextAvailableURL(item.output, isTaken: { claimed.contains(key($0)) })
 
             do {
                 // The converter writes into this directory and does not create it.
@@ -96,11 +114,29 @@ public actor BatchFileConverter<Work: FileConversionWork> {
                 return .failure(error)
             }
 
-            claimed.insert(resolved)
+            claimed.insert(key(resolved))
 
             item.output = resolved
             item.conflictScheme = .overwrite
             return .success(item)
+        }
+    }
+
+    /// Reads the nearest existing ancestor, since an output folder may not exist yet. An unreadable
+    /// volume counts as case-insensitive, which can only number a name that needed none.
+    private static func volumeIsCaseSensitive(at folder: URL) -> Bool {
+        var folder = folder
+
+        while !folder.exists, folder.path != "/" {
+            folder = folder.deletingLastPathComponent()
+        }
+
+        do {
+            let values = try folder.resourceValues(forKeys: [.volumeSupportsCaseSensitiveNamesKey])
+            return values.volumeSupportsCaseSensitiveNames ?? false
+        } catch {
+            Log.error(folder, error)
+            return false
         }
     }
 }
