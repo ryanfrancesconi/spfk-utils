@@ -87,35 +87,5 @@
                 }
             }
         }
-
-        @MainActor
-        public static func popUpContextMenuBeneath(
-            _ menu: NSMenu,
-            with event: NSEvent,
-            for view: NSView
-        ) {
-            let localLocation = NSPoint(x: 0, y: -5)
-            let windowLocation = view.convert(localLocation, to: nil)
-
-            guard let newEvent = NSEvent.mouseEvent(
-                with: event.type,
-                location: windowLocation,
-                modifierFlags: event.modifierFlags,
-                timestamp: event.timestamp,
-                windowNumber: event.windowNumber,
-                context: nil,
-                eventNumber: event.eventNumber,
-                clickCount: 1,
-                pressure: 0
-            ) else {
-                return
-            }
-
-            NSMenu.popUpContextMenu(
-                menu,
-                with: newEvent,
-                for: view
-            )
-        }
     }
 #endif
