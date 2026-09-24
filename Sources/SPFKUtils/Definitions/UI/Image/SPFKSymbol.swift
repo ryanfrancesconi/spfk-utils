@@ -59,6 +59,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case documentBadgePlus = "document.badge.plus"
     case documentOnDocument = "document.on.document"
     case documentOnDocumentFill = "document.on.document.fill"
+    case dotViewfinder = "dot.viewfinder"
     case dragAndDrop = "pointer.arrow.and.square.on.square.dashed"
     case dragHandle = "line.3.horizontal"
     case duplicate = "plus.square.on.square"
