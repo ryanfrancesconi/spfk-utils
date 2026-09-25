@@ -24,6 +24,8 @@ public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {
         case imageExport
         /// CSV export — save location.
         case csvExport
+        /// FCPXML export — save location.
+        case fcpxmlExport
         /// UCS rename copy — destination directory.
         case ucsRename
         /// Export Soundpack — destination directory.
