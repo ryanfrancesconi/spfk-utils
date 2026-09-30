@@ -24,10 +24,13 @@ public actor BatchFileConverter<Work: FileConversionWork> {
 
     /// Converts every item, returning a result for each in the order given.
     ///
+    /// Cancelling stops new items; those already running finish, and every item not run is
+    /// `.failed` with `CancellationError`, so the results still hold one per item.
+    ///
     /// - Parameters:
     ///   - progress: called as each item finishes, with how many have finished so far.
     ///   - convert: converts one item and returns it as converted. Runs concurrently.
-    /// - Throws: on an empty batch, and `CancellationError` when cancelled.
+    /// - Throws: on an empty batch.
     public func start(
         progress: (@Sendable (_ completed: Int, _ total: Int, _ result: Result) async -> Void)? = nil,
         convert: @escaping @Sendable (Work) async throws -> Work
@@ -43,7 +46,7 @@ public actor BatchFileConverter<Work: FileConversionWork> {
         let total = resolved.count
 
         // batchMap appends as tasks finish, so each result carries the index it was asked for.
-        let finished: [(index: Int, result: Result)] = try await batchMap(count: total, batchSize: batchSize) { index in
+        let finished: [(index: Int, result: Result)] = await batchMapKeepingFinished(count: total, batchSize: batchSize) { index in
             let result: Result
 
             switch resolved[index] {
@@ -64,7 +67,11 @@ public actor BatchFileConverter<Work: FileConversionWork> {
             return (index: index, result: result)
         }
 
-        return finished.sorted { $0.index < $1.index }.map(\.result)
+        let byIndex = Dictionary(finished.map { ($0.index, $0.result) }, uniquingKeysWith: { first, _ in first })
+
+        return work.indices.map { index in
+            byIndex[index] ?? .failed(work[index], CancellationError())
+        }
     }
 
     private func didFinish() -> Int {

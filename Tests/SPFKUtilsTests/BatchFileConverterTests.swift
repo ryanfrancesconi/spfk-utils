@@ -19,6 +19,21 @@ final class BatchFileConverterTests: BinTestCase {
 
     private struct ConversionFailure: Error {}
 
+    /// Cancels a task from inside it, whichever of the two arrives first.
+    private actor Canceller {
+        private var action: (@Sendable () -> Void)?
+        private var isPending = false
+
+        func set(_ action: @escaping @Sendable () -> Void) {
+            self.action = action
+            if isPending { action() }
+        }
+
+        func cancel() {
+            if let action { action() } else { isPending = true }
+        }
+    }
+
     private actor Recorder {
         var converted: [String] = []
         var progress: [(completed: Int, total: Int)] = []
@@ -227,7 +242,7 @@ final class BatchFileConverterTests: BinTestCase {
         #expect(progress.allSatisfy { $0.total == 3 })
     }
 
-    @Test func cancellingStopsTheBatch() async {
+    @Test func cancellingStopsTheBatch() async throws {
         let items = ["a", "b", "c"].map { work($0) }
 
         let task = Task {
@@ -239,8 +254,38 @@ final class BatchFileConverterTests: BinTestCase {
 
         task.cancel()
 
-        await #expect(throws: CancellationError.self) {
-            _ = try await task.value
+        let results = try await task.value
+        #expect(results.map(\.work.output) == items.map(\.output))
+        #expect(results.allSatisfy { $0.error is CancellationError })
+    }
+
+    /// A cancel keeps what already finished, one result per item in input order.
+    @Test func cancellingKeepsTheFilesThatFinished() async throws {
+        let items = ["a", "b", "c", "d"].map { work($0) }
+        let first = items[0].output
+        let canceller = Canceller()
+
+        let task = Task {
+            try await BatchFileConverter(items, batchSize: 1).start(
+                progress: { _, _, result in
+                    if result.work.output == first {
+                        await canceller.cancel()
+                    }
+                },
+                convert: { item in
+                    if item.output != first {
+                        try await Task.sleep(seconds: 5)
+                    }
+                    return item
+                }
+            )
         }
+
+        await canceller.set { task.cancel() }
+        let results = try await task.value
+
+        #expect(results.map(\.work.output) == items.map(\.output))
+        #expect(results.first?.error == nil)
+        #expect(results.dropFirst().allSatisfy { $0.error is CancellationError })
     }
 }

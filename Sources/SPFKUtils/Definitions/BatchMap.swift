@@ -5,7 +5,8 @@ import Foundation
 /// Processes `count` items concurrently with a sliding window of `batchSize`.
 ///
 /// The worker closure receives an index (0..<count) and returns an optional result.
-/// Nil results are filtered out. Cancellation is checked between iterations.
+/// Nil results are filtered out. Cancellation is checked between iterations, and throws away
+/// every result already finished; ``batchMapKeepingFinished(count:batchSize:worker:)`` keeps them.
 ///
 /// ## Choosing a batchSize
 ///
