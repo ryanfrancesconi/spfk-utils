@@ -384,6 +384,34 @@ final class ImageDataStoreTests: BinTestCase {
         #expect(await store.fetch(type, for: url) != nil)
     }
 
+    @Test func pruneRemovesAnEntryWithOnlyAPrimary() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let urlA = fakeURL(index: 303)
+        let urlB = fakeURL(index: 304)
+
+        try await store.insert(.fullQuality, cgImage: try syntheticImage(), for: urlA)
+
+        let removed = await store.prune(activeURLs: [urlB])
+
+        #expect(removed == 1)
+        #expect(await store.fetch(.fullQuality, for: urlA) == nil)
+    }
+
+    @Test func aTIFFSourceIsStoredWhereFetchFindsIt() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let url = fakeURL(index: 305)
+        let png = try syntheticImage(utType: .png)
+        let tiff = try CGImage.create(from: png.dataRepresentation(utType: .tiff))
+        #expect(tiff.utType as String? == UTType.tiff.identifier)
+
+        try await store.insert(.fullQuality, cgImage: tiff, for: url)
+
+        let fetched = try #require(await store.fetch(.fullQuality, for: url))
+        #expect(fetched.hasEqualPixelData(tiff))
+    }
+
     /// A 200x200 PNG with a white top band and a solid body of the given red component.
     /// Round-tripped losslessly so the decoded leading rows stay byte-identical between the two.
     private func bandedImage(bodyRed: CGFloat) throws -> CGImage {

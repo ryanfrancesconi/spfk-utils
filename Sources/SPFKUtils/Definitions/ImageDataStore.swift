@@ -65,8 +65,11 @@ public actor ImageDataStore {
         }
     }
 
+    /// Every key with a thumbnail, a primary, or both.
     private func entryKeys() -> [String] {
-        shardedDirectory.entryKeys(suffix: Self.thumbSuffix)
+        let suffixes = [Self.thumbSuffix] + Self.fullExtensions.map { "\(Self.fullSuffix).\($0)" }
+        let keys = suffixes.flatMap { shardedDirectory.entryKeys(suffix: $0) }
+        return Array(Set(keys))
     }
 }
 
@@ -226,8 +229,10 @@ extension ImageDataStore {
             throw NSError(description: "Unknown UTType in cgImage")
         }
 
+        // Primaries are stored as PNG or JPEG only, the extensions every lookup probes.
+        let storedType: UTType = utType == .jpeg ? .jpeg : .png
         let key = url.sha256
-        let ext = utType.preferredFilenameExtension ?? (utType == .png ? "png" : "jpeg")
+        let ext = storedType.preferredFilenameExtension ?? (storedType == .png ? "png" : "jpeg")
         let destURL = primaryURL(for: key, ext: ext)
 
         if let existing = existingPrimaryURL(for: key), existing != destURL {
@@ -254,7 +259,7 @@ extension ImageDataStore {
         }
 
         try shardedDirectory.ensureShardDirectory(for: key)
-        try cgImage.export(utType: utType, to: destURL)
+        try cgImage.export(utType: storedType, to: destURL)
 
         if let fingerprint {
             primaryFingerprintCache[fingerprint] = key
