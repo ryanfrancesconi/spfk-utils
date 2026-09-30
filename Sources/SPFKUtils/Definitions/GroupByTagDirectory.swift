@@ -53,10 +53,18 @@ public struct GroupByTagDirectory {
 // MARK: - Path Sanitization
 
 extension String {
-    /// Trims whitespace, normalizes to title case, and replaces `:` (which macOS Finder treats as `/`) with `-`.
+    /// Trims whitespace, normalizes to title case, replaces `:` (which macOS Finder treats as `/`) with `-`,
+    /// and shortens to the 255-byte file name limit on whole characters.
     public var sanitizedPathComponent: String {
-        trimmingCharacters(in: .whitespacesAndNewlines)
+        let sanitized = trimmingCharacters(in: .whitespacesAndNewlines)
             .displayTitleCased
             .replacingOccurrences(of: ":", with: "-")
+
+        var byteCount = 0
+        let kept = sanitized.prefix {
+            byteCount += $0.utf8.count
+            return byteCount <= 255
+        }
+        return String(kept).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

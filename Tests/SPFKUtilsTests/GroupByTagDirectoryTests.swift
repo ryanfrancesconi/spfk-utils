@@ -141,4 +141,15 @@ final class GroupByTagDirectoryTests {
         #expect(!result.pathComponents.contains("."))
         #expect(path == base.path || path.hasPrefix(base.path + "/"))
     }
+
+    /// The limit counts precomposed bytes, while a file URL hands its components back decomposed.
+    @Test func aComponentIsShortenedToTheFileSystemNameLimit() {
+        let value = String(repeating: "\u{E9}", count: 200)
+        let result = GroupByTagDirectory(["genre"]).resolve(base: base, tags: ["genre": value])
+        let component = result.lastPathComponent
+
+        #expect(component.precomposedStringWithCanonicalMapping.utf8.count <= 255)
+        #expect(!component.isEmpty)
+        #expect(value.sanitizedPathComponent.hasPrefix(component))
+    }
 }
