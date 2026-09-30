@@ -92,7 +92,7 @@ public actor BatchFileConverter<Work: FileConversionWork> {
                 return value
             }()
             let path = url.standardizedFileURL.path
-            return isCaseSensitive ? path : path.lowercased()
+            return isCaseSensitive ? path : path.folding(options: [.caseInsensitive], locale: nil)
         }
 
         return work.map { item in

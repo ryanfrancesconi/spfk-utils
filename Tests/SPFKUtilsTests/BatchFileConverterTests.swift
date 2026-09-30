@@ -109,6 +109,30 @@ final class BatchFileConverterTests: BinTestCase {
         #expect(Set(paths).count == 2)
     }
 
+    /// The volume folds case by full Unicode rules, which `lowercased()` does not match: ß expands
+    /// to ss, and a final sigma folds to σ.
+    @Test(arguments: [FileConflictScheme.overwrite, .unique], [
+        ("Stra\u{DF}e.wav", "STRASSE.wav"),
+        ("\u{3C3}.wav", "\u{3C2}.wav"),
+        ("\u{FB01}le.wav", "file.wav"),
+    ])
+    func outputsTheVolumeFoldsToOneNameAreSettledApart(scheme: FileConflictScheme, names: (String, String)) async throws {
+        let values = try bin.resourceValues(forKeys: [.volumeSupportsCaseSensitiveNamesKey])
+        try #require(values.volumeSupportsCaseSensitiveNames == false)
+
+        let items = [work(names.0, scheme: scheme), work(names.1, scheme: scheme)]
+
+        let results = try await BatchFileConverter(items).start { item in
+            try Data(item.output.lastPathComponent.utf8).write(to: item.output, options: .withoutOverwriting)
+            return item
+        }
+
+        #expect(results.allSatisfy { $0.error == nil })
+
+        let written = try FileManager.default.contentsOfDirectory(at: bin, includingPropertiesForKeys: nil)
+        #expect(written.count == 2)
+    }
+
     /// The in-batch rename is about siblings; a file already on disk is still the scheme's call.
     @Test(arguments: [FileConflictScheme.overwrite, .error])
     func aFileAlreadyAtTheOutputIsStillHandledByItsScheme(scheme: FileConflictScheme) async throws {
