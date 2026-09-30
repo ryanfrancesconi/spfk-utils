@@ -14,7 +14,6 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 
 ### Definitions
 
-- **DictionaryParser** — Type-safe accessor wrapper around `[String: Any]` dictionaries with support for strings, numbers, booleans, URLs, and nested structures.
 - **Rescale** — Linear interpolation and mapping between numeric domains and ranges.
 - **Counter** — Simple incrementing counter with reset support.
 - **ProgressTracker / ChunkedProgressTracker** — Track completion progress as a normalized value, with optional chunked progress for parallel operations.
