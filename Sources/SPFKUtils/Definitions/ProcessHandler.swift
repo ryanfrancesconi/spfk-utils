@@ -6,8 +6,9 @@
 
     public class ProcessHandler {
         public var process = Process()
+        /// Carries both stdout and stderr, so a child filling one while the other is still open
+        /// cannot stall the read.
         public let outputPipe = Pipe()
-        public let errorPipe = Pipe()
 
         public var qos: DispatchQoS.QoSClass
 
@@ -18,7 +19,7 @@
             process.arguments = args
             process.qualityOfService = qos.qualityOfService
             process.standardOutput = outputPipe
-            process.standardError = errorPipe
+            process.standardError = outputPipe
         }
 
         public func run() throws -> String {
@@ -31,10 +32,6 @@
                 output += string + "\n"
             }
 
-            let error = errorPipe.fileHandleForReading.readDataToEndOfFile()
-            if let string = String(data: error, encoding: .utf8) {
-                output += string + "\n"
-            }
             process.waitUntilExit()
 
             return output
