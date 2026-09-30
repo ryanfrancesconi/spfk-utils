@@ -3,7 +3,7 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 
-A Swift utility library providing UI definitions, audio extensions, and Foundation/CoreGraphics conveniences for macOS and iOS development.
+A Swift utility library providing UI definitions and Foundation/CoreGraphics conveniences for macOS and iOS development.
 
 ## Requirements
 
@@ -18,15 +18,14 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 - **Counter** — Simple incrementing counter with reset support.
 - **ProgressTracker / ChunkedProgressTracker** — Track completion progress as a normalized value, with optional chunked progress for parallel operations.
 - **URLProperties** — Structured metadata container for URL-associated properties.
-- **HardwareInfo** — System hardware queries (model identifier, machine name).
+- **HardwareInfo** — System hardware queries (chip, chip name, memory, hardware UUID).
 - **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
-- **StereoState** — Enumeration of stereo routing states (stereo, mono, left, right, swapped).
+- **StereoState** — Enumeration of stereo routing states (normal, flipped, mono).
 - **ByteCount** — Binary size constants and human-readable file-size formatting.
 - **SearchScope** — Whether a search covers everything in scope or only the current selection.
 - **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
 - **CSVBuilder** — RFC 4180 CSV text from a header row and a per-row value provider.
 - **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path, or, with `nestsOnSlash: false`, keeping each value one folder.
-- **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
 - **Email** — Composing a mail message.
 
 ### Concurrency
@@ -56,7 +55,6 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 
 ### UI
 
-- **HexColor / RGBAColor** — Hex string and RGBA representations for cross-platform color handling.
 - **SPFKSchemeColor** — The two neutral grays used as default arguments by `SPFKSymbol.tinted()` and `NSImageConvertible.stateImage()`. It lives here because non-UI packages use it as a default argument.
 - **SPFKSymbol** — SF Symbol definitions with tinting and state images. Here for the same reason.
 - **AppearanceObserver** — Observe system appearance (light/dark mode) changes via Combine.
@@ -65,14 +63,13 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 
 ### Extensions
 
-Categorized extensions across Foundation, AppKit, CoreGraphics, and Audio frameworks:
+Categorized extensions across Foundation, AppKit and CoreGraphics:
 
 | Category | Highlights |
 |---|---|
-| **Foundation** | `String` (padding, truncation, data conversion), `URL` (parent detection, query parameters, bookmark management), `Dictionary` (merging, key mapping), `TimeInterval` (mach time conversion), `UUID` (zero constants), `NumberFormatter` |
-| **AppKit** | `NSView` (Auto Layout constraint helpers), `NSImage` (resizing, tinting), `NSWindow` (positioning), `NSEdgeInsets` (convenience inits) |
-| **CoreGraphics** | `CGImage` (scaling), `CGRect` (square fitting), `CGSize` (equality init), `CGColor` (hex conversion) |
-| **Audio** | `AUValue` (dB/linear conversion, normalization), `AVAudioTime` (host time utilities) |
+| **Foundation** | `URL` (file and content-type icons), `UUID` (zero constants), `NumberFormatter` |
+| **AppKit** | `NSView` (Auto Layout constraint helpers), `NSImage` (resizing, tinting), `NSWindow` (title bar height, modal state), `NSEdgeInsets` (convenience inits) |
+| **CoreGraphics** | `CGRect` (square fitting), `CGSize` (equality init), `CGColor` (hex conversion) |
 | **XML** | `AEXMLDocument` (load from a path, URL or string), `AEXMLElement` (child and attribute lookup, writing to a URL) |
 
 ### Entropy
@@ -83,7 +80,7 @@ Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) l
 
 | Package | Description |
 |---|---|
-| [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions |
+| [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions (test target only) |
 | [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
 | [spfk-image](https://github.com/ryanfrancesconi/spfk-image) | Encoding, decoding and fingerprints for the image data store |
 | [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
