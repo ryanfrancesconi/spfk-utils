@@ -11,8 +11,11 @@
         case dark
         case light
 
+        /// Resolves through AppKit's own matching, so the high-contrast and vibrant variants
+        /// follow the appearance they derive from.
         public init(appearanceNamed name: NSAppearance.Name) {
-            self = name == .aqua ? .light : .dark
+            let match = NSAppearance(named: name)?.bestMatch(from: [.aqua, .darkAqua])
+            self = match == .darkAqua ? .dark : .light
         }
 
         public init(colorScheme: SwiftUI.ColorScheme) {
