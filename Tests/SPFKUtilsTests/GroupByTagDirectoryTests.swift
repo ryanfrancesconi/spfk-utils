@@ -129,4 +129,16 @@ final class GroupByTagDirectoryTests {
         let result = GroupByTagDirectory(["genre"]).resolve(base: base, tags: ["genre": "A//B"])
         #expect(result.path.hasSuffix("/A/B"))
     }
+
+    // MARK: - Staying inside the base
+
+    @Test(arguments: [("..", true), (".", true), ("a/../../b", true), ("../..", true), ("..", false)])
+    func dotOnlyComponentsStayInsideTheBase(value: String, nestsOnSlash: Bool) {
+        let result = GroupByTagDirectory(["genre"], nestsOnSlash: nestsOnSlash).resolve(base: base, tags: ["genre": value])
+        let path = result.standardizedFileURL.path
+
+        #expect(!result.pathComponents.contains(".."))
+        #expect(!result.pathComponents.contains("."))
+        #expect(path == base.path || path.hasPrefix(base.path + "/"))
+    }
 }

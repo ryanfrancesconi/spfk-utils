@@ -24,8 +24,8 @@ public struct GroupByTagDirectory {
 
     /// Resolves the output directory, appending subdirectories from each key's tag value.
     ///
-    /// Keys with missing or blank values are skipped. Each value is split on `"/"` to
-    /// support nested folder paths, unless ``nestsOnSlash`` is `false`.
+    /// Keys with missing or blank values are skipped, as are components made only of dots. Each value
+    /// is split on `"/"` to support nested folder paths, unless ``nestsOnSlash`` is `false`.
     public func resolve(base: URL, tags: [String: String]) -> URL {
         var result = base
         for key in keys {
@@ -40,7 +40,7 @@ public struct GroupByTagDirectory {
 
             let components = segments
                 .map(\.sanitizedPathComponent)
-                .filter { !$0.isEmpty }
+                .filter { !$0.isEmpty && !$0.allSatisfy { $0 == "." } }
 
             result = components.reduce(result) {
                 $0.appending(component: $1, directoryHint: .isDirectory)
