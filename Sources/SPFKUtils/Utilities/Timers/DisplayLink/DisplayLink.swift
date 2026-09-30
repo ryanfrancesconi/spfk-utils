@@ -18,6 +18,9 @@
 
         public private(set) var running: Bool = false
 
+        /// A cancelled source must be neither resumed nor cancelled again.
+        private var isCancelled = false
+
         public var timeInterval: TimeInterval {
             let cvTime = CVDisplayLinkGetNominalOutputVideoRefreshPeriod(displaylink)
             return cvTime.timeValue.double / cvTime.timeScale.double
@@ -30,10 +33,27 @@
          - queue: Queue which will receive the callback calls
          */
         public init(onQueue queue: DispatchQueue = .main) throws {
-            // Source
-            source = DispatchSource.makeUserDataAddSource(queue: queue)
+            let source = DispatchSource.makeUserDataAddSource(queue: queue)
 
-            // Timer
+            do {
+                displaylink = try Self.makeDisplayLink(signalling: source)
+            } catch {
+                // A source released while suspended traps, so one that never started is resumed first.
+                source.resume()
+                source.cancel()
+                throw error
+            }
+
+            self.source = source
+
+            // Timer setup
+            source.setEventHandler { [weak self] in
+                self?.callback?()
+            }
+        }
+
+        /// A display link on the main display that adds to `source` on every frame.
+        private static func makeDisplayLink(signalling source: DispatchSourceUserDataAdd) throws -> CVDisplayLink {
             var timerRef: CVDisplayLink?
 
             // Create timer
@@ -75,12 +95,7 @@
                 throw NSError(description: "Failed to connect to display")
             }
 
-            displaylink = timerRef
-
-            // Timer setup
-            source.setEventHandler { [weak self] in
-                self?.callback?()
-            }
+            return timerRef
         }
 
         /// Starts the timer
@@ -130,20 +145,23 @@
             }
 
             source.cancel()
+            isCancelled = true
             running = false
         }
 
         deinit {
             Log.debug("- { \(self) }")
 
-            // If the timer is suspended, calling cancel without resuming
-            // triggers a crash. This is documented here https://forums.developer.apple.com/thread/15902
-            if !running {
-                source.resume()
+            CVDisplayLinkStop(displaylink)
+
+            // A suspended source must be resumed before it is cancelled or released.
+            if !isCancelled {
+                if !running {
+                    source.resume()
+                }
+                source.cancel()
             }
 
-            CVDisplayLinkStop(displaylink)
-            source.cancel()
             callback = nil
         }
     }
