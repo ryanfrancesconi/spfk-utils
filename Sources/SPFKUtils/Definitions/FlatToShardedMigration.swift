@@ -54,11 +54,8 @@ public struct FlatToShardedMigration: Sendable {
     /// Starts a background sweep that migrates all entries from the old flat directory to the
     /// sharded location. No-op if the old directory does not exist. Resumable across launches.
     ///
-    /// Returns the underlying `Task` so a caller that needs to know when the sweep actually
-    /// finishes (tests, primarily — production fire-and-forget callers can ignore the
-    /// `@discardableResult` return) can `await task?.value` instead of guessing a sleep
-    /// duration, which is inherently racy under heavier system load (e.g. running as part of
-    /// a large test batch rather than in isolation).
+    /// Returns the underlying `Task` so a caller that needs to know when the sweep finishes can
+    /// `await task?.value` rather than sleep for a guessed duration.
     ///
     /// Not `.background`: a process's first task at that priority waits on a background-QoS
     /// worker thread being spawned, measured at 2.7-48.6s for an empty closure.

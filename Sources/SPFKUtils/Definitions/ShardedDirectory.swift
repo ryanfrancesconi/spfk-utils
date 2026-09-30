@@ -4,8 +4,7 @@ import Foundation
 
 /// Manages a sharded file directory using a 2-hex-char prefix scheme (256 shards).
 ///
-/// Files are stored as `<root>/<key[0..<2]>/<key><suffix>`, mirroring the layout
-/// used by `BookmarkDataStore`. This keeps individual directory sizes manageable at
+/// Files are stored as `<root>/<key[0..<2]>/<key><suffix>`. This keeps individual directory sizes manageable at
 /// large library scales where flat directories cause expensive enumeration costs.
 public struct ShardedDirectory: Sendable {
     public let rootURL: URL

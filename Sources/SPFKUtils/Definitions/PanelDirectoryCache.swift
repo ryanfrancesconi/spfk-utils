@@ -9,7 +9,7 @@ import Foundation
 /// directory). Setting `NSOpenPanel.directoryURL` to a path outside the sandbox
 /// is safe — the panel runs via the OS powerbox and can navigate anywhere.
 ///
-/// One key set for both products; a key a product never writes costs it nothing.
+/// One key set for every consumer; a key never written costs nothing.
 public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {
     // MARK: - Keys
 

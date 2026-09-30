@@ -8,13 +8,8 @@
 
     /// The two neutral scheme grays symbol tinting renders against.
     ///
-    /// These live here rather than with the rest of the color system in `SPFKUI` because
-    /// `SPFKSymbol.tinted()` and `NSImageConvertible.stateImage()` use them as default arguments,
-    /// and both are reachable from data packages (`spfk-playlist-data`, `spfk-torchtag-data`) that
-    /// depend on `spfk-utils` and cannot depend on `SPFKUI` — `spfk-ui` already depends on
-    /// `spfk-playlist-data`, so the reverse edge would be a cycle.
-    ///
-    /// `SPFKColor.schemeColor` / `.schemeColorAlternate` resolve to these, so there is one definition.
+    /// These live here because `SPFKSymbol.tinted()` and `NSImageConvertible.stateImage()` use them
+    /// as default arguments, and both are reached from packages that cannot depend on a UI package.
     public enum SPFKSchemeColor {
         case primary
         case alternate

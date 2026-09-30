@@ -24,24 +24,23 @@
         /// collapsing them here is lossy in a way nothing downstream can undo: `finderTags` are
         /// extended attributes, so a Finder tag edit moves only the attribute date. A file
         /// observer comparing a single date can tell *that* the file changed but not whether
-        /// re-reading its contents is warranted -- and for a photo library, that is the difference
-        /// between reading an xattr and re-decoding EXIF, XMP and a video track.
+        /// re-reading its contents is warranted -- and for a media file, that is the difference
+        /// between reading an xattr and re-decoding its metadata.
         public private(set) var modificationState: FileModificationState
 
         /// Why the file refuses a write, or that it does not.
         ///
         /// Observed, not edited: the lock is applied to the file immediately rather than becoming
-        /// a pending change, so this always describes what the file was last seen to be. Deferring
-        /// it was tried and reverted -- a write barrier cannot share a commit boundary with the
-        /// data it guards, since applying it would first write everything else pending.
+        /// a pending change, so this always describes what the file was last seen to be. It is not
+        /// deferred: a write barrier cannot share a commit boundary with the data it guards, since
+        /// applying it would first write everything else pending.
         ///
         /// Recorded so a row on an unmounted volume still shows what the library last knew.
         /// **Never the value a write guard consults** -- `URL.lockState` re-reads the file, so a
         /// stale value can neither let a bad write through nor block a good one.
         public private(set) var lockState: FileLockState
 
-        /// When the file last changed, of either kind. Unchanged in meaning from when this was a
-        /// stored property, so every existing display and sort call site reads the same value.
+        /// When the file last changed, of either kind.
         public var modificationDate: Date? { modificationState.modificationDate }
 
         /// How the file on disk now differs from the state captured here, or `nil` if it doesn't.
@@ -177,8 +176,8 @@
             try container.encode(lockState, forKey: .lockState)
 
             // The collapsed `modificationDate` key is deliberately not written back. It is
-            // recoverable from either of these, and a library this size pays for every redundant
-            // field once per element.
+            // recoverable from either of these, and every redundant field is paid for once per
+            // element.
             try container.encodeIfPresent(
                 modificationState.contentModificationDate, forKey: .contentModificationDate
             )
