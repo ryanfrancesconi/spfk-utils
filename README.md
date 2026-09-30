@@ -75,7 +75,7 @@ Categorized extensions across Foundation, AppKit, CoreGraphics, and Audio framew
 | **AppKit** | `NSView` (Auto Layout constraint helpers), `NSImage` (resizing, tinting), `NSWindow` (positioning), `NSEdgeInsets` (convenience inits) |
 | **CoreGraphics** | `CGImage` (scaling), `CGRect` (square fitting), `CGSize` (equality init), `CGColor` (hex conversion) |
 | **Audio** | `AUValue` (dB/linear conversion, normalization), `AVAudioTime` (host time utilities) |
-| **XML** | `PlistUtilities` (dictionary/plist round-trip serialization via AEXML) |
+| **XML** | `AEXMLDocument` (load from a path, URL or string), `AEXMLElement` (child and attribute lookup, writing to a URL) |
 
 ### Entropy
 
