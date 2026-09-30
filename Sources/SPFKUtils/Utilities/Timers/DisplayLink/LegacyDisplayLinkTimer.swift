@@ -24,7 +24,6 @@ public class LegacyDisplayLinkTimer: TimerModel {
 
     private var displayLink: DisplayLink?
 
-    // global(qos: .default)
     public init(onQueue queue: DispatchQueue = .main) {
         do {
             Log.debug("Creating on", queue)

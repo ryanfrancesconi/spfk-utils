@@ -108,8 +108,6 @@
 
         private static func send(selector: Selector) {
             Task { @MainActor in
-                // Log.debug("firstResponder is", NSApp.mainWindow?.firstResponder)
-
                 NSApp.sendAction(selector, to: nil, from: nil)
             }
         }
