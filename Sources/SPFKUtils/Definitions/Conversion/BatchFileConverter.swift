@@ -76,10 +76,10 @@ public actor BatchFileConverter<Work: FileConversionWork> {
     /// the disk would claim the same free name.
     ///
     /// The first item claiming a path keeps it and its scheme, which decides what happens to a file
-    /// already there. A `.unique` item, or a later one claiming a path already claimed in this batch,
-    /// is numbered instead and its scheme becomes `.overwrite`, since the slot is now decided. A name
-    /// is held in memory rather than claimed on disk, so an item the converter later refuses leaves
-    /// nothing behind.
+    /// already there. A `.unique` item, a later one claiming a path already claimed in this batch, or
+    /// one naming another item's input, is numbered instead and its scheme becomes `.overwrite`, since
+    /// the slot is now decided. A name is held in memory rather than claimed on disk, so an item the
+    /// converter later refuses leaves nothing behind.
     static func resolvingOutputs(_ work: [Work]) -> [Swift.Result<Work, any Error>] {
         var claimed: Set<String> = []
         var caseSensitiveFolders: [URL: Bool] = [:]
@@ -95,14 +95,27 @@ public actor BatchFileConverter<Work: FileConversionWork> {
             return isCaseSensitive ? path : path.folding(options: [.caseInsensitive], locale: nil)
         }
 
-        return work.map { item in
-            guard item.conflictScheme == .unique || claimed.contains(key(item.output)) else {
+        var readers: [String: Set<Int>] = [:]
+
+        for (index, item) in work.enumerated() {
+            for input in [item.input, item.originalInput].compactMap { $0 } {
+                readers[key(input), default: []].insert(index)
+            }
+        }
+
+        return work.enumerated().map { index, item in
+            func isTaken(_ url: URL) -> Bool {
+                let path = key(url)
+                return claimed.contains(path) || readers[path, default: []].subtracting([index]).isNotEmpty
+            }
+
+            guard item.conflictScheme == .unique || isTaken(item.output) else {
                 claimed.insert(key(item.output))
                 return .success(item)
             }
 
             var item = item
-            let resolved = FileSystem.nextAvailableURL(item.output, isTaken: { claimed.contains(key($0)) })
+            let resolved = FileSystem.nextAvailableURL(item.output, isTaken: isTaken)
 
             do {
                 // The converter writes into this directory and does not create it.

@@ -133,6 +133,52 @@ final class BatchFileConverterTests: BinTestCase {
         #expect(written.count == 2)
     }
 
+    private func file(_ name: String) -> URL {
+        bin.appending(component: name, directoryHint: .notDirectory)
+    }
+
+    /// An item whose output is its own input is left for its converter to refuse.
+    @Test func anOutputNamingAnotherItemsInputIsNumberedApart() async throws {
+        try Data([1]).write(to: file("a.wav"))
+
+        let items = [
+            Work(input: file("a.aif"), output: file("a.wav")),
+            Work(input: file("a.wav"), output: file("a.wav")),
+        ]
+
+        let results = try await BatchFileConverter(items).start { $0 }
+
+        #expect(results[0].work.output != file("a.wav"))
+        #expect(results[1].work.output == file("a.wav"))
+    }
+
+    @Test func anOutputNamingAnotherItemsOriginalInputIsNumberedApart() async throws {
+        try Data([1]).write(to: file("b.wav"))
+
+        let items = [
+            Work(input: file("render.wav"), output: file("b.flac"), originalInput: file("b.wav")),
+            Work(input: file("x.aif"), output: file("b.wav")),
+        ]
+
+        let results = try await BatchFileConverter(items).start { $0 }
+
+        #expect(results[1].work.output != file("b.wav"))
+    }
+
+    @Test func anItemConvertingItsOwnInputFirstStillKeepsItsOutput() async throws {
+        try Data([1]).write(to: file("a.wav"))
+
+        let items = [
+            Work(input: file("a.wav"), output: file("a.wav")),
+            Work(input: file("a.aif"), output: file("a.wav")),
+        ]
+
+        let results = try await BatchFileConverter(items).start { $0 }
+
+        #expect(results[0].work.output == file("a.wav"))
+        #expect(results[1].work.output != file("a.wav"))
+    }
+
     /// The in-batch rename is about siblings; a file already on disk is still the scheme's call.
     @Test(arguments: [FileConflictScheme.overwrite, .error])
     func aFileAlreadyAtTheOutputIsStillHandledByItsScheme(scheme: FileConflictScheme) async throws {
