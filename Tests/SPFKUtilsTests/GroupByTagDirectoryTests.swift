@@ -152,4 +152,11 @@ final class GroupByTagDirectoryTests {
         #expect(!component.isEmpty)
         #expect(value.sanitizedPathComponent.hasPrefix(component))
     }
+
+    @Test func aLeadingDotIsStrippedSoTheFolderIsNotHidden() {
+        let directory = GroupByTagDirectory(["genre"])
+
+        #expect(directory.resolve(base: base, tags: ["genre": ".Drafts"]).lastPathComponent == "Drafts")
+        #expect(directory.resolve(base: base, tags: ["genre": ".."]) == base)
+    }
 }
