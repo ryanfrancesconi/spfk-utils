@@ -32,6 +32,7 @@ public func batchMap<R: Sendable>(
     worker: @Sendable @escaping (Int) async throws -> R?
 ) async throws -> [R] {
     guard count > 0 else { return [] }
+    let batchSize = max(1, batchSize)
 
     return try await withThrowingTaskGroup(
         of: R?.self,
@@ -76,6 +77,7 @@ public func batchMapKeepingFinished<R: Sendable>(
     worker: @Sendable @escaping (Int) async -> R?
 ) async -> [R] {
     guard count > 0 else { return [] }
+    let batchSize = max(1, batchSize)
 
     return await withTaskGroup(of: R?.self, returning: [R].self) { taskGroup in
         var index = 0

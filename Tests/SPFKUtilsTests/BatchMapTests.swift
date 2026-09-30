@@ -173,3 +173,17 @@ private actor ConcurrencyCounter {
         current -= 1
     }
 }
+
+struct BatchMapSizeTests {
+    @Test(arguments: [0, -1])
+    func batchMapRunsEveryItemWhateverTheBatchSize(batchSize: Int) async throws {
+        let results = try await batchMap(count: 3, batchSize: batchSize) { i -> Int? in i }
+        #expect(Set(results) == [0, 1, 2])
+    }
+
+    @Test(arguments: [0, -1])
+    func batchMapKeepingFinishedRunsEveryItemWhateverTheBatchSize(batchSize: Int) async {
+        let results = await batchMapKeepingFinished(count: 3, batchSize: batchSize) { i -> Int? in i }
+        #expect(Set(results) == [0, 1, 2])
+    }
+}
