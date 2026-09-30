@@ -4,47 +4,6 @@
     import AppKit
 
     extension NSMenu {
-        /// Get: Returns first checked index.
-        /// Set: Sets checked state for the given index, and removes checked state for all other indexes if present.
-        public var firstCheckedIndex: Int {
-            get {
-                for i in 0 ..< items.count {
-                    let item = items[i]
-
-                    if item.state == .on {
-                        return i
-                    }
-                }
-                return -1
-            }
-
-            set {
-                for i in 0 ..< items.count {
-                    items[i].state = (i == newValue).stateValue
-                }
-            }
-        }
-
-        /// Returns all checked items.
-        public var checkedItems: [String] {
-            get {
-                var out = [String]()
-                for item in items where item.state == .on {
-                    out.append(item.title)
-                }
-                return out
-            }
-
-            set {
-                for item in items {
-                    item.state = .off
-                }
-                for item in items where newValue.contains(item.title) {
-                    item.state = .on
-                }
-            }
-        }
-
         /// Removes checked state from all items.
         public func checkNone() {
             for item in items {

@@ -52,29 +52,3 @@ extension Date {
         dateStyleNoTime.string(from: self)
     }
 }
-
-extension StringProtocol {
-    public func toDate() -> Date? {
-        switch self {
-        case let str as String:
-            return dateStyleLong.date(from: str)
-        default:
-            return dateStyleLong.date(from: String(self))
-        }
-    }
-}
-
-extension Date {
-    public init?(
-        posix string: String,
-        dateFormat: String? = nil
-    ) {
-        let dateFormat = dateFormat ?? "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'"
-        let dateFormatter = DateFormatter()
-        let enUSPosixLocale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.locale = enUSPosixLocale
-        dateFormatter.dateFormat = dateFormat
-        guard let formDate = dateFormatter.date(from: string) else { return nil }
-        self = formDate
-    }
-}

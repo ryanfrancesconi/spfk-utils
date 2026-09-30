@@ -8,52 +8,6 @@ import SPFKBase
 import SPFKUtils
 import Testing
 
-// MARK: - URL.isParent
-
-final class URLParentTests {
-    @Test func directoryIsParent() {
-        let parent = URL(fileURLWithPath: NSTemporaryDirectory())
-        let child = parent.appendingPathComponent("somefile.txt")
-        #expect(parent.isParent(of: child))
-    }
-
-    @Test func unrelatedPathsNotParent() {
-        let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-        let other = URL(fileURLWithPath: "/System/Library")
-        #expect(!dir.isParent(of: other))
-    }
-
-    @Test func deepChildIsStillChild() {
-        let dir = URL(fileURLWithPath: NSTemporaryDirectory())
-        let child = dir.appendingPathComponent("sub/deep/file.txt")
-        #expect(dir.isParent(of: child))
-    }
-}
-
-// MARK: - URL.queryStringParameter
-
-final class QueryStringTests {
-    @Test func basicParam() {
-        let url = URL(string: "https://example.com?name=test")!
-        #expect(url.queryStringParameter("name") == "test")
-    }
-
-    @Test func multipleParams() {
-        let url = URL(string: "https://example.com?a=1&b=2&c=3")!
-        #expect(url.queryStringParameter("b") == "2")
-    }
-
-    @Test func missingParam() {
-        let url = URL(string: "https://example.com?name=test")!
-        #expect(url.queryStringParameter("missing") == nil)
-    }
-
-    @Test func encodedValue() {
-        let url = URL(string: "https://example.com?name=hello%20world")!
-        #expect(url.queryStringParameter("name") == "hello world")
-    }
-}
-
 // MARK: - CGRect.largestCenteredSquare
 
 final class CGRectTests {
@@ -282,30 +236,6 @@ final class CGColorHexTests {
     }
 }
 
-// MARK: - Dictionary.merge
-
-final class DictionaryMergeTests {
-    @Test func mergeOverrides() {
-        var dict: [String: Int] = ["a": 1, "b": 2]
-        dict.merge(dictionaries: ["b": 3, "c": 4])
-        #expect(dict["a"] == 1)
-        #expect(dict["b"] == 3)
-        #expect(dict["c"] == 4)
-    }
-
-    @Test func mergeMultiple() {
-        var dict: [String: Int] = ["a": 1]
-        dict.merge(dictionaries: ["b": 2], ["c": 3])
-        #expect(dict.count == 3)
-    }
-
-    @Test func mergeEmpty() {
-        var dict: [String: Int] = ["a": 1]
-        dict.merge(dictionaries: [:])
-        #expect(dict == ["a": 1])
-    }
-}
-
 // MARK: - ByteCount
 
 final class ByteCountTests {
@@ -333,26 +263,6 @@ final class ByteCountTests {
         #expect(ByteCount.megabyte.rawValue == ByteCount.kilobyte.rawValue * 1024)
         #expect(ByteCount.gigabyte.rawValue == ByteCount.megabyte.rawValue * 1024)
         #expect(ByteCount.terabyte.rawValue == ByteCount.gigabyte.rawValue * 1024)
-    }
-
-    @Test func fromString() throws {
-        let size1 = try #require(ByteCount.fromString("1 KB"))
-        #expect(size1 == ByteCount.kilobyte.rawValue)
-
-        let size2 = try #require(ByteCount.fromString("1 MB"))
-        #expect(size2 == ByteCount.megabyte.rawValue)
-
-        let size3 = try #require(ByteCount.fromString("1 GB"))
-        #expect(size3 == ByteCount.gigabyte.rawValue)
-
-        let size4 = try #require(ByteCount.fromString("1 TB"))
-        #expect(size4 == ByteCount.terabyte.rawValue)
-
-        let size5 = try #require(ByteCount.fromString("160.2 MB"))
-        #expect(size5 == 167_981_875)
-
-        let size6 = try #require(ByteCount.fromString("765.5 MB")).double
-        #expect(size6 == 765.5 * ByteCount.megabyte.rawValue.double)
     }
 
     @Test func toStringFormatting() throws {
