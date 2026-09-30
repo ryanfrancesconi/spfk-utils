@@ -13,10 +13,9 @@ public actor ImageDataStore {
     public nonisolated let directoryURL: URL
     nonisolated let shardedDirectory: ShardedDirectory
 
-    /// Session-scoped content fingerprint caches: fingerprint → first-written urlKey.
-    /// Subsequent inserts of identical images are hardlinked to the existing file instead of
-    /// being re-encoded and re-written. Hardlinks share the same inode so `exists`, `fetch`,
-    /// and `prune` all work transparently.
+    /// Session-scoped content fingerprint caches: fingerprint → the key whose file holds it.
+    /// Identical pixels inserted for two keys share one file through a hardlink. Rewriting a key
+    /// drops its entries first, so it never changes what another key holds.
     private var thumbnailFingerprintCache: [Int: String] = [:]
     private var primaryFingerprintCache: [Int: String] = [:]
 
@@ -191,7 +190,11 @@ extension ImageDataStore {
         let key = url.sha256
         let destURL = thumbnailURL(for: key)
 
-        if let fp = cgImage.fingerprint, let existingKey = thumbnailFingerprintCache[fp] {
+        let fingerprint = cgImage.fingerprint
+        let existingKey = fingerprint.flatMap { thumbnailFingerprintCache[$0] }
+        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != key }
+
+        if let existingKey {
             let existingURL = thumbnailURL(for: existingKey)
             if FileManager.default.fileExists(atPath: existingURL.path) {
                 try shardedDirectory.ensureShardDirectory(for: key)
@@ -208,8 +211,8 @@ extension ImageDataStore {
         try shardedDirectory.ensureShardDirectory(for: key)
         try data.write(to: destURL, options: .atomic)
 
-        if let fp = cgImage.fingerprint {
-            thumbnailFingerprintCache[fp] = key
+        if let fingerprint {
+            thumbnailFingerprintCache[fingerprint] = key
         }
     }
 
@@ -226,7 +229,11 @@ extension ImageDataStore {
             try? FileManager.default.removeItem(at: existing)
         }
 
-        if let fp = cgImage.fingerprint, let existingKey = primaryFingerprintCache[fp] {
+        let fingerprint = cgImage.fingerprint
+        let existingKey = fingerprint.flatMap { primaryFingerprintCache[$0] }
+        primaryFingerprintCache = primaryFingerprintCache.filter { $0.value != key }
+
+        if let existingKey {
             let existingURL = primaryURL(for: existingKey, ext: ext)
             if FileManager.default.fileExists(atPath: existingURL.path) {
                 try shardedDirectory.ensureShardDirectory(for: key)
@@ -239,8 +246,8 @@ extension ImageDataStore {
         try shardedDirectory.ensureShardDirectory(for: key)
         try cgImage.export(utType: utType, to: destURL)
 
-        if let fp = cgImage.fingerprint {
-            primaryFingerprintCache[fp] = key
+        if let fingerprint {
+            primaryFingerprintCache[fingerprint] = key
         }
     }
 }

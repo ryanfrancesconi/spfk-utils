@@ -348,6 +348,28 @@ final class ImageDataStoreTests: BinTestCase {
         #expect(fetchedB.hasEqualPixelData(imageB))
     }
 
+    /// Rewriting a key with different pixels must not leave its previous image linkable: a later
+    /// insert of that previous image for another key has to get that image, not the rewrite.
+    @Test(arguments: [CachedImageType.thumbnail, .fullQuality])
+    func rewritingAKeyDoesNotLeaveItsOldImageLinkable(type: CachedImageType) async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let imageX = try bandedImage(bodyRed: 1)
+        let imageY = try bandedImage(bodyRed: 0)
+        let urlA = fakeURL(index: 300)
+        let urlC = fakeURL(index: 301)
+
+        try await store.insert(type, cgImage: imageX, for: urlA)
+        try await store.insert(type, cgImage: imageY, for: urlA)
+        try await store.insert(type, cgImage: imageX, for: urlC)
+
+        let fetchedA = try #require(await store.fetch(type, for: urlA))
+        let fetchedC = try #require(await store.fetch(type, for: urlC))
+
+        #expect(fetchedA.hasEqualPixelData(imageY))
+        #expect(fetchedC.hasEqualPixelData(imageX))
+    }
+
     /// A 200x200 PNG with a white top band and a solid body of the given red component.
     /// Round-tripped losslessly so the decoded leading rows stay byte-identical between the two.
     private func bandedImage(bodyRed: CGFloat) throws -> CGImage {
