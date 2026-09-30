@@ -18,12 +18,9 @@
             let url = TestBundleResources.shared.sharksandwich
 
             let originalImage = try #require(NSImage(contentsOf: url)?.cgImage)
-            Log.debug(originalImage)
 
             let data = try #require(originalImage.jpegRepresentation)
             let newImage = try #require(NSImage(data: data)?.cgImage)
-
-            Log.debug(newImage)
 
             #expect(newImage.width == originalImage.width)
             #expect(newImage.height == originalImage.height)
@@ -63,14 +60,6 @@
 
             let first = try CGImage.contentsOf(url: url)
             let second = try CGImage.contentsOf(url: url)
-
-            let firstData = first.dataProvider?.data as Data?
-            let secondData = second.dataProvider?.data as Data?
-
-            Log.debug("first: \(first.width)x\(first.height) bpc:\(first.bitsPerComponent) bpp:\(first.bitsPerPixel) bpr:\(first.bytesPerRow) alpha:\(first.alphaInfo.rawValue)")
-            Log.debug("second: \(second.width)x\(second.height) bpc:\(second.bitsPerComponent) bpp:\(second.bitsPerPixel) bpr:\(second.bytesPerRow) alpha:\(second.alphaInfo.rawValue)")
-            Log.debug("first data: \(firstData?.count ?? -1) bytes")
-            Log.debug("second data: \(secondData?.count ?? -1) bytes")
 
             #expect(first.hasEqualPixelData(second))
         }

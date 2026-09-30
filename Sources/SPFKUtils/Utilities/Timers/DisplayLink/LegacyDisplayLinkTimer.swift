@@ -26,7 +26,6 @@ public class LegacyDisplayLinkTimer: TimerModel {
 
     public init(onQueue queue: DispatchQueue = .main) {
         do {
-            Log.debug("Creating on", queue)
             displayLink = try DisplayLink(onQueue: queue)
         } catch {
             Log.error(error)
@@ -43,10 +42,6 @@ public class LegacyDisplayLinkTimer: TimerModel {
         guard state == .resumed else { return }
         displayLink?.suspend()
         state = .suspended
-    }
-
-    deinit {
-        Log.debug("- { \(self) }")
     }
 
     public func dispose() {

@@ -81,9 +81,5 @@
             displayLink = nil
             eventHandler = nil
         }
-
-        deinit {
-            Log.debug("- { \(self) }")
-        }
     }
 #endif

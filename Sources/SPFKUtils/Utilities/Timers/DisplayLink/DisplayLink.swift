@@ -150,8 +150,6 @@
         }
 
         deinit {
-            Log.debug("- { \(self) }")
-
             CVDisplayLinkStop(displaylink)
 
             // A suspended source must be resumed before it is cancelled or released.

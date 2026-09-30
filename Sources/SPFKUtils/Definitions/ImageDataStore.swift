@@ -173,7 +173,6 @@ extension ImageDataStore {
         var removedCount = 0
 
         for key in entryKeys() where !activeKeys.contains(key) {
-            Log.debug("pruning orphaned image cache: \(key)")
             deleteFiles(for: key)
             removedCount += 1
         }
