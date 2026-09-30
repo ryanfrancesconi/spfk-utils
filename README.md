@@ -43,8 +43,7 @@ A Swift utility library providing UI definitions, audio extensions, and Foundati
 
 ### Timers
 
-- **BasicTimer / RepeatingTimer / OneShotTimer** — Simple timers behind one `TimerModel` protocol, with `TimerType` and `TimerState`.
-- **DisplayLinkTimer / LegacyDisplayLinkTimer** — Screen-refresh-synced timing for playhead and transport updates.
+- **DisplayLinkTimer / LegacyDisplayLinkTimer** — Screen-refresh-synced timing for playhead and transport updates, behind the `TimerModel` protocol with `TimerState`.
 
 ### Outline and table state
 

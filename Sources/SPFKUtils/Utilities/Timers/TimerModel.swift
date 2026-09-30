@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Common interface for all timer implementations (basic, one-shot, repeating, display-link).
+/// Common interface for the display-link timers.
 ///
 /// Timers start in the ``TimerState/suspended`` state. Call ``resume()`` to start
 /// firing, ``suspend()`` to pause, and ``dispose()`` to permanently release resources.
