@@ -251,32 +251,32 @@ final class NumberFormatterTests {
 
 final class CGColorHexTests {
     @Test func redNoAlpha() {
-        let color = CGColor(red: 1, green: 0, blue: 0, alpha: 1)
+        let color = CGColor(srgbRed: 1, green: 0, blue: 0, alpha: 1)
         let hex = color.toHex(alpha: false)
         #expect(hex == "FF0000")
     }
 
     @Test func redWithAlpha() {
-        let color = CGColor(red: 1, green: 0, blue: 0, alpha: 1)
+        let color = CGColor(srgbRed: 1, green: 0, blue: 0, alpha: 1)
         let hex = color.toHex(alpha: true)
         #expect(hex == "FF0000FF")
     }
 
     @Test func halfAlpha() {
-        let color = CGColor(red: 1, green: 0, blue: 0, alpha: 0.5)
+        let color = CGColor(srgbRed: 1, green: 0, blue: 0, alpha: 0.5)
         let hex = color.toHex(alpha: true)
         // 0.5 * 255 = 127.5, lroundf = 128 = 0x80
         #expect(hex == "FF000080")
     }
 
     @Test func black() {
-        let color = CGColor(red: 0, green: 0, blue: 0, alpha: 1)
+        let color = CGColor(srgbRed: 0, green: 0, blue: 0, alpha: 1)
         let hex = color.toHex()
         #expect(hex == "000000")
     }
 
     @Test func white() {
-        let color = CGColor(red: 1, green: 1, blue: 1, alpha: 1)
+        let color = CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 1)
         let hex = color.toHex()
         #expect(hex == "FFFFFF")
     }

@@ -4,37 +4,30 @@ import CoreGraphics
 import Foundation
 
 extension CGColor {
+    /// The color's sRGB value as hex digits, `RRGGBB` or `RRGGBBAA`. Nil when it cannot be
+    /// converted to sRGB.
     public func toHex(alpha: Bool = false) -> String? {
-        guard let components,
+        guard let srgb = CGColorSpace(name: CGColorSpace.sRGB),
+              let converted = converted(to: srgb, intent: .defaultIntent, options: nil),
+              let components = converted.components,
               components.count >= 3
         else {
             return nil
         }
 
-        let r = Float(components[0])
-        let g = Float(components[1])
-        let b = Float(components[2])
-        var a = Float(1.0)
-
-        if components.count >= 4 {
-            a = Float(components[3])
+        func byte(_ value: CGFloat) -> Int {
+            lround(Double(min(max(value, 0), 1)) * 255)
         }
 
+        let r = byte(components[0])
+        let g = byte(components[1])
+        let b = byte(components[2])
+        let a = components.count >= 4 ? byte(components[3]) : 255
+
         if alpha {
-            return String(
-                format: "%02lX%02lX%02lX%02lX",
-                lroundf(r * 255),
-                lroundf(g * 255),
-                lroundf(b * 255),
-                lroundf(a * 255)
-            )
+            return String(format: "%02lX%02lX%02lX%02lX", r, g, b, a)
         } else {
-            return String(
-                format: "%02lX%02lX%02lX",
-                lroundf(r * 255),
-                lroundf(g * 255),
-                lroundf(b * 255)
-            )
+            return String(format: "%02lX%02lX%02lX", r, g, b)
         }
     }
 }
