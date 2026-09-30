@@ -10,7 +10,6 @@ public enum ScrollAlignment {
 }
 
 public enum ScrollToBehavior {
-    case visible
     case centerIfOutOfView
     case centerAlways
 }

@@ -21,12 +21,6 @@ extension NSClipView {
         animationDuration duration: Double = scrollToAnimationDuration
     ) -> Bool {
         switch behavior {
-        case .visible:
-            return scroll(
-                toRect: rect,
-                animationDuration: duration
-            )
-
         case .centerIfOutOfView:
             return scroll(
                 toCenter: rect,
@@ -44,73 +38,6 @@ extension NSClipView {
     }
 
     // MARK: - Helpers
-
-    private func scroll(
-        toRect rect: CGRect,
-        animationDuration duration: Double
-    ) -> Bool {
-        // unwrap refs
-        guard let scrollView = enclosingScrollView,
-              let docView = documentView else { return false }
-        let clipView = self
-
-        // make a copy of the current origin
-        var newOrigin = clipView.documentVisibleRect.origin
-
-        // if we are too far to the right, correct it
-        if newOrigin.x > rect.origin.x {
-            newOrigin.x = rect.origin.x
-        }
-
-        // if we are too far to the left, correct it
-        if rect.origin.x > newOrigin.x + clipView.documentVisibleRect.width - rect.width {
-            newOrigin.x = rect.origin.x - clipView.documentVisibleRect.width + rect.width
-        }
-
-        // if we are too low, correct it
-        if newOrigin.y > rect.origin.y {
-            newOrigin.y = rect.origin.y
-        }
-
-        // if we are too high, correct it
-        if rect.origin.y > newOrigin.y + clipView.documentVisibleRect.height - rect.height {
-            newOrigin.y = rect.origin.y - clipView.documentVisibleRect.height + rect.height
-        }
-
-        // match the new origin to bounds.origin
-        newOrigin.x += clipView.bounds.origin.x - clipView.documentVisibleRect.origin.x
-        newOrigin.y += clipView.bounds.origin.y - clipView.documentVisibleRect.origin.y
-
-        // clamp X to view edges if necessary
-        let minX = docView.bounds.minX + 1
-        let maxX = docView.bounds.width - clipView.documentVisibleRect.width
-
-        // clamp Y to view edges if necessary
-        let minY = docView.bounds.minY + 1
-        let maxY = docView.bounds.height - clipView.documentVisibleRect.height
-
-        newOrigin.x = newOrigin.x.clamped(to: minX ... maxX)
-        newOrigin.y = newOrigin.y.clamped(to: minY ... maxY)
-
-        guard newOrigin != clipView.bounds.origin else {
-            // no scrolling necessary
-            return false
-        }
-
-        if duration > 0.0 { // animate
-            NSAnimationContext.beginGrouping()
-            NSAnimationContext.current.duration = duration
-            clipView.animator().setBoundsOrigin(newOrigin)
-            scrollView.reflectScrolledClipView(clipView)
-            NSAnimationContext.endGrouping()
-
-        } else { // no animation
-            clipView.setBoundsOrigin(newOrigin)
-            scrollView.reflectScrolledClipView(clipView)
-        }
-
-        return true
-    }
 
     @discardableResult
     private func scroll(
