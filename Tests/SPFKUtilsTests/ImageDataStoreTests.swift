@@ -370,6 +370,20 @@ final class ImageDataStoreTests: BinTestCase {
         #expect(fetchedC.hasEqualPixelData(imageX))
     }
 
+    /// A second insert of the same pixels for the same key must leave the entry in place.
+    @Test(arguments: [CachedImageType.thumbnail, .fullQuality])
+    func reinsertingTheSameImageForTheSameURLKeepsTheEntry(type: CachedImageType) async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let image = try syntheticImage(utType: .png)
+        let url = fakeURL(index: 302)
+
+        try await store.insert(type, cgImage: image, for: url)
+        try await store.insert(type, cgImage: image, for: url)
+
+        #expect(await store.fetch(type, for: url) != nil)
+    }
+
     /// A 200x200 PNG with a white top band and a solid body of the given red component.
     /// Round-tripped losslessly so the decoded leading rows stay byte-identical between the two.
     private func bandedImage(bodyRed: CGFloat) throws -> CGImage {

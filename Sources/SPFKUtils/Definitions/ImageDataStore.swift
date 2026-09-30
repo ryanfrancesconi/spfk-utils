@@ -192,11 +192,16 @@ extension ImageDataStore {
 
         let fingerprint = cgImage.fingerprint
         let existingKey = fingerprint.flatMap { thumbnailFingerprintCache[$0] }
+
+        if existingKey == key, FileManager.default.fileExists(atPath: destURL.path) {
+            return
+        }
+
         thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != key }
 
         if let existingKey {
             let existingURL = thumbnailURL(for: existingKey)
-            if FileManager.default.fileExists(atPath: existingURL.path) {
+            if existingURL != destURL, FileManager.default.fileExists(atPath: existingURL.path) {
                 try shardedDirectory.ensureShardDirectory(for: key)
                 try? FileManager.default.removeItem(at: destURL)
                 try FileManager.default.linkItem(at: existingURL, to: destURL)
@@ -231,11 +236,16 @@ extension ImageDataStore {
 
         let fingerprint = cgImage.fingerprint
         let existingKey = fingerprint.flatMap { primaryFingerprintCache[$0] }
+
+        if existingKey == key, FileManager.default.fileExists(atPath: destURL.path) {
+            return
+        }
+
         primaryFingerprintCache = primaryFingerprintCache.filter { $0.value != key }
 
         if let existingKey {
             let existingURL = primaryURL(for: existingKey, ext: ext)
-            if FileManager.default.fileExists(atPath: existingURL.path) {
+            if existingURL != destURL, FileManager.default.fileExists(atPath: existingURL.path) {
                 try shardedDirectory.ensureShardDirectory(for: key)
                 try? FileManager.default.removeItem(at: destURL)
                 try FileManager.default.linkItem(at: existingURL, to: destURL)
