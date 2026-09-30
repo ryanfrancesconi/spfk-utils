@@ -8,7 +8,14 @@
         public private(set) var url: URL
         public var finderTags: FinderTagGroup
         public private(set) var creationDate: Date?
+
+        /// The file's length in bytes, as Finder shows it.
         public private(set) var fileSize: UInt64?
+
+        /// The disk blocks the file occupies. Moves only in whole blocks, which is what change
+        /// detection relies on; never for display.
+        public private(set) var allocatedSize: UInt64?
+
         public private(set) var fileSizeString: String?
 
         /// When the file was last written, split by kind of change.
@@ -49,7 +56,8 @@
             creationDate = url.creationDate
             modificationState = FileModificationState(url: url)
             finderTags = FinderTagGroup(url: url)
-            fileSize = url.regularFileAllocatedSize
+            fileSize = url.fileSize.map { UInt64($0) }
+            allocatedSize = url.regularFileAllocatedSize
             lockState = url.lockState
 
             initialize()
@@ -68,6 +76,7 @@
             finderTags: FinderTagGroup,
             creationDate: Date?,
             fileSize: UInt64?,
+            allocatedSize: UInt64?,
             modificationState: FileModificationState,
             lockState: FileLockState
         ) {
@@ -75,6 +84,7 @@
             self.finderTags = finderTags
             self.creationDate = creationDate
             self.fileSize = fileSize
+            self.allocatedSize = allocatedSize
             self.modificationState = modificationState
             self.lockState = lockState
 
@@ -112,7 +122,9 @@
             case modificationDate
             case contentModificationDate
             case attributeModificationDate
+            /// The allocated size, under the name it had when that was the only size stored.
             case fileSize
+            case logicalSize
             case lockState
         }
 
@@ -121,7 +133,10 @@
             url = try container.decode(URL.self, forKey: .url)
             finderTags = try container.decodeIfPresent(FinderTagGroup.self, forKey: .finderTags) ?? FinderTagGroup()
             creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
-            fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
+            allocatedSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
+            // Absent from records written before it was stored; the allocated size stands in
+            // until the file is next read.
+            fileSize = try container.decodeIfPresent(UInt64.self, forKey: .logicalSize) ?? allocatedSize
 
             // Absent from every record written before the lock state existed, and `.writable` is
             // the right reading of that: nothing was known to be in the way. The value is a
@@ -157,7 +172,8 @@
             try container.encode(url, forKey: .url)
             try container.encode(finderTags, forKey: .finderTags)
             try container.encodeIfPresent(creationDate, forKey: .creationDate)
-            try container.encodeIfPresent(fileSize, forKey: .fileSize)
+            try container.encodeIfPresent(allocatedSize, forKey: .fileSize)
+            try container.encodeIfPresent(fileSize, forKey: .logicalSize)
             try container.encode(lockState, forKey: .lockState)
 
             // The collapsed `modificationDate` key is deliberately not written back. It is
