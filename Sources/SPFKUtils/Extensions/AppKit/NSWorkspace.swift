@@ -5,7 +5,7 @@
     import UniformTypeIdentifiers
 
     extension NSWorkspace {
-        /// Cache these common types as `CGImage`s
+        /// Cache these common types as `NSImage`s
         public enum FinderIcon {
             /// Any audio and/or video content.
             public static let media: NSImage? = NSWorkspace.shared.icon(for: .audiovisualContent)

@@ -6,9 +6,6 @@
     /// Generates first responder actions to assist with building main application menus programatically.
     ///
     /// `FirstResponder.send(action: .showHelp)`
-    ///
-    /// Reference for first responder actions in NSResponder
-    /// @MainActor public protocol NSStandardKeyBindingResponding : NSObjectProtocol {
     public class FirstResponder {
         /// A subset of general responder actions which are handled by this class
         public enum Action: Equatable, Sendable {

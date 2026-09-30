@@ -30,7 +30,7 @@ public struct NodeIdentifier: Sendable, Hashable, Equatable, Codable, CustomStri
     /// if the node was duplicated, the previous `id` is stored here for tracking changes
     public var originalId: UUID?
 
-    /// when the node is moved, the prevoius `parentId` will be cached here
+    /// when the node is moved, the previous `parentId` will be cached here
     public private(set) var previousParentId: UUID?
 
     public var description: String {

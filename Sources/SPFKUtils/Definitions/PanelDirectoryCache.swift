@@ -5,9 +5,7 @@ import Foundation
 /// Persists the last user-chosen directory URL for each panel type so that
 /// NSOpenPanel and NSSavePanel reopen in the same location across sessions.
 ///
-/// The stored URL is always a directory (file selection panels store the parent
-/// directory). Setting `NSOpenPanel.directoryURL` to a path outside the sandbox
-/// is safe — the panel runs via the OS powerbox and can navigate anywhere.
+/// Callers store a directory (file panels store the parent).
 ///
 /// One key set for every consumer; a key never written costs nothing.
 public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {

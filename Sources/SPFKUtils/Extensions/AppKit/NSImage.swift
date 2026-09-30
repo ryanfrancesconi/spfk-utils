@@ -20,7 +20,6 @@
         }
 
         /// Initializes a new `NSImage` by tinting a template image.
-        /// If image is not a template, image is unmodified.
         public convenience init?(templateNamed: NSImage.Name, tint color: NSColor) {
             self.init(named: templateNamed)
             tint(color: color)
@@ -35,7 +34,7 @@
     }
 
     extension NSImage {
-        /// Returns a new `NSImage` by tinting a template image.
+        /// Tints this image in place.
         public func tint(color: NSColor) {
             lockFocus()
             color.set()
@@ -119,11 +118,6 @@
     }
 
     extension NSImage {
-        ///  Copies the  image and resizes it to the given size.
-        ///
-        ///  - parameter size: The size of the new image.
-        ///
-        ///  - returns: The resized copy of the given image.
         /// Draws this image centered inside a larger canvas, without scaling it.
         ///
         /// Unlike ``copy(size:)``, which stretches the image to fill, this pads. Use it to give a
@@ -152,6 +146,11 @@
             return padded
         }
 
+        ///  Copies the  image and resizes it to the given size.
+        ///
+        ///  - parameter size: The size of the new image.
+        ///
+        ///  - returns: The resized copy of the given image.
         public func copy(size: NSSize) -> NSImage? {
             // Create a new rect with given width and height
             let frame = NSMakeRect(0, 0, size.width, size.height)
@@ -178,8 +177,8 @@
             return nil
         }
 
-        ///  Copies the current image and resizes it to the size of the given NSSize, while
-        ///  maintaining the aspect ratio of the original image.
+        ///  Copies the current image scaled uniformly to cover `size` (aspect fill): the result is at
+        ///  least `size` on both axes.
         ///
         ///  - parameter size: The size of the new image.
         ///

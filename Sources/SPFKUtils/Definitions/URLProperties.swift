@@ -93,7 +93,7 @@
         /// Re-reads the lock state from the file, and the dates the write that changed it moved.
         ///
         /// Narrower than rebuilding through ``init(url:)`` on purpose: that also replaces
-        /// `finderTags`, which is where a colour edit lives until it is saved.
+        /// `finderTags`, which is where a color edit lives until it is saved.
         ///
         /// **``modificationState`` is not optional here.** Toggling the flag moves the attribute
         /// date, so refreshing the lock alone leaves the record claiming a date the file no longer
