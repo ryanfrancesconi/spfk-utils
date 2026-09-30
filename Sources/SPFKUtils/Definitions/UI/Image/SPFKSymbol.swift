@@ -342,7 +342,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
             )
         }
 
-        // override default impl
+        /// Used by direct calls on a symbol. Not a protocol requirement, so the protocol's
+        /// `stateImage()` still tints through `NSImageConvertible`'s own implementation.
         public func tinted(color: NSColor) -> NSImage? {
             NSImage.systemSymbol(
                 named: systemSymbolName,
