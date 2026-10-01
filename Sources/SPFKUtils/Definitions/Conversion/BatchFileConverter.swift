@@ -105,7 +105,7 @@ public actor BatchFileConverter<Work: FileConversionWork> {
         var readers: [String: Set<Int>] = [:]
 
         for (index, item) in work.enumerated() {
-            for input in [item.input, item.originalInput].compactMap { $0 } {
+            for case let input? in [item.input, item.originalInput] {
                 readers[key(input), default: []].insert(index)
             }
         }
