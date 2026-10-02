@@ -159,6 +159,53 @@ extension ImageDataStore {
         entryKeys().count
     }
 
+    /// Moves every cached image for `oldURL` to `newURL`, for a file that moved without its content
+    /// changing. When `newURL` already has entries they win, and `oldURL`'s are deleted.
+    ///
+    /// Each moved entry is stamped with the current date, since a caller compares an entry's date
+    /// against its file's and the moved file may be newer than the entry. **Only call this for a
+    /// file verified to hold the same content** — the stamp is what asserts it. Copied rather than
+    /// renamed, so the stamp cannot reach another key sharing the entry through a hardlink.
+    public func rekey(from oldURL: URL, to newURL: URL) throws {
+        let oldKey = oldURL.sha256
+        let newKey = newURL.sha256
+
+        guard oldKey != newKey else { return }
+
+        defer { deleteFiles(for: oldKey) }
+
+        let fm = FileManager.default
+
+        guard !fm.fileExists(atPath: thumbnailURL(for: newKey).path), existingPrimaryURL(for: newKey) == nil else {
+            return
+        }
+
+        var moves: [(from: URL, to: URL)] = []
+
+        let thumbnail = thumbnailURL(for: oldKey)
+        if fm.fileExists(atPath: thumbnail.path) {
+            moves.append((thumbnail, thumbnailURL(for: newKey)))
+        }
+
+        if let primary = existingPrimaryURL(for: oldKey) {
+            moves.append((primary, primaryURL(for: newKey, ext: primary.pathExtension)))
+        }
+
+        guard moves.isNotEmpty else { return }
+
+        try shardedDirectory.ensureShardDirectory(for: newKey)
+
+        let now = Date()
+
+        for move in moves {
+            try fm.copyItem(at: move.from, to: move.to)
+            try fm.setAttributes([.modificationDate: now], ofItemAtPath: move.to.path)
+        }
+
+        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != oldKey }
+        primaryFingerprintCache = primaryFingerprintCache.filter { $0.value != oldKey }
+    }
+
     @discardableResult
     public func prune(activeURLs: Set<URL>) -> Int {
         prune(activeKeys: Set(activeURLs.map(\.sha256)))

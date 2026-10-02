@@ -17,6 +17,10 @@ public protocol ImageDataStoreAccess: Sendable {
     /// Drops every cached image for one file.
     func deleteImages(for url: URL) async
 
+    /// Moves every cached image for a file that moved without its content changing. See
+    /// ``ImageDataStore/rekey(from:to:)``.
+    func rekeyImages(from oldURL: URL, to newURL: URL) async throws
+
     @discardableResult
     func pruneImages(activeURLs: Set<URL>) async -> Int
 }
