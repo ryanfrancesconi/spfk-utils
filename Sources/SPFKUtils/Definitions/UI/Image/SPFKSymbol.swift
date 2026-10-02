@@ -105,6 +105,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
     case linesDecrease = "line.3.horizontal.decrease"
+    case link
     case listAndFilm = "list.and.film"
     case listBullet = "list.bullet"
     case lock
