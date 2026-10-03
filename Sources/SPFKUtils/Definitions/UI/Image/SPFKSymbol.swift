@@ -217,6 +217,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case textAlignRight = "text.alignright"
     case textBadgePlus = "text.badge.plus"
     case textDocumentMagnifyingGlass = "text.page.badge.magnifyingglass"
+    case textFormatCharacters = "textformat.characters"
     case textMagnifyingGlass = "text.magnifyingglass"
     case textSparkle = "character.textbox.badge.sparkles"
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
@@ -285,6 +286,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .numbers: "textformat.123"
         case .paste: "doc.on.clipboard"
         case .textDocumentMagnifyingGlass: "doc.text.magnifyingglass"
+        case .textFormatCharacters: "textformat"
         case .wandAndSparkles: "wand.and.stars"
 
         // macOS 15.0, 15.1, 15.2, 15.4
@@ -315,7 +317,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .center, .clockArrows, .document, .documentBadgePlus, .documentOnDocument,
              .documentOnDocumentFill, .fill, .hideOthers, .horizontalPanelMaximized,
              .horizontalPanelMinimized, .numbers, .paste, .textDocumentMagnifyingGlass,
-             .wandAndSparkles:
+             .textFormatCharacters, .wandAndSparkles:
             OSVersion.macOS15.isAvailable
 
         case .waveformBadgeCheckmark: OSVersion.macOS15_1.isAvailable
