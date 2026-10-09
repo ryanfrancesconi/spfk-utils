@@ -83,6 +83,7 @@ Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) l
 | [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
 | [spfk-image](https://github.com/ryanfrancesconi/spfk-image) | Encoding, decoding and fingerprints for the image data store |
 | [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
+| [spfk-base](https://github.com/ryanfrancesconi/spfk-base) | Common extensions and logging (test target only) |
 | [spfk-testing](https://github.com/ryanfrancesconi/spfk-testing) | Test infrastructure (test target only) |
 
 ## About
