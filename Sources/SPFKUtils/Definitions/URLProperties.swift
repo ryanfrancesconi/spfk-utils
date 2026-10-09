@@ -104,6 +104,34 @@
             modificationState = FileModificationState(url: url)
         }
 
+        /// The properties of `newURL`, keeping these Finder tags: a color edit lives in them until
+        /// it is saved, and re-reading the file would drop it.
+        public func repointed(to newURL: URL) -> URLProperties {
+            let fresh = URLProperties(url: newURL)
+
+            return URLProperties(
+                url: newURL,
+                finderTags: finderTags,
+                creationDate: fresh.creationDate,
+                fileSize: fresh.fileSize,
+                allocatedSize: fresh.allocatedSize,
+                modificationState: fresh.modificationState,
+                lockState: fresh.lockState
+            )
+        }
+
+        /// The end of every metadata save: writes the Finder tags to `url`, bumps its modification
+        /// date, then re-reads every property, or a stale date reads as an external change on the
+        /// next scan.
+        ///
+        /// `url` is the file's location now, which a relocation can have moved past ``url``.
+        public mutating func finishSave(at url: URL) throws {
+            try url.set(finderTags: finderTags)
+            try url.updateModificationDate()
+
+            self = URLProperties(url: url)
+        }
+
         private mutating func initialize() {
             if let fileSize {
                 fileSizeString = ByteCount.toString(fileSize.int64)
