@@ -37,7 +37,6 @@ A Swift utility library providing UI definitions and Foundation/CoreGraphics con
 
 - **ImageDataStore / ImageDataStoreAccess / CachedImageType** — A disk cache for decoded images, and the narrow protocol a data layer exposes it through.
 - **ShardedDirectory** — A 2-hex-character prefix scheme (256 shards) laid out as `<root>/<key[0..<2]>/<key><suffix>`, so a large library does not pay flat-directory enumeration costs.
-- **FlatToShardedMigration** — Moves a legacy flat cache into that layout, owning where the old directory was and how to prune orphans during the migration window. The store itself knows nothing about any prior location.
 
 ### Timers
 
