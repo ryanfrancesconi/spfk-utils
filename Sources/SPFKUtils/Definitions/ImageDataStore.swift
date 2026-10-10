@@ -39,7 +39,7 @@ public actor ImageDataStore {
 
     // MARK: - Private Filename Helpers
 
-    private func thumbnailURL(for key: String) -> URL {
+    private nonisolated func thumbnailURL(for key: String) -> URL {
         shardedDirectory.fileURL(for: key, suffix: Self.thumbSuffix)
     }
 
@@ -86,19 +86,26 @@ extension ImageDataStore {
     }
 
     /// Returns the cached CGImage for the given type, or nil if not cached.
-    public func fetch(_ type: CachedImageType, for url: URL) -> CGImage? {
+    ///
+    /// Thumbnail reads run off the actor, so many proceed at once. Every thumbnail write replaces
+    /// the file atomically, so a read finds the whole file or none.
+    public nonisolated func fetch(_ type: CachedImageType, for url: URL) async -> CGImage? {
         let key = url.sha256
 
-        let fileURL: URL?
         switch type {
         case .thumbnail:
-            let thumbURL = thumbnailURL(for: key)
-            fileURL = FileManager.default.fileExists(atPath: thumbURL.path) ? thumbURL : nil
+            return Self.readImage(at: thumbnailURL(for: key))
         case .fullQuality:
-            fileURL = existingPrimaryURL(for: key)
+            return await fetchPrimary(key: key)
         }
+    }
 
-        guard let fileURL, let data = try? Data(contentsOf: fileURL) else { return nil }
+    private func fetchPrimary(key: String) -> CGImage? {
+        existingPrimaryURL(for: key).flatMap(Self.readImage)
+    }
+
+    private nonisolated static func readImage(at fileURL: URL) -> CGImage? {
+        guard let data = try? Data(contentsOf: fileURL) else { return nil }
         return try? CGImage.create(from: data)
     }
 
@@ -165,7 +172,8 @@ extension ImageDataStore {
     /// Each moved entry is stamped with the current date, since a caller compares an entry's date
     /// against its file's and the moved file may be newer than the entry. **Only call this for a
     /// file verified to hold the same content** — the stamp is what asserts it. Copied rather than
-    /// renamed, so the stamp cannot reach another key sharing the entry through a hardlink.
+    /// renamed, so the stamp cannot reach another key sharing the entry through a hardlink, and
+    /// staged beside the destination so a concurrent thumbnail read never sees a partial copy.
     public func rekey(from oldURL: URL, to newURL: URL) throws {
         let oldKey = oldURL.sha256
         let newKey = newURL.sha256
@@ -198,8 +206,16 @@ extension ImageDataStore {
         let now = Date()
 
         for move in moves {
-            try fm.copyItem(at: move.from, to: move.to)
-            try fm.setAttributes([.modificationDate: now], ofItemAtPath: move.to.path)
+            let staging = move.to.appendingPathExtension("\(UUID().uuidString).staging")
+
+            do {
+                try fm.copyItem(at: move.from, to: staging)
+                try fm.setAttributes([.modificationDate: now], ofItemAtPath: staging.path)
+                try fm.moveItem(at: staging, to: move.to)
+            } catch {
+                try? fm.removeItem(at: staging)
+                throw error
+            }
         }
 
         thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != oldKey }

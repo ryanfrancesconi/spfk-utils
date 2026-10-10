@@ -91,4 +91,22 @@ final class ImageDataStoreRekeyTests: BinTestCase {
         #expect(await store.cacheDate(.thumbnail, for: other) == otherDate)
         #expect(await store.fetch(.thumbnail, for: other) != nil)
     }
+
+    /// Each entry is staged under another name and moved into place, so nothing is left at the
+    /// staging name and the new key's shard holds exactly the moved entries.
+    @Test(.tags(.thumbnailFill)) func aRekeyLeavesNothingAtAStagingName() async throws {
+        let store = try makeStore()
+        try await store.insert(.thumbnail, cgImage: image(red: 1), for: old)
+        try await store.insert(.fullQuality, cgImage: image(red: 1), for: old)
+
+        try await store.rekey(from: old, to: new)
+
+        let shard = store.shardedDirectory.shardURL(for: new.sha256)
+        let names = try FileManager.default.contentsOfDirectory(atPath: shard.path)
+            .filter { !$0.hasPrefix(".") }
+        let newKey = new.sha256
+
+        #expect(names.allSatisfy { $0.hasPrefix(newKey) }, "Unexpected files in the shard: \(names)")
+        #expect(names.count == 2)
+    }
 }
