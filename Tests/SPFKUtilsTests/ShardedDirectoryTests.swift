@@ -111,4 +111,18 @@ final class ShardedDirectoryTests: BinTestCase {
 
         #expect(sd.entryKeys(suffix: ".wfcache").isEmpty)
     }
+
+    @Test func entryKeysInShardListsOnlyThatShard() throws {
+        deleteBinOnExit = true
+        let dir = try makeDirectory()
+        let sd = ShardedDirectory(rootURL: dir)
+
+        for key in ["ab01", "ab02-2", "cd03"] {
+            try sd.ensureShardDirectory(for: key)
+            try Data().write(to: sd.fileURL(for: key, suffix: ".wfcache"))
+        }
+
+        #expect(Set(sd.entryKeys(suffix: ".wfcache", inShardOf: "ab01")) == ["ab01", "ab02-2"])
+        #expect(sd.entryKeys(suffix: ".wfcache", inShardOf: "ee99").isEmpty)
+    }
 }

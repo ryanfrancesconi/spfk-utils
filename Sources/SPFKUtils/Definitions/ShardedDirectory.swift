@@ -48,13 +48,26 @@ public struct ShardedDirectory: Sendable {
         var keys: [String] = []
         for shardDir in shardDirs {
             guard (try? shardDir.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true else { continue }
-            guard let files = try? fm.contentsOfDirectory(at: shardDir, includingPropertiesForKeys: nil) else { continue }
-            for file in files {
-                let name = file.lastPathComponent
-                guard name.hasSuffix(suffix) else { continue }
-                keys.append(String(name.dropLast(suffix.count)))
-            }
+            keys += Self.entryKeys(in: shardDir, suffix: suffix)
         }
         return keys
+    }
+
+    /// The keys in the one shard `key` belongs to, so every key sharing its first two characters.
+    ///
+    /// A lookup by key prefix needs only this: one directory listing rather than 256.
+    public func entryKeys(suffix: String, inShardOf key: String) -> [String] {
+        Self.entryKeys(in: shardURL(for: key), suffix: suffix)
+    }
+
+    private static func entryKeys(in shardDir: URL, suffix: String) -> [String] {
+        guard let files = try? FileManager.default.contentsOfDirectory(at: shardDir, includingPropertiesForKeys: nil) else {
+            return []
+        }
+
+        return files.compactMap { file in
+            let name = file.lastPathComponent
+            return name.hasSuffix(suffix) ? String(name.dropLast(suffix.count)) : nil
+        }
     }
 }
