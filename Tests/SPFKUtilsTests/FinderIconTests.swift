@@ -55,6 +55,24 @@
         @Test func theGenericFallbackIconsResolve() {
             #expect(NSWorkspace.FinderIcon.image != nil)
         }
+
+        /// A system icon is resolved by IconServices in every image view it is set on; a bitmap is not.
+        private func isBitmap(_ image: NSImage?) -> Bool {
+            guard let image, image.representations.isNotEmpty else { return false }
+            return image.representations.allSatisfy { $0 is NSBitmapImageRep }
+        }
+
+        @Test func aFileTypeIconIsHandedOutAsABitmap() {
+            #expect(isBitmap(NSWorkspace.FinderIcon.fileType(for: url("bitmap.wav"))))
+        }
+
+        @Test func aFallbackIsHandedOutAsABitmapDrawnOnce() {
+            let first = NSWorkspace.FinderIcon.fileImage(for: url("README"), thumbnail: nil, fallback: NSWorkspace.FinderIcon.media)
+            let second = NSWorkspace.FinderIcon.fileImage(for: url("LICENSE"), thumbnail: nil, fallback: NSWorkspace.FinderIcon.media)
+
+            #expect(isBitmap(first))
+            #expect(first === second)
+        }
     }
 
 #endif
