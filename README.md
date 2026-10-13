@@ -22,7 +22,6 @@ A Swift utility library providing UI definitions and Foundation/CoreGraphics con
 - **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
 - **StereoState** — Enumeration of stereo routing states (normal, flipped, mono).
 - **ByteCount** — Binary size constants and human-readable file-size formatting.
-- **SearchScope** — Whether a search covers everything in scope or only the current selection.
 - **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
 - **CSVBuilder** — RFC 4180 CSV text from a header row and a per-row value provider.
 - **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path, or, with `nestsOnSlash: false`, keeping each value one folder.
