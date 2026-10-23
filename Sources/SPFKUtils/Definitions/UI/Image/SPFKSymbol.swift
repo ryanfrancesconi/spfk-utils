@@ -47,6 +47,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case circle
     case circleBadgeFill = "circlebadge.fill"
     case circleFill = "circle.fill"
+    case circleGrid2x1 = "circle.grid.2x1"
+    case circleGrid2x1Fill = "circle.grid.2x1.fill"
     case circleSlash = "circle.slash"
     case clock
     case clockArrowCirclepath = "clock.arrow.circlepath"
@@ -104,6 +106,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case infoBubble = "info.bubble"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
+    case lCircle = "l.circle"
     case linesDecrease = "line.3.horizontal.decrease"
     case link
     case listAndFilm = "list.and.film"
@@ -113,6 +116,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case lockSquareStack = "lock.square.stack"
     case loop = "repeat"
     case macwindow
+    case mCircle = "m.circle"
     case magnifyingGlass = "magnifyingglass"
     case mapPin = "mappin.and.ellipse"
     case mathFunction = "function"
@@ -157,6 +161,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case quarterNote = "music.quarternote.3"
     case questionmarkCircle = "questionmark.circle"
     case quit = "xmark.rectangle"
+    case rCircle = "r.circle"
     case rectangleCompressVertical = "rectangle.compress.vertical"
     case rectangleExpandVertical = "rectangle.expand.vertical"
     case rectanglePortraitArrowTriangle = "rectangle.portrait.arrowtriangle.2.inward"
