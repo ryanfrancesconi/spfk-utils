@@ -106,6 +106,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case infoBubble = "info.bubble"
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
+    case interfaceWindowOnRectangle = "interface.window.on.rectangle" // os 26+
     case lCircle = "l.circle"
     case linesDecrease = "line.3.horizontal.decrease"
     case link
@@ -306,6 +307,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .minusPlusLines: "ruler"
         case .musicNoteSlash: "waveform.slash"
         case .musicNoteSquareStack, .musicPages: "music.note.list"
+        case .interfaceWindowOnRectangle: "macwindow.on.rectangle"
         case .waveformMid: "waveform"
 
         default: nil
@@ -329,7 +331,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .infoTriangle: OSVersion.macOS15_2.isAvailable
         case .textSparkle: OSVersion.macOS15_4.isAvailable
 
-        case .dragAndDrop, .finder, .minusPlusLines, .musicNoteSlash, .musicNoteSquareStack,
+        case .dragAndDrop, .finder, .interfaceWindowOnRectangle, .minusPlusLines, .musicNoteSlash, .musicNoteSquareStack,
              .musicPages, .waveformMid:
             OSVersion.macOS26.isAvailable
 
