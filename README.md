@@ -19,7 +19,6 @@ A Swift utility library providing UI definitions and Foundation/CoreGraphics con
 - **ProgressTracker / ChunkedProgressTracker** — Track completion progress as a normalized value, with optional chunked progress for parallel operations.
 - **URLProperties** — Structured metadata container for URL-associated properties.
 - **HardwareInfo** — System hardware queries (chip, chip name, memory, hardware UUID).
-- **ProcessHandler** — Launch and manage external processes with stdout/stderr capture.
 - **StereoState** — Enumeration of stereo routing states (normal, flipped, mono).
 - **ByteCount** — Binary size constants and human-readable file-size formatting.
 - **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
