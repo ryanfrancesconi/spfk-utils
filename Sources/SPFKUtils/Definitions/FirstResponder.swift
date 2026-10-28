@@ -32,8 +32,12 @@
             case moveRightAndModifySelection
             case moveWordLeft
             case moveWordRight
+            case moveWordLeftAndModifySelection
+            case moveWordRightAndModifySelection
             case moveToBeginningOfLine
             case moveToEndOfLine
+            case moveToBeginningOfLineAndModifySelection
+            case moveToEndOfLineAndModifySelection
             case moveToBeginningOfDocument
             case moveToEndOfDocument
             case performMiniaturize
@@ -90,10 +94,18 @@
                 send(selector: #selector(moveWordLeft(_:)))
             case .moveWordRight:
                 send(selector: #selector(moveWordRight(_:)))
+            case .moveWordLeftAndModifySelection:
+                send(selector: #selector(moveWordLeftAndModifySelection(_:)))
+            case .moveWordRightAndModifySelection:
+                send(selector: #selector(moveWordRightAndModifySelection(_:)))
             case .moveToBeginningOfLine:
                 send(selector: #selector(moveToBeginningOfLine(_:)))
             case .moveToEndOfLine:
                 send(selector: #selector(moveToEndOfLine(_:)))
+            case .moveToBeginningOfLineAndModifySelection:
+                send(selector: #selector(moveToBeginningOfLineAndModifySelection(_:)))
+            case .moveToEndOfLineAndModifySelection:
+                send(selector: #selector(moveToEndOfLineAndModifySelection(_:)))
             case .moveToBeginningOfDocument:
                 send(selector: #selector(moveToBeginningOfDocument(_:)))
             case .moveToEndOfDocument:
@@ -158,8 +170,12 @@
         @objc fileprivate static func moveRightAndModifySelection(_ sender: Any) {} // Shift Right
         @objc fileprivate static func moveWordLeft(_ sender: Any) {} // Option Left
         @objc fileprivate static func moveWordRight(_ sender: Any) {} // Option Right
+        @objc fileprivate static func moveWordLeftAndModifySelection(_ sender: Any) {} // Shift Option Left
+        @objc fileprivate static func moveWordRightAndModifySelection(_ sender: Any) {} // Shift Option Right
         @objc fileprivate static func moveToBeginningOfLine(_ sender: Any) {} // CMD Left Arrow
         @objc fileprivate static func moveToEndOfLine(_ sender: Any) {} // CMD Right Arrow
+        @objc fileprivate static func moveToBeginningOfLineAndModifySelection(_ sender: Any) {} // Shift CMD Left Arrow
+        @objc fileprivate static func moveToEndOfLineAndModifySelection(_ sender: Any) {} // Shift CMD Right Arrow
         @objc fileprivate static func moveToBeginningOfDocument(_ sender: Any) {} // CMD Up Arrow
         @objc fileprivate static func moveToEndOfDocument(_ sender: Any) {} // CMD Down Arrow
 
