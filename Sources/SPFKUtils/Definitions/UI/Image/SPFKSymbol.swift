@@ -98,6 +98,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case gaugeNeedle50 = "gauge.with.dots.needle.50percent"
     case gaugeNeedle67 = "gauge.with.dots.needle.67percent"
     case gearshape
+    case grid
     case hammer
     case handWave = "hand.wave"
     case headphones
