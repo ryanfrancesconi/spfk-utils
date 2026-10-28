@@ -30,6 +30,8 @@
             case moveLeftAndModifySelection
             case moveRight
             case moveRightAndModifySelection
+            case moveWordLeft
+            case moveWordRight
             case moveToBeginningOfLine
             case moveToEndOfLine
             case moveToBeginningOfDocument
@@ -84,6 +86,10 @@
                 send(selector: #selector(moveRight(_:)))
             case .moveRightAndModifySelection:
                 send(selector: #selector(moveRightAndModifySelection(_:)))
+            case .moveWordLeft:
+                send(selector: #selector(moveWordLeft(_:)))
+            case .moveWordRight:
+                send(selector: #selector(moveWordRight(_:)))
             case .moveToBeginningOfLine:
                 send(selector: #selector(moveToBeginningOfLine(_:)))
             case .moveToEndOfLine:
@@ -150,6 +156,8 @@
         @objc fileprivate static func moveRight(_ sender: Any) {} // Right Arrow
         @objc fileprivate static func moveLeftAndModifySelection(_ sender: Any) {} // Shift Left
         @objc fileprivate static func moveRightAndModifySelection(_ sender: Any) {} // Shift Right
+        @objc fileprivate static func moveWordLeft(_ sender: Any) {} // Option Left
+        @objc fileprivate static func moveWordRight(_ sender: Any) {} // Option Right
         @objc fileprivate static func moveToBeginningOfLine(_ sender: Any) {} // CMD Left Arrow
         @objc fileprivate static func moveToEndOfLine(_ sender: Any) {} // CMD Right Arrow
         @objc fileprivate static func moveToBeginningOfDocument(_ sender: Any) {} // CMD Up Arrow
