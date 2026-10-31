@@ -287,12 +287,10 @@ extension ImageDataStore {
     }
 
     private func insertPrimary(cgImage: CGImage, url: URL) throws {
-        guard let utTypeString = cgImage.utType, let utType = UTType(utTypeString as String) else {
-            throw NSError(description: "Unknown UTType in cgImage")
-        }
-
-        // Primaries are stored as PNG or JPEG only, the extensions every lookup probes.
-        let storedType: UTType = utType == .jpeg ? .jpeg : .png
+        // JPEG unless the image has transparency: a 12 MP photo encodes in a fraction of the time
+        // and size a PNG takes. Both are extensions every lookup probes.
+        let hasAlpha = ![CGImageAlphaInfo.none, .noneSkipFirst, .noneSkipLast].contains(cgImage.alphaInfo)
+        let storedType: UTType = hasAlpha ? .png : .jpeg
         let key = url.sha256
         let ext = storedType.preferredFilenameExtension ?? (storedType == .png ? "png" : "jpeg")
         let destURL = primaryURL(for: key, ext: ext)

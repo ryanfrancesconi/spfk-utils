@@ -398,6 +398,59 @@ final class ImageDataStoreTests: BinTestCase {
         #expect(await store.fetch(.fullQuality, for: urlA) == nil)
     }
 
+    /// A solid image drawn in memory, so it carries no source type.
+    private func drawnImage(alphaInfo: CGImageAlphaInfo, alpha: CGFloat = 1) throws -> CGImage {
+        let context = try #require(CGContext(
+            data: nil, width: 200, height: 200, bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: alphaInfo.rawValue
+        ))
+        context.setFillColor(red: 0.2, green: 0.6, blue: 0.4, alpha: alpha)
+        context.fill(CGRect(x: 0, y: 0, width: 200, height: 200))
+        return try #require(context.makeImage())
+    }
+
+    private func storedPrimaryExtensions(for url: URL) -> [String] {
+        let key = url.sha256
+        let shard = bin.appendingPathComponent("Data/Image/\(key.prefix(2))")
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: shard.path)) ?? []
+        return names.filter { $0.hasPrefix("\(key)_full.") }.map { ($0 as NSString).pathExtension }
+    }
+
+    @Test func anOpaqueImageIsStoredAsJPEG() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let url = fakeURL(index: 310)
+        let opaque = try drawnImage(alphaInfo: .noneSkipLast)
+        let png = try CGImage.create(from: opaque.dataRepresentation(utType: .png))
+
+        try await store.insert(.fullQuality, cgImage: png, for: url)
+
+        #expect(storedPrimaryExtensions(for: url) == ["jpeg"])
+        #expect(await store.fetch(.fullQuality, for: url) != nil)
+    }
+
+    @Test func anImageWithTransparencyIsStoredAsPNG() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let url = fakeURL(index: 311)
+
+        try await store.insert(.fullQuality, cgImage: drawnImage(alphaInfo: .premultipliedLast, alpha: 0.5), for: url)
+
+        #expect(storedPrimaryExtensions(for: url) == ["png"])
+    }
+
+    @Test func anImageWithNoSourceTypeIsStored() async throws {
+        deleteBinOnExit = true
+        let store = try ImageDataStore(inDirectory: bin)
+        let url = fakeURL(index: 312)
+        let drawn = try drawnImage(alphaInfo: .noneSkipLast)
+        #expect(drawn.utType == nil)
+
+        try await store.insert(.fullQuality, cgImage: drawn, for: url)
+
+        #expect(await store.fetch(.fullQuality, for: url) != nil)
+    }
+
     @Test func aTIFFSourceIsStoredWhereFetchFindsIt() async throws {
         deleteBinOnExit = true
         let store = try ImageDataStore(inDirectory: bin)
