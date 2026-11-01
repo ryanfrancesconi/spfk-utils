@@ -3,86 +3,30 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fryanfrancesconi%2Fspfk-utils%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/ryanfrancesconi/spfk-utils)
 
-A Swift utility library providing UI definitions and Foundation/CoreGraphics conveniences for macOS and iOS development.
+Support utilities for the packages above spfk-base. The data and UI layers of both products reach
+it; nothing embeds it on its own.
 
-## Requirements
+It holds utilities that need more than Foundation: AppKit, CoreGraphics and Core Animation
+extensions, display-link timers, bounded-concurrency batch work including batch file conversion, a
+disk cache for decoded images, and CSV and XML helpers. It also holds the state a sidebar and a table
+persist, such as outline nodes, expansion, column layout and sort, because data packages need that
+state without depending on a UI package.
 
-- **Platforms:** macOS 13+, iOS 16+
-- **Swift:** 6.2+
+## Scope
 
-## Modules
+spfk-base is the Foundation-level floor; spfk-utils sits above it and above spfk-filesystem and
+spfk-image, and may use AppKit. It is for utilities in the plain sense: something with no subject of
+its own that more than one package needs. It is not a grab bag. A type belongs in the package whose
+subject it is (audio vocabulary in spfk-audio-base, time in spfk-time, views in spfk-ui), and a type
+that fits nowhere yet means a package is missing, not that it goes here.
 
-### Definitions
+`SPFKSymbol` and `SPFKSchemeColor` are UI definitions kept here deliberately: non-UI packages use
+them as default arguments, and spfk-ui already depends on spfk-playlist-data, so they cannot move up.
 
-- **Rescale** — Linear interpolation and mapping between numeric domains and ranges.
-- **Counter** — Simple incrementing counter with reset support.
-- **ProgressTracker / ChunkedProgressTracker** — Track completion progress as a normalized value, with optional chunked progress for parallel operations.
-- **URLProperties** — Structured metadata container for URL-associated properties.
-- **HardwareInfo** — System hardware queries (chip, chip name, memory, hardware UUID).
-- **StereoState** — Enumeration of stereo routing states (normal, flipped, mono).
-- **ByteCount** — Binary size constants and human-readable file-size formatting.
-- **DictionaryMergeScheme** — How two dictionaries combine: preserve, replace, or combine.
-- **CSVBuilder** — RFC 4180 CSV text from a header row and a per-row value provider.
-- **GroupByTagDirectory** — Resolves an output directory by appending subdirectories derived from tag values, splitting on `/` so a value can name a nested path, or, with `nestsOnSlash: false`, keeping each value one folder.
-- **Email** — Composing a mail message.
+## Vendored code
 
-### Concurrency
-
-- **BatchFileConverter** — Runs a per-file conversion over a batch of `FileConversionWork`: bounded concurrency, every output name settled before any file starts (two outputs sharing a path, compared case-insensitively where the volume is, are numbered apart, and an output never takes another item's input), each file's failure kept to that file, and results in input order.
-- **batchMap** — Bounded-concurrency map over a collection. For CPU-bound work set the batch size near the core count, since a task holds a thread while it runs; for suspending work it is a resource knob rather than a throughput one, because a suspended task holds no thread.
-
-### Caching
-
-- **ImageDataStore / ImageDataStoreAccess / CachedImageType** — A disk cache for decoded images, and the narrow protocol a data layer exposes it through.
-- **ShardedDirectory** — A 2-hex-character prefix scheme (256 shards) laid out as `<root>/<key[0..<2]>/<key><suffix>`, so a large library does not pay flat-directory enumeration costs.
-
-### Timers
-
-- **DisplayLinkTimer / LegacyDisplayLinkTimer** — Screen-refresh-synced timing for playhead and transport updates, behind the `TimerModel` protocol with `TimerState`.
-
-### Outline and table state
-
-- **OutlineNode / OutlineNodeCollection / NodeIdentifier** — The sidebar tree's node model and its stable identifier.
-- **OutlineState** — Expansion state, persisted.
-- **OutlineEditOperation** — One edit to that tree.
-- **NavigationHistory** — Back/forward through sidebar selections.
-- **TableColumnState** — One column's title, stable identifier, width and visibility, saved independently of AppKit's autosave. The identifier is always the matching key; old saves predating the title/identifier split fall back to using the title as the identifier.
-- **TableColumnPreset / TableSortState / SortValue** — A named column layout, and how a table is sorted.
-- **PasteboardCopyable** — What a type does to put itself on the pasteboard.
-
-### UI
-
-- **SPFKSchemeColor** — The two neutral grays used as default arguments by `SPFKSymbol.tinted()` and `NSImageConvertible.stateImage()`. It lives here because non-UI packages use it as a default argument.
-- **SPFKSymbol** — SF Symbol definitions with tinting and state images. Here for the same reason.
-- **AppearanceObserver** — Observe system appearance (light/dark mode) changes via Combine.
-- **StateImage** — Associate images with on/off/disabled control states.
-- **FirstResponder** — Utilities for managing first responder status in AppKit.
-
-### Extensions
-
-Categorized extensions across Foundation, AppKit and CoreGraphics:
-
-| Category | Highlights |
-|---|---|
-| **Foundation** | `URL` (file and content-type icons), `UUID` (zero constants), `NumberFormatter` |
-| **AppKit** | `NSView` (Auto Layout constraint helpers), `NSImage` (resizing, tinting), `NSWindow` (title bar height, modal state), `NSEdgeInsets` (convenience inits) |
-| **CoreGraphics** | `CGRect` (square fitting), `CGSize` (equality init), `CGColor` (hex conversion) |
-| **XML** | `AEXMLDocument` (load from a path, URL or string), `AEXMLElement` (child and attribute lookup, writing to a URL) |
-
-### Entropy
-
-Embedded [EntropyString](https://github.com/EntropyString/EntropyString-Swift) library for generating cryptographically random identifiers with configurable character sets and entropy levels (small, medium, large, session, token).
-
-## Dependencies
-
-| Package | Description |
-|---|---|
-| [spfk-audio-base](https://github.com/ryanfrancesconi/spfk-audio-base) | Shared audio type definitions (test target only) |
-| [spfk-filesystem](https://github.com/ryanfrancesconi/spfk-filesystem) | File system utilities, directory observation, Finder tags |
-| [spfk-image](https://github.com/ryanfrancesconi/spfk-image) | Encoding, decoding and fingerprints for the image data store |
-| [AEXML](https://github.com/tadija/AEXML) | XML parsing and generation |
-| [spfk-base](https://github.com/ryanfrancesconi/spfk-base) | Common extensions and logging (test target only) |
-| [spfk-testing](https://github.com/ryanfrancesconi/spfk-testing) | Test infrastructure (test target only) |
+Includes [EntropyString](https://github.com/EntropyString/EntropyString-Swift) under its MIT license,
+for random identifiers.
 
 ## About
 
