@@ -94,19 +94,21 @@ extension ImageDataStore {
 
         switch type {
         case .thumbnail:
-            return Self.readImage(at: thumbnailURL(for: key))
+            // Decoded here, off the main actor. Left lazy, the PNG decode runs in the main
+            // thread's Core Animation commit the first time a layer shows it.
+            return Self.readImage(at: thumbnailURL(for: key), decodingImmediately: true)
         case .fullQuality:
             return await fetchPrimary(key: key)
         }
     }
 
     private func fetchPrimary(key: String) -> CGImage? {
-        existingPrimaryURL(for: key).flatMap(Self.readImage)
+        existingPrimaryURL(for: key).flatMap { Self.readImage(at: $0) }
     }
 
-    private nonisolated static func readImage(at fileURL: URL) -> CGImage? {
+    private nonisolated static func readImage(at fileURL: URL, decodingImmediately: Bool = false) -> CGImage? {
         guard let data = try? Data(contentsOf: fileURL) else { return nil }
-        return try? CGImage.create(from: data)
+        return try? CGImage.create(from: data, decodingImmediately: decodingImmediately)
     }
 
     /// When the cached image for `url` was written, or nil when nothing is cached.
