@@ -11,6 +11,10 @@ let package = Package(
             name: "SPFKUtils",
             targets: ["SPFKUtils",]
         ),
+
+        // Image conversion throughput and memory -- see Sources/ImageConversionBench. An executable
+        // because the numbers only mean anything compiled `-O`.
+        .executable(name: "spfk-image-conversion-bench", targets: ["ImageConversionBench"]),
     ],
     dependencies: [
         .package(url: "https://github.com/ryanfrancesconi/spfk-audio-base", from: "1.6.1"),
@@ -27,6 +31,14 @@ let package = Package(
                 .product(name: "SPFKFileSystem", package: "spfk-filesystem"),
                 .product(name: "SPFKImage", package: "spfk-image"),
                 .product(name: "AEXML", package: "AEXML"),
+            ]
+        ),
+        .executableTarget(
+            name: "ImageConversionBench",
+            dependencies: [
+                .targetItem(name: "SPFKUtils", condition: nil),
+                .product(name: "SPFKImage", package: "spfk-image"),
+                .product(name: "SPFKBench", package: "spfk-testing"),
             ]
         ),
         .testTarget(
