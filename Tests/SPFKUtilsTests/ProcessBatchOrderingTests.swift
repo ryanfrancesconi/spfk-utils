@@ -2,7 +2,7 @@
 
 import Foundation
 import SPFKBase
-import SPFKUtils
+@testable import SPFKUtils
 import Testing
 
 struct ProcessBatchOrderingTests {
@@ -127,4 +127,46 @@ private final class AutoreleaseMarker: NSObject {
     }
 
     deinit { Self.freed.increment() }
+}
+
+struct BatchWorkKindWidthTests {
+    @Test func blockingLeavesTwoPoolThreadsFreeAtAnyCoreCount() {
+        #expect(BatchWorkKind.blockingWidth(activeCores: 10) == 8)
+        #expect(BatchWorkKind.blockingWidth(activeCores: 12) == 10)
+        #expect(BatchWorkKind.blockingWidth(activeCores: 18) == 16)
+        #expect(BatchWorkKind.blockingWidth(activeCores: 2) == 2)
+    }
+
+    @Test func renderStaysAtFourAndDropsOnlyForSmallMemory() {
+        let gb: UInt64 = 1 << 30
+        #expect(BatchWorkKind.renderWidth(memory: 32 * gb, blockingWidth: 8) == 4)
+        #expect(BatchWorkKind.renderWidth(memory: 128 * gb, blockingWidth: 16) == 4)
+        #expect(BatchWorkKind.renderWidth(memory: 16 * gb, blockingWidth: 10) == 4)
+        #expect(BatchWorkKind.renderWidth(memory: 8 * gb, blockingWidth: 6) == 2)
+    }
+}
+
+struct BatchSlotsTests {
+    private actor Peak {
+        var current = 0
+        var highest = 0
+        func enter() { current += 1; highest = max(highest, current) }
+        func leave() { current -= 1 }
+    }
+
+    @Test func noMoreThanTheSlotCountRunAtOnce() async throws {
+        let slots = BatchSlots(2)
+        let peak = Peak()
+
+        _ = try await processBatch(count: 12, kind: .custom(6), name: { "\($0)" }) { index -> Int in
+            await slots.acquire()
+            await peak.enter()
+            try await Task.sleep(nanoseconds: 5_000_000)
+            await peak.leave()
+            await slots.release()
+            return index
+        }
+
+        #expect(await peak.highest == 2)
+    }
 }
