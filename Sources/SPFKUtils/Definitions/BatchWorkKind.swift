@@ -16,9 +16,8 @@ public enum BatchWorkKind: Sendable, Equatable {
 
     /// Rendering an edit to a new file, which holds the whole decoded signal per item.
     ///
-    /// Four, or one per 4 GB of memory where that is fewer, and never below 2. On 32 GB, a fade on
-    /// files over 20 MB peaked at 2.5 GB six at a time and 1.8 GB four at a time in the same time,
-    /// so more cores do not make more renders worth their memory; two at a time was half again slower.
+    /// One per 4 GB of memory, between 2 and the blocking width. A fade on a file over 20 MB held
+    /// about 425 MB while it rendered, so this keeps renders in flight near a tenth of memory.
     case render
 
     /// Metadata reads and writes, and work done in memory.
@@ -49,6 +48,6 @@ public enum BatchWorkKind: Sendable, Equatable {
 
     static func renderWidth(memory: UInt64, blockingWidth: Int) -> Int {
         let perFourGB = Int(memory / (4 << 30))
-        return min(4, blockingWidth, max(2, perFourGB))
+        return min(blockingWidth, max(2, perFourGB))
     }
 }
