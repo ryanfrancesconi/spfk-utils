@@ -4,7 +4,7 @@ import Foundation
 import SPFKBase
 import SPFKFileSystem
 
-/// Converts a batch of files concurrently, `batchSize` at a time.
+/// Converts a batch of files concurrently, in one or more ``FileConversionPass``es.
 ///
 /// Owns what is the same for every kind of file: settling output names before anything runs,
 /// isolating each file's failure, and returning results in input order. The per-file converter owns
@@ -14,21 +14,27 @@ public actor BatchFileConverter<Work: FileConversionWork> {
     public typealias Result = BatchFileConversionResult<Work>
 
     private let work: [Work]
-    private let batchSize: Int
+    private let passes: [FileConversionPass]
     private var finishedCount = 0
 
-    public init(_ work: [Work], batchSize: Int = 8) {
+    public init(_ work: [Work], batchSize: Int = FileConversionPass.defaultBatchSize) {
+        self.init(work, passes: [FileConversionPass(indexes: Array(work.indices), batchSize: batchSize)])
+    }
+
+    /// An item no pass names fails rather than converting.
+    public init(_ work: [Work], passes: [FileConversionPass]) {
         self.work = work
-        self.batchSize = max(1, batchSize)
+        self.passes = passes
     }
 
     /// Converts every item, returning a result for each in the order given.
     ///
-    /// Cancelling stops new items; those already running finish, and every item not run is
-    /// `.failed` with `CancellationError`, so the results still hold one per item.
+    /// Cancelling stops new items, in this pass and every later one; those already running finish,
+    /// and every item not run is `.failed` with `CancellationError`, so the results still hold one
+    /// per item.
     ///
     /// - Parameters:
-    ///   - progress: called as each item finishes, with how many have finished so far.
+    ///   - progress: called as each item finishes, with how many have finished so far across every pass.
     ///   - convert: converts one item and returns it as converted. Runs concurrently.
     /// - Throws: on an empty batch.
     public func start(
@@ -43,10 +49,44 @@ public actor BatchFileConverter<Work: FileConversionWork> {
 
         let work = work
         let resolved = Self.resolvingOutputs(work)
-        let total = resolved.count
+
+        var scheduled = Set<Int>()
+        let passes: [(indexes: [Int], batchSize: Int)] = self.passes.map { pass in
+            (indexes: pass.indexes.filter { work.indices.contains($0) && scheduled.insert($0).inserted }, batchSize: pass.batchSize)
+        }
+
+        let total = scheduled.count
+        var finished: [(index: Int, result: Result)] = []
+
+        for pass in passes where !Task.isCancelled {
+            finished += await run(pass.indexes, batchSize: pass.batchSize, resolved: resolved, total: total, progress: progress, convert: convert)
+        }
+
+        let byIndex = Dictionary(finished.map { ($0.index, $0.result) }, uniquingKeysWith: { first, _ in first })
+
+        return work.indices.map { index in
+            if let result = byIndex[index] { return result }
+
+            return .failed(
+                work[index],
+                scheduled.contains(index) ? CancellationError() : NSError(description: "\(work[index].input.lastPathComponent) is in no conversion pass")
+            )
+        }
+    }
+
+    private func run(
+        _ indexes: [Int],
+        batchSize: Int,
+        resolved: [Swift.Result<Work, any Error>],
+        total: Int,
+        progress: (@Sendable (_ completed: Int, _ total: Int, _ result: Result) async -> Void)?,
+        convert: @escaping @Sendable (Work) async throws -> Work
+    ) async -> [(index: Int, result: Result)] {
+        let work = work
 
         // batchMap appends as tasks finish, so each result carries the index it was asked for.
-        let finished: [(index: Int, result: Result)] = await batchMapKeepingFinished(count: total, batchSize: batchSize) { index in
+        return await batchMapKeepingFinished(count: indexes.count, batchSize: batchSize) { offset in
+            let index = indexes[offset]
             let result: Result
 
             switch resolved[index] {
@@ -65,12 +105,6 @@ public actor BatchFileConverter<Work: FileConversionWork> {
             await progress?(completed, total, result)
 
             return (index: index, result: result)
-        }
-
-        let byIndex = Dictionary(finished.map { ($0.index, $0.result) }, uniquingKeysWith: { first, _ in first })
-
-        return work.indices.map { index in
-            byIndex[index] ?? .failed(work[index], CancellationError())
         }
     }
 

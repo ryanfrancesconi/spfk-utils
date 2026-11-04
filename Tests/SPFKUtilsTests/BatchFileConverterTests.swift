@@ -8,7 +8,7 @@ import Testing
 
 @testable import SPFKUtils
 
-@Suite(.tags(.file))
+@Suite(.tags(.file, .conversion))
 final class BatchFileConverterTests: BinTestCase {
     private struct Work: FileConversionWork {
         var input: URL
@@ -32,6 +32,8 @@ final class BatchFileConverterTests: BinTestCase {
         func cancel() {
             if let action { action() } else { isPending = true }
         }
+
+        var isArmed: Bool { action != nil }
     }
 
     private actor Recorder {
@@ -286,6 +288,126 @@ final class BatchFileConverterTests: BinTestCase {
 
         #expect(results.map(\.work.output) == items.map(\.output))
         #expect(results.first?.error == nil)
+        #expect(results.dropFirst().allSatisfy { $0.error is CancellationError })
+    }
+
+    // MARK: - Passes
+
+    /// How many conversions are in flight, and the most seen per pass.
+    private actor Concurrency {
+        private var running = 0
+        private(set) var peak: [String: Int] = [:]
+        private(set) var events: [String] = []
+
+        func enter(_ pass: String, _ name: String) {
+            running += 1
+            peak[pass] = max(peak[pass] ?? 0, running)
+            events.append("+\(name)")
+        }
+
+        func leave(_ name: String) {
+            running -= 1
+            events.append("-\(name)")
+        }
+    }
+
+    /// A pass never runs wider than its batch size, and the next starts only once it has drained.
+    @Test func eachPassRunsAtItsOwnWidthAndAfterTheLast() async throws {
+        let items = ["a1", "a2", "a3", "b1", "b2", "b3", "b4"].map { work($0) }
+        let concurrency = Concurrency()
+
+        let results = try await BatchFileConverter(items, passes: [
+            FileConversionPass(indexes: [0, 1, 2], batchSize: 1),
+            FileConversionPass(indexes: [3, 4, 5, 6], batchSize: 4),
+        ]).start { item in
+            let name = item.output.lastPathComponent
+            await concurrency.enter(String(name.prefix(1)), name)
+            try await Task.sleep(seconds: 0.02)
+            await concurrency.leave(name)
+            return item
+        }
+
+        #expect(results.allSatisfy { $0.error == nil })
+        #expect(await concurrency.peak["a"] == 1)
+        #expect(await concurrency.peak["b"] ?? 0 <= 4)
+
+        let events = await concurrency.events
+        let lastA = try #require(events.lastIndex { $0.hasPrefix("-a") })
+        let firstB = try #require(events.firstIndex { $0.hasPrefix("+b") })
+        #expect(lastA < firstB)
+    }
+
+    /// Names are settled once for the whole batch, so two passes cannot claim the same free name.
+    @Test func outputsAreSettledAcrossPasses() async throws {
+        let items = [work("song.out", scheme: .unique), work("song.out", scheme: .unique)]
+
+        let results = try await BatchFileConverter(items, passes: [
+            FileConversionPass(indexes: [1]),
+            FileConversionPass(indexes: [0]),
+        ]).start { $0 }
+
+        #expect(Set(results.map(\.work.output)).count == 2)
+    }
+
+    /// Progress counts across passes, against the total of every pass.
+    @Test func progressCountsAcrossPasses() async throws {
+        let items = ["a", "b", "c"].map { work($0) }
+        let recorder = Recorder()
+
+        _ = try await BatchFileConverter(items, passes: [
+            FileConversionPass(indexes: [0], batchSize: 1),
+            FileConversionPass(indexes: [1, 2], batchSize: 1),
+        ]).start(
+            progress: { completed, total, _ in await recorder.report(completed, total) },
+            convert: { $0 }
+        )
+
+        #expect(await recorder.progress.map(\.completed) == [1, 2, 3])
+        #expect(await recorder.progress.allSatisfy { $0.total == 3 })
+    }
+
+    /// An index named twice runs once; one named by no pass fails without converting.
+    @Test func anIndexRunsOnceAndAnUnnamedOneFails() async throws {
+        let items = ["a", "b", "c"].map { work($0) }
+        let recorder = Recorder()
+
+        let results = try await BatchFileConverter(items, passes: [
+            FileConversionPass(indexes: [0, 1]),
+            FileConversionPass(indexes: [1, 7]),
+        ]).start { item in
+            await recorder.convert(item.output.lastPathComponent)
+            return item
+        }
+
+        #expect(await recorder.converted.sorted() == ["a", "b"])
+        #expect(results[0].error == nil && results[1].error == nil)
+        #expect(results[2].error != nil && !(results[2].error is CancellationError))
+    }
+
+    @Test func cancellingInOnePassRunsNothingOfTheNext() async throws {
+        let items = ["a", "b", "c"].map { work($0) }
+        let canceller = Canceller()
+        let recorder = Recorder()
+
+        let task = Task {
+            try await BatchFileConverter(items, passes: [
+                FileConversionPass(indexes: [0], batchSize: 1),
+                FileConversionPass(indexes: [1, 2], batchSize: 2),
+            ]).start(
+                progress: { _, _, _ in await canceller.cancel() },
+                convert: { item in
+                    // Holds the first pass open until the cancel is armed, so it lands before the next starts.
+                    while await !canceller.isArmed { await Task.yield() }
+                    await recorder.convert(item.output.lastPathComponent)
+                    return item
+                }
+            )
+        }
+
+        await canceller.set { task.cancel() }
+        let results = try await task.value
+
+        #expect(await recorder.converted == ["a"])
         #expect(results.dropFirst().allSatisfy { $0.error is CancellationError })
     }
 }
