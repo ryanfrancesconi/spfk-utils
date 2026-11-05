@@ -7,6 +7,7 @@ import Foundation
 /// The worker closure receives an index (0..<count) and returns an optional result.
 /// Nil results are filtered out. Cancellation is checked between iterations, and throws away
 /// every result already finished; ``batchMapKeepingFinished(count:batchSize:worker:)`` keeps them.
+/// Each item also takes a slot from ``BatchBudget/shared``, which bounds every batch running at once.
 ///
 /// ## Choosing a batchSize
 ///
@@ -40,9 +41,10 @@ public func batchMap<R: Sendable>(
         returning: [R].self
     ) { taskGroup in
         try Task.checkCancellation()
+        let lease = BatchBudget.Lease()
 
         for i in 0 ..< min(batchSize, count) {
-            taskGroup.addTask { try await worker(i) }
+            taskGroup.addTask { try await BatchBudget.shared.withSlot(lease) { try await worker(i) } }
         }
 
         var index = batchSize
@@ -57,7 +59,7 @@ public func batchMap<R: Sendable>(
 
             if index < count {
                 taskGroup.addTask { [index] in
-                    try await worker(index)
+                    try await BatchBudget.shared.withSlot(lease) { try await worker(index) }
                 }
                 index += 1
             }
@@ -81,10 +83,11 @@ public func batchMapKeepingFinished<R: Sendable>(
     let batchSize = max(1, batchSize)
 
     return await withTaskGroup(of: R?.self, returning: [R].self) { taskGroup in
+        let lease = BatchBudget.Lease()
         var index = 0
 
         while index < min(batchSize, count), !Task.isCancelled {
-            taskGroup.addTask { [index] in await worker(index) }
+            taskGroup.addTask { [index] in await BatchBudget.shared.withSlot(lease) { await worker(index) } }
             index += 1
         }
 
@@ -96,7 +99,7 @@ public func batchMapKeepingFinished<R: Sendable>(
             }
 
             if index < count, !Task.isCancelled {
-                taskGroup.addTask { [index] in await worker(index) }
+                taskGroup.addTask { [index] in await BatchBudget.shared.withSlot(lease) { await worker(index) } }
                 index += 1
             }
         }
