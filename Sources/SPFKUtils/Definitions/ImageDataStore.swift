@@ -3,6 +3,7 @@
 import CoreGraphics
 import Foundation
 import SPFKBase
+import SPFKFileSystem
 import SPFKImage
 import UniformTypeIdentifiers
 
@@ -25,7 +26,7 @@ public actor ImageDataStore {
     static let fullExtensions = ["png", "jpeg", "jpg"]
 
     public init(inDirectory: URL) throws {
-        directoryURL = inDirectory.appendingPathComponent("Data/Image")
+        directoryURL = inDirectory.appendingPathComponent(CacheDirectoryName.data).appendingPathComponent("Image")
         shardedDirectory = ShardedDirectory(rootURL: directoryURL)
         try Self.ensureDirectory(at: directoryURL)
     }
