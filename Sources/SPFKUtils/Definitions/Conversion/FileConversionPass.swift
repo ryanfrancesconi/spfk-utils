@@ -15,5 +15,6 @@ public struct FileConversionPass: Sendable, Equatable {
         self.batchSize = max(1, batchSize)
     }
 
-    public static let defaultBatchSize = 8
+    /// Converting decodes and encodes on one thread for the whole item.
+    public static let defaultBatchSize = BatchWorkKind.blocking.width
 }
