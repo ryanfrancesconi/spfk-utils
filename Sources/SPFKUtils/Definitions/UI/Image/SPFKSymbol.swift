@@ -110,6 +110,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case infoCircle = "info.circle"
     case infoTriangle = "info.triangle"
     case interfaceWindowOnRectangle = "interface.window.on.rectangle" // os 26+
+    case internalDrive = "internaldrive"
     case lCircle = "l.circle"
     case linesDecrease = "line.3.horizontal.decrease"
     case linesMeasurementHorizontal = "lines.measurement.horizontal"
