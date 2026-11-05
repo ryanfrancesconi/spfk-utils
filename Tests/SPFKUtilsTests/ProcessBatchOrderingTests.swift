@@ -139,9 +139,9 @@ struct BatchWorkKindWidthTests {
 
     @Test func renderFollowsMemoryWithinTheBlockingWidth() {
         let gb: UInt64 = 1 << 30
-        #expect(BatchWorkKind.renderWidth(memory: 32 * gb, blockingWidth: 8) == 8)
+        #expect(BatchWorkKind.renderWidth(memory: 32 * gb, blockingWidth: 8) == 4)
         #expect(BatchWorkKind.renderWidth(memory: 128 * gb, blockingWidth: 16) == 16)
-        #expect(BatchWorkKind.renderWidth(memory: 16 * gb, blockingWidth: 10) == 4)
+        #expect(BatchWorkKind.renderWidth(memory: 16 * gb, blockingWidth: 10) == 2)
         #expect(BatchWorkKind.renderWidth(memory: 8 * gb, blockingWidth: 6) == 2)
     }
 }
