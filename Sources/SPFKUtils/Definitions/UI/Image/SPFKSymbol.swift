@@ -84,6 +84,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case filmStack = "film.stack"
     case finder
     case flag
+    case flipHorizontal = "arrow.left.and.right.righttriangle.left.righttriangle.right"
+    case flipVertical = "arrow.up.and.down.righttriangle.up.righttriangle.down"
     case folder
     case folderBadgePlus = "folder.badge.plus"
     case folderGearBadge = "folder.badge.gearshape"
@@ -179,6 +181,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case rewindAll = "backward.end"
     case rewindAllFill = "backward.end.fill"
     case rewindFill = "backward.fill"
+    case rotateLeft = "rotate.left"
+    case rotateRight = "rotate.right"
     case ruler
     case save = "square.and.arrow.down"
     case saveFill = "square.and.arrow.down.fill"
