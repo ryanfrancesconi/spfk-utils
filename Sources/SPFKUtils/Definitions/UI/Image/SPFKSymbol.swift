@@ -77,6 +77,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case export = "square.and.arrow.up"
     case exportMultiple = "square.and.arrow.up.on.square"
     case eye
+    case eyedropper
     case eyeSlash = "eye.slash"
     case fill = "inset.filled.rectangle"
     case film
@@ -236,6 +237,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case textFormatCharacters = "textformat.characters"
     case textMagnifyingGlass = "text.magnifyingglass"
     case textSparkle = "character.textbox.badge.sparkles"
+    case thermometerMedium = "thermometer.medium"
     case toggleFullScreen = "arrow.up.left.and.arrow.down.right"
     case trash
     case triangle
