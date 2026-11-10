@@ -16,6 +16,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case arrowBackward = "arrow.backward"
     case arrowClockwise = "arrow.clockwise"
     case arrowDownCircle = "arrow.down.circle"
+    case arrowDownDocument = "arrow.down.document"
     case arrowForward = "arrow.forward"
     case arrowLeftAndRight = "arrow.left.and.right"
     case arrowLeftAndRightSquare = "arrow.left.and.right.square"
@@ -292,6 +293,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .waveformMagnifyingGlass: "waveform.and.magnifyingglass"
 
         // macOS 15.0, renamed
+        case .arrowDownDocument: "arrow.down.doc"
         case .center: "rectangle.center.inset.filled"
         case .clockArrows: "clock.arrow.2.circlepath"
         case .document: "doc"
@@ -333,7 +335,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
              .movieclapper, .performZoom, .speakerWaveBubble, .waveformMagnifyingGlass:
             OSVersion.macOS14.isAvailable
 
-        case .center, .clockArrows, .document, .documentBadgePlus, .documentOnDocument,
+        case .arrowDownDocument, .center, .clockArrows, .document, .documentBadgePlus, .documentOnDocument,
              .documentOnDocumentFill, .fill, .hideOthers, .horizontalPanelMaximized,
              .horizontalPanelMinimized, .numbers, .paste, .textDocumentMagnifyingGlass,
              .textFormatCharacters, .wandAndSparkles:
