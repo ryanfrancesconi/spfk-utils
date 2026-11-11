@@ -34,6 +34,8 @@ public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {
         case photosLibrary
         /// Image format conversion — destination directory.
         case imageConversion
+        /// Import metadata from spreadsheets — the folder last chosen from.
+        case spreadsheetImport
     }
 
     // MARK: - Storage
