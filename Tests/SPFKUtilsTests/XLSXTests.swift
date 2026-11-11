@@ -27,6 +27,29 @@ struct XLSXTests {
     }
 
     #if os(macOS)
+    /// Without a style part and column widths, Numbers shows every column narrow and wraps each cell.
+    @Test func aWrittenWorkbookSizesColumnsAndStylesItsHeader() throws {
+        let long = String(repeating: "x", count: 200)
+        let data = XLSXWriter.data(header: ["Name", "Description"], rows: [["a.wav", long], ["b.wav", ""]])
+        let entries = try ZipArchive.entries(of: data)
+
+        let sheet = try #require(entries["xl/worksheets/sheet1.xml"].flatMap { String(data: $0, encoding: .utf8) })
+        #expect(sheet.contains(#"<col min="1" max="1" width="\#(XLSXWriter.minimumWidth)" customWidth="1"/>"#))
+        #expect(sheet.contains(#"<col min="2" max="2" width="\#(XLSXWriter.maximumWidth)" customWidth="1"/>"#))
+        #expect(sheet.contains(#"state="frozen""#))
+        #expect(sheet.contains(#"<c s="1" t="inlineStr"><is><t>Name</t>"#))
+
+        let styles = try #require(entries["xl/styles.xml"].flatMap { String(data: $0, encoding: .utf8) })
+        #expect(styles.contains("<b/>") && !styles.contains("wrapText"))
+
+        let types = try #require(entries["[Content_Types].xml"].flatMap { String(data: $0, encoding: .utf8) })
+        let relationships = try #require(entries["xl/_rels/workbook.xml.rels"].flatMap { String(data: $0, encoding: .utf8) })
+        #expect(types.contains("/xl/styles.xml") && relationships.contains(#"Target="styles.xml""#))
+
+        let document = try XLSXReader.read(data: data)
+        #expect(document.sheets.first?.rows == [["Name", "Description"], ["a.wav", long], ["b.wav", ""]])
+    }
+
     @Test func aWrittenWorkbookPassesUnzipTest() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).xlsx")
         defer { try? FileManager.default.removeItem(at: url) }
