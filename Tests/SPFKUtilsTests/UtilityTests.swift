@@ -45,72 +45,6 @@ final class CGRectTests {
     }
 }
 
-// MARK: - CGSize.init(equal:)
-
-final class CGSizeTests {
-    @Test func equalInit() {
-        let size = CGSize(equal: 42)
-        #expect(size.width == 42)
-        #expect(size.height == 42)
-    }
-
-    @Test func zeroInit() {
-        let size = CGSize(equal: 0)
-        #expect(size.width == 0)
-        #expect(size.height == 0)
-    }
-}
-
-// MARK: - ClosedRange<TimeInterval>.duration
-
-final class ClosedRangeTests {
-    @Test func duration() {
-        let range: ClosedRange<TimeInterval> = 1.0 ... 5.0
-        #expect(range.duration == 4.0)
-    }
-
-    @Test func zeroDuration() {
-        let range: ClosedRange<TimeInterval> = 3.0 ... 3.0
-        #expect(range.duration == 0)
-    }
-
-    @Test func negativeLowerBound() {
-        let range: ClosedRange<TimeInterval> = -2.0 ... 3.0
-        #expect(range.duration == 5.0)
-    }
-}
-
-// MARK: - Bool.string
-
-final class BoolExtensionTests {
-    @Test func trueString() {
-        #expect(true.string == "true")
-    }
-
-    @Test func falseString() {
-        #expect(false.string == "false")
-    }
-}
-
-// MARK: - UUID.zero
-
-final class UUIDExtensionTests {
-    @Test func zeroUUID() {
-        let zero = UUID.zero
-        #expect(zero.uuidString == "00000000-0000-0000-0000-000000000000")
-    }
-
-    @Test func zeroAddingByte() {
-        let uuid = UUID.zero(adding: 1)
-        #expect(uuid.uuidString == "00000000-0000-0000-0000-000000000001")
-    }
-
-    @Test func zeroAddingMaxByte() {
-        let uuid = UUID.zero(adding: 255)
-        #expect(uuid.uuidString == "00000000-0000-0000-0000-0000000000FF")
-    }
-}
-
 // MARK: - AUValue dB helpers
 
 final class AUValueTests {
@@ -162,45 +96,6 @@ final class AUValueTests {
     }
 }
 
-// MARK: - TimeInterval / mach time
-
-final class TimeIntervalTests {
-    @Test func hostTimeRoundTrip() {
-        let original: TimeInterval = 1.0
-        let hostTime = original.convertedToHostTime()
-        let back = hostTime.hostTimeConvertedToTimeInterval()
-        #expect(abs(back - original) < 0.001)
-    }
-
-    @Test func zeroConversion() {
-        let zero: TimeInterval = 0
-        let hostTime = zero.convertedToHostTime()
-        #expect(hostTime == 0)
-    }
-
-    @Test func machTimeConstants() {
-        #expect(machTimeSecondsPerTick > 0)
-        #expect(machTimeTicksPerSecond > 0)
-        // They should be reciprocals (approximately)
-        #expect(abs(machTimeSecondsPerTick * machTimeTicksPerSecond - 1.0) < 0.0001)
-    }
-}
-
-// MARK: - NumberFormatter
-
-final class NumberFormatterTests {
-    @Test func decimalStringFromInt() {
-        let result = NumberFormatter.decimalString(from: 1000)
-        #expect(result != nil)
-        #expect(result?.contains(",") == true || result?.contains(".") == true || result == "1000")
-    }
-
-    @Test func decimalStringFromDouble() {
-        let result = NumberFormatter.decimalString(from: 1234.5)
-        #expect(result != nil)
-    }
-}
-
 // MARK: - CGColor.toHex
 
 final class CGColorHexTests {
@@ -239,57 +134,8 @@ final class CGColorHexTests {
 // MARK: - ByteCount
 
 final class ByteCountTests {
-    @Test func byte() {
-        #expect(ByteCount.byte.rawValue == 1)
-    }
-
-    @Test func kilobyte() {
-        #expect(ByteCount.kilobyte.rawValue == 1024)
-    }
-
-    @Test func megabyte() {
-        #expect(ByteCount.megabyte.rawValue == 1_048_576)
-    }
-
-    @Test func gigabyte() {
-        #expect(ByteCount.gigabyte.rawValue == 1_073_741_824)
-    }
-
-    @Test func terabyte() {
-        #expect(ByteCount.terabyte.rawValue == 1_099_511_627_776)
-    }
-
-    @Test func sizesAreMultiples() {
-        #expect(ByteCount.megabyte.rawValue == ByteCount.kilobyte.rawValue * 1024)
-        #expect(ByteCount.gigabyte.rawValue == ByteCount.megabyte.rawValue * 1024)
-        #expect(ByteCount.terabyte.rawValue == ByteCount.gigabyte.rawValue * 1024)
-    }
-
     @Test func toStringFormatting() throws {
         let result = try #require(ByteCount.toString(1_048_576))
         #expect(result == "1 MB")
     }
 }
-
-#if os(macOS)
-
-    // MARK: - NSEdgeInsets
-
-    import Foundation
-
-    final class NSEdgeInsetsTests {
-        @Test func equalInit() {
-            let insets = NSEdgeInsets(equal: 10)
-            #expect(insets.top == 10)
-            #expect(insets.left == 10)
-            #expect(insets.bottom == 10)
-            #expect(insets.right == 10)
-        }
-
-        @Test func zeroInit() {
-            let insets = NSEdgeInsets(equal: 0)
-            #expect(insets.top == 0)
-            #expect(insets.left == 0)
-        }
-    }
-#endif

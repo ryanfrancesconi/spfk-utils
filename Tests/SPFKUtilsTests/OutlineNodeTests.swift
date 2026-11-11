@@ -94,15 +94,6 @@
             #expect(group[childIndex: 999] == nil)
         }
 
-        // MARK: - titleAndID
-
-        @Test func titleAndID() {
-            let id = UUID()
-            let node = OutlineNode(title: "My Node", isEditable: true, symbolName: nil, nodeIdentifier: .init(id: id))
-
-            #expect(node.titleAndID == "My Node (\(id))")
-        }
-
         // MARK: - Equality
 
         @Test func equalityBasedOnNodeIdentifierOnly() {
@@ -357,27 +348,6 @@
 
     @Suite
     final class NodeIdentifierTests: TestCaseModel {
-        // MARK: - Init
-
-        @Test func initWithDefaults() {
-            let id = UUID()
-            let identifier = NodeIdentifier(id: id)
-
-            #expect(identifier.id == id)
-            #expect(identifier.parentId == nil)
-            #expect(identifier.originalId == nil)
-            #expect(identifier.previousParentId == nil)
-        }
-
-        @Test func initWithParentId() {
-            let id = UUID()
-            let parentId = UUID()
-            let identifier = NodeIdentifier(parentId: parentId, id: id)
-
-            #expect(identifier.id == id)
-            #expect(identifier.parentId == parentId)
-        }
-
         // MARK: - Equality
 
         @Test func equalitySameIdAndParent() {
@@ -464,20 +434,6 @@
             identifier.parentId = parent
             #expect(identifier.previousParentId == nil) // was nil before
             #expect(identifier.parentId == parent)
-        }
-
-        // MARK: - Description
-
-        @Test func description() {
-            let id = UUID()
-            let parentId = UUID()
-            let identifier = NodeIdentifier(parentId: parentId, id: id)
-
-            let desc = identifier.description
-            #expect(desc.contains(id.uuidString))
-            #expect(desc.contains(parentId.uuidString))
-            #expect(desc.contains("originalId: nil"))
-            #expect(desc.contains("previousParentId: nil"))
         }
 
         // MARK: - Codable

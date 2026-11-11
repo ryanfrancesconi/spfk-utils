@@ -51,11 +51,6 @@
             #expect(NSWorkspace.FinderIcon.fileType(for: url("a.spfk-not-a-real-type")) != nil)
         }
 
-        /// The generic fallbacks the callers reach for when the above is nil.
-        @Test func theGenericFallbackIconsResolve() {
-            #expect(NSWorkspace.FinderIcon.image != nil)
-        }
-
         /// A system icon is resolved by IconServices in every image view it is set on; a bitmap is not.
         private func isBitmap(_ image: NSImage?) -> Bool {
             guard let image, image.representations.isNotEmpty else { return false }

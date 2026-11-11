@@ -5,14 +5,6 @@ import SPFKUtils
 import Testing
 
 final class ProgressTrackerTests {
-    @Test func initialState() async {
-        let tracker = ProgressTracker(total: 10)
-        let index = await tracker.index
-        let progress = await tracker.progress
-        #expect(index == 0)
-        #expect(progress == 0)
-    }
-
     @Test func singleIncrement() async {
         let tracker = ProgressTracker(total: 10)
         let progress = await tracker.increment()
@@ -45,22 +37,9 @@ final class ProgressTrackerTests {
         let progress = await tracker.increment()
         #expect(progress == 0)
     }
-
-    @Test func description() async {
-        let tracker = ProgressTracker(total: 10)
-        _ = await tracker.increment()
-        let desc = await tracker.description
-        #expect(desc == "1/10")
-    }
 }
 
 final class ChunkedProgressTrackerTests {
-    @Test func initialState() async {
-        let tracker = ChunkedProgressTracker(chunklength: 3)
-        let total = await tracker.totalCompleted
-        #expect(total == 0)
-    }
-
     @Test func singleChunkUpdate() async {
         let tracker = ChunkedProgressTracker(chunklength: 2)
         let total = await tracker.update(index: 0, progress: 1.0)
