@@ -8,18 +8,22 @@ public enum CSVBuilder {
     ///   - columns: The header row.
     ///   - rows: The source data, one CSV row per element.
     ///   - delimiter: The field separator: `","` for CSV, `"\t"` for TSV.
+    ///   - quotesFields: False writes every field verbatim, for a reader that does not understand
+    ///     quoting. The caller must then keep delimiters and line breaks out of the values.
     ///   - rowValues: Returns the raw (unescaped) column values for one row, in `columns` order.
     ///     Do any per-row setup/caching inside this closure, not per-column.
     public static func build<Row>(
         columns: [String],
         rows: [Row],
         delimiter: Character = ",",
+        quotesFields: Bool = true,
         rowValues: (Row) -> [String]
     ) -> String {
         let separator = String(delimiter)
 
         func line(_ fields: [String]) -> String {
-            fields.map { escapeField($0, delimiter: delimiter) }.joined(separator: separator)
+            guard quotesFields else { return fields.joined(separator: separator) }
+            return fields.map { escapeField($0, delimiter: delimiter) }.joined(separator: separator)
         }
 
         var lines = [line(columns)]
