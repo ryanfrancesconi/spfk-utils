@@ -1,9 +1,11 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 import Foundation
+import SPFKTesting
 @testable import SPFKUtils
 import Testing
 
+@Suite(.tags(.spreadsheetImport))
 struct XLSXTests {
     // MARK: - Writer → reader
 

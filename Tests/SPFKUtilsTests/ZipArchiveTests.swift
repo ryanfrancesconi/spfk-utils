@@ -1,9 +1,11 @@
 // Copyright Ryan Francesconi. All Rights Reserved. Revision History at https://github.com/ryanfrancesconi/spfk-utils
 
 import Foundation
+import SPFKTesting
 @testable import SPFKUtils
 import Testing
 
+@Suite(.tags(.spreadsheetImport))
 struct ZipArchiveTests {
     /// The standard check value for this CRC variant.
     @Test func crc32OfTheCheckStringMatchesTheStandard() {
