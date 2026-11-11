@@ -126,6 +126,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case lockSquareStack = "lock.square.stack"
     case loop = "repeat"
     case macwindow
+    case metadataTemplate = "list.bullet.rectangle"
     case mCircle = "m.circle"
     case magnifyingGlass = "magnifyingglass"
     case mapPin = "mappin.and.ellipse"
