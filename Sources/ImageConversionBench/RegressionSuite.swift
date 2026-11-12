@@ -109,7 +109,7 @@ enum RegressionSuite {
             defer { peakMB = max(peakMB, footprint.stop()) }
 
             let results = try await BatchFileConverter(work).start { item in
-                try ImageFormatConverter(source: item).convert()
+                try await ImageFormatConverter(source: item).convert()
             }
 
             return results.filter { $0.error == nil }.count
