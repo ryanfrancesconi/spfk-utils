@@ -3,8 +3,8 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Which technical-data domain a media file belongs to. The two blocks are disjoint — EXIF against
-/// AVFoundation/QuickTime — so a consumer populates and reads one or the other.
+/// Which technical-data domain a media file belongs to. The two blocks are disjoint - EXIF against
+/// AVFoundation/QuickTime - so a consumer populates and reads one or the other.
 ///
 /// **The `String` raw values are on-disk schema.** They are persisted and bound into queries by
 /// consumers, so renaming a case is a migration rather than a rename.

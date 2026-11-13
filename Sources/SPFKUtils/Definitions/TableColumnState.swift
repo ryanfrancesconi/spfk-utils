@@ -37,7 +37,7 @@ public struct TableColumnState: Sendable, Hashable, Equatable, Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decode(String.self, forKey: .title)
-        // Old saves have no `identifier` key — the `title` field stored the identifier value.
+        // Old saves have no `identifier` key - the `title` field stored the identifier value.
         identifier = try container.decodeIfPresent(String.self, forKey: .identifier) ?? title
         width = try container.decode(CGFloat.self, forKey: .width)
         isHidden = try container.decodeIfPresent(Bool.self, forKey: .isHidden) ?? false

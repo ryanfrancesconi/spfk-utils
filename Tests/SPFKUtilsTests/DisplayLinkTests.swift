@@ -2,7 +2,7 @@
 
 // `DisplayLink` is deprecated in macOS 14, and `@Test` cannot be applied to a deprecated declaration.
 // So the tests' bodies live in a deprecated conformance, which the suite reaches through a dynamic
-// cast — naming the conformance statically would warn too. Delete this file with `DisplayLink`.
+// cast - naming the conformance statically would warn too. Delete this file with `DisplayLink`.
 
 #if os(macOS)
     import CoreGraphics

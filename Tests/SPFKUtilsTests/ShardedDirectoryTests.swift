@@ -92,7 +92,7 @@ final class ShardedDirectoryTests: BinTestCase {
         let key = "ab" + String(repeating: "0", count: 14)
         try sd.ensureShardDirectory(for: key)
 
-        // Write a .json file — should not appear when looking for .wfcache
+        // Write a .json file - should not appear when looking for .wfcache
         let jsonURL = sd.fileURL(for: key, suffix: ".json")
         try Data("{}".utf8).write(to: jsonURL)
 

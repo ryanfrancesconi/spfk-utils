@@ -105,7 +105,7 @@ final class ImageDataStoreTests: BinTestCase {
         try await insertBoth(store, cgImage: jpegImage, url: url)
         #expect(await store.fetch(.fullQuality, for: url) != nil)
 
-        // Re-insert as PNG — old .jpg should be deleted
+        // Re-insert as PNG - old .jpg should be deleted
         let pngImage = try syntheticImage(utType: .png)
         try await insertBoth(store, cgImage: pngImage, url: url)
 

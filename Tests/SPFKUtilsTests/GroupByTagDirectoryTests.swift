@@ -75,7 +75,7 @@ final class GroupByTagDirectoryTests {
             base: base,
             tags: ["genre": "Jazz", "category": "Smooth"]
         )
-        // "mood" absent — genre and category folders created, mood skipped
+        // "mood" absent - genre and category folders created, mood skipped
         #expect(result.path.hasSuffix("/output/Jazz/Smooth"))
     }
 

@@ -11,7 +11,7 @@
         public var canGoBack: Bool { index > 0 }
         public var canGoForward: Bool { index < entries.count - 1 }
 
-        /// Discards every entry. Required when the node tree is replaced wholesale — the retained
+        /// Discards every entry. Required when the node tree is replaced wholesale - the retained
         /// entries name nodes that no longer exist.
         public mutating func clear() {
             entries.removeAll()

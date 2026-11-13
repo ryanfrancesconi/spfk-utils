@@ -159,8 +159,8 @@
             #expect(fp1 != fp2)
         }
 
-        /// Two covers of the same size whose leading rows match — a white band above the
-        /// artwork, which is a common layout — must still fingerprint differently.
+        /// Two covers of the same size whose leading rows match - a white band above the
+        /// artwork, which is a common layout - must still fingerprint differently.
         /// `ImageDataStore` hardlinks on fingerprint equality, so a match here serves one
         /// album's artwork for another's.
         @Test func fingerprintDiffersWhenOnlyLaterRowsDiffer() async throws {
@@ -203,7 +203,7 @@
             let original = try #require(NSImage(contentsOf: TestBundleResources.shared.sharksandwich)?.cgImage)
             let outputURL = bin.appendingPathComponent("overwrite.jpg")
 
-            // Write twice — second should overwrite without error
+            // Write twice - second should overwrite without error
             try original.export(utType: .jpeg, to: outputURL)
             let firstSize = try Data(contentsOf: outputURL).count
 

@@ -5,7 +5,7 @@ import Foundation
 /// Persisted sort order for a table view: which column, and which direction.
 ///
 /// `identifier` is the stable column identifier (`NSTableColumn.identifier.rawValue`), the same
-/// string `TableColumnState.identifier` holds and the same one `NSSortDescriptor.key` carries —
+/// string `TableColumnState.identifier` holds and the same one `NSSortDescriptor.key` carries -
 /// never the localized header title, which would not survive a language change.
 public struct TableSortState: Sendable, Hashable, Equatable, Codable {
     public var identifier: String

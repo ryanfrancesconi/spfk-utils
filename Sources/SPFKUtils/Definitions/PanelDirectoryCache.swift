@@ -14,27 +14,27 @@ public struct PanelDirectoryCache: Sendable, Hashable, Equatable, Codable {
     public enum Key: String, Codable, CaseIterable, Sendable {
         /// Add files / directories to the current playlist or album.
         case addFiles
-        /// External-format import — decrypted output directory.
+        /// External-format import - decrypted output directory.
         case addImportDestination
-        /// Audio format conversion — destination directory.
+        /// Audio format conversion - destination directory.
         case fileConversion
-        /// Image export — destination directory.
+        /// Image export - destination directory.
         case imageExport
-        /// CSV export — save location.
+        /// CSV export - save location.
         case csvExport
-        /// FCPXML export — save location.
+        /// FCPXML export - save location.
         case fcpxmlExport
-        /// UCS rename copy — destination directory.
+        /// UCS rename copy - destination directory.
         case ucsRename
-        /// Export Soundpack — destination directory.
+        /// Export Soundpack - destination directory.
         case soundpackExport
-        /// Segment render — output directory.
+        /// Segment render - output directory.
         case segmentRenderOutput
-        /// Import Photos Library — the folder holding the `.photoslibrary` last chosen.
+        /// Import Photos Library - the folder holding the `.photoslibrary` last chosen.
         case photosLibrary
-        /// Image format conversion — destination directory.
+        /// Image format conversion - destination directory.
         case imageConversion
-        /// Import metadata from spreadsheets — the folder last chosen from.
+        /// Import metadata from spreadsheets - the folder last chosen from.
         case spreadsheetImport
     }
 

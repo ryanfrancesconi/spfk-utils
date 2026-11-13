@@ -281,7 +281,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     /// introduced later. Nil when `rawValue` has always existed.
     ///
     /// `NSImage(systemSymbolName:)` returns nil for a name the running system does not know, and
-    /// every call site treats a nil image as no image — so an ungated newer name is a blank
+    /// every call site treats a nil image as no image - so an ungated newer name is a blank
     /// control, not an error. Entries marked *renamed* are the same glyph under its former
     /// spelling; the rest are substitutes.
     public var legacySymbolName: String? {

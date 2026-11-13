@@ -33,7 +33,7 @@
         }
 
         @Test func topLevelNodeWithNoChildrenIsNotLeaf() {
-            // parentId is nil and children is empty — isLeaf requires parentId != nil
+            // parentId is nil and children is empty - isLeaf requires parentId != nil
             let node = OutlineNode(title: "Lonely", isEditable: true, symbolName: nil, nodeIdentifier: .init(id: UUID()))
 
             #expect(node.isLeaf == false)
@@ -66,7 +66,7 @@
         }
 
         @Test func identifierForTopLevelEmptyNode() {
-            // No parentId, no children — not a leaf, so "OutlineNodeGroup"
+            // No parentId, no children - not a leaf, so "OutlineNodeGroup"
             let node = OutlineNode(title: "Empty", isEditable: true, symbolName: nil, nodeIdentifier: .init(id: UUID()))
 
             #expect(node.identifier.rawValue == "OutlineNodeGroup")
@@ -283,7 +283,7 @@
         }
 
         @Test func codableDecodesWithMissingOptionalFields() throws {
-            // Minimal JSON — only title and nodeIdentifier
+            // Minimal JSON - only title and nodeIdentifier
             let id = UUID()
             let json = """
             {
@@ -320,19 +320,19 @@
         }
 
         @Test func codableDecodesWithTitleOnlyNoNodeIdentifier() throws {
-            // title present but no nodeIdentifier — should succeed with generated UUID
+            // title present but no nodeIdentifier - should succeed with generated UUID
             let json = """
             { "title": "Title Only" }
             """
 
             let decoded = try JSONDecoder().decode(OutlineNode.self, from: Data(json.utf8))
             #expect(decoded.title == "Title Only")
-            // nodeIdentifier gets a default UUID — just verify it's non-nil
+            // nodeIdentifier gets a default UUID - just verify it's non-nil
             #expect(decoded.id != UUID()) // extremely unlikely to collide
         }
 
         @Test func codableDecodesWithNodeIdentifierOnlyNoTitle() throws {
-            // nodeIdentifier present but no title — should succeed with empty title
+            // nodeIdentifier present but no title - should succeed with empty title
             let id = UUID()
             let json = """
             { "nodeIdentifier": { "id": "\(id.uuidString)" } }

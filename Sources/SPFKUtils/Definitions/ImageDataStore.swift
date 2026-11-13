@@ -20,7 +20,7 @@ public actor ImageDataStore {
     private var thumbnailFingerprintCache: [Int: String] = [:]
     private var primaryFingerprintCache: [Int: String] = [:]
 
-    /// File naming constants — implementation detail of the disk layout.
+    /// File naming constants - implementation detail of the disk layout.
     static let thumbSuffix = "_thumb.png"
     static let fullSuffix = "_full"
     static let fullExtensions = ["png", "jpeg", "jpg"]
@@ -171,7 +171,7 @@ extension ImageDataStore {
     ///
     /// Each moved entry is stamped with the current date, since a caller compares an entry's date
     /// against its file's and the moved file may be newer than the entry. **Only call this for a
-    /// file verified to hold the same content** — the stamp is what asserts it. Copied rather than
+    /// file verified to hold the same content** - the stamp is what asserts it. Copied rather than
     /// renamed, so the stamp cannot reach another key sharing the entry through a hardlink, and
     /// staged beside the destination so a concurrent thumbnail read never sees a partial copy.
     public func rekey(from oldURL: URL, to newURL: URL) throws {
@@ -243,7 +243,7 @@ extension ImageDataStore {
         return removedCount
     }
 
-    /// No-op — each insert writes immediately.
+    /// No-op - each insert writes immediately.
     /// Kept for API symmetry with other stores.
     public func save() {}
 }

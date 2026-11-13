@@ -13,7 +13,7 @@
         }
 
         /// The single-line pixel size of a string at this font. Use when you need both width and
-        /// height for a specific string. Not rounded — use the raw value for layout math, or
+        /// height for a specific string. Not rounded - use the raw value for layout math, or
         /// `width(for:)` when you only need the width.
         public func size(for string: String) -> CGSize {
             string.size(withAttributes: [.font: self])

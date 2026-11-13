@@ -10,8 +10,8 @@ public enum SortValue: Hashable, Sendable {
 }
 
 extension SortValue: Comparable {
-    /// Three-way ordering. A sort that has to tell *equal* from *ordered* — to break ties on
-    /// something else — gets both from one call; `<` alone has to be asked twice, and for
+    /// Three-way ordering. A sort that has to tell *equal* from *ordered* - to break ties on
+    /// something else - gets both from one call; `<` alone has to be asked twice, and for
     /// `.string` each ask is a separate `localizedStandardCompare`.
     public func compare(_ other: SortValue) -> ComparisonResult {
         switch (self, other) {

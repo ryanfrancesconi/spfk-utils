@@ -16,7 +16,7 @@ struct SortValueTests {
         #expect(!(SortValue.string("b") < SortValue.string("a")))
     }
 
-    /// Localized standard order is why "file 2" precedes "file 10" — a plain lexicographic compare
+    /// Localized standard order is why "file 2" precedes "file 10" - a plain lexicographic compare
     /// puts them the other way, and a table of numbered takes reads as scrambled.
     @Test func stringsOrderNumericRunsByValue() {
         #expect(SortValue.string("take 2.wav") < SortValue.string("take 10.wav"))
@@ -49,7 +49,7 @@ struct SortValueTests {
         #expect(!(SortValue.string("a") < SortValue.double(9.0)))
     }
 
-    /// The rule holds regardless of the numeral's text — it is a type rule, not a value rule.
+    /// The rule holds regardless of the numeral's text - it is a type rule, not a value rule.
     @Test func numericsSortBeforeStringsThatLookNumeric() {
         #expect(SortValue.integer(100) < SortValue.string("1"))
     }
@@ -63,7 +63,7 @@ struct SortValueTests {
         #expect(!(value < value))
     }
 
-    /// Numerically equal but differently padded is an *order*, not a tie — the unpadded form comes
+    /// Numerically equal but differently padded is an *order*, not a tie - the unpadded form comes
     /// first. Pinned because it is the case that looks like it should tie and does not, which is
     /// what a caller distinguishing equal from ordered depends on.
     @Test func differentlyPaddedNumeralsAreOrderedRatherThanTied() {

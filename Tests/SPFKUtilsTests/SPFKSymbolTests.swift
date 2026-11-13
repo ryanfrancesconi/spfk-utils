@@ -11,7 +11,7 @@
     /// Whether every symbol name actually names a symbol.
     ///
     /// `nsImage` returns `nil` for a name AppKit cannot resolve, and nothing above it reports that
-    /// — a menu item just renders with no icon. `linesDecrease` carried three `U+200B` zero-width
+    /// - a menu item just renders with no icon. `linesDecrease` carried three `U+200B` zero-width
     /// spaces inside its raw value and had been unresolvable for as long as it existed; the name
     /// reads correctly at every glance, which is exactly why it survived.
     ///
@@ -62,7 +62,7 @@
         }
 
         /// A symbol added from a current SF Symbols release resolves on this machine, so nothing
-        /// else here notices that it needs a fallback — simulating an older OS only changes which
+        /// else here notices that it needs a fallback - simulating an older OS only changes which
         /// name is requested, not whether the raw value exists. Asks the system what release each
         /// raw value came from instead of restating a list that would rot.
         @Test func everySymbolNewerThanTheDeploymentFloorDeclaresAFallback() throws {

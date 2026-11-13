@@ -135,7 +135,7 @@
 
             child.centerHorizontalInSuperview()
 
-            // (200/2) - (41/2) = 79.5 — NSView version does not snap
+            // (200/2) - (41/2) = 79.5 - NSView version does not snap
             #expect(child.frame.origin.x == 79.5)
         }
 
