@@ -16,7 +16,9 @@
         /// detection relies on; never for display.
         public private(set) var allocatedSize: UInt64?
 
-        public private(set) var fileSizeString: String?
+        /// Formatted on each read: the formatter makes two bundle lookups a call, which a library
+        /// read cannot pay per row.
+        public var fileSizeString: String? { fileSize.flatMap { ByteCount.toString($0.int64) } }
 
         /// When the file was last written, split by kind of change.
         ///
@@ -58,8 +60,6 @@
             fileSize = url.fileSize.map { UInt64($0) }
             allocatedSize = url.regularFileAllocatedSize
             lockState = url.lockState
-
-            initialize()
         }
 
         /// Rebuilds a previously captured set of properties without touching the file.
@@ -68,8 +68,6 @@
         /// stored property here is `private(set)`, so a backend outside this module has no other
         /// way to put the values back. ``init(url:)`` is not a substitute - it re-reads the file,
         /// which answers the wrong question for a file on a volume that is no longer mounted.
-        ///
-        /// `fileSizeString` is derived from `fileSize` here, exactly as it is on every other path.
         public init(
             url: URL,
             finderTags: FinderTagGroup,
@@ -86,8 +84,6 @@
             self.allocatedSize = allocatedSize
             self.modificationState = modificationState
             self.lockState = lockState
-
-            initialize()
         }
 
         /// Re-reads the lock state from the file, and the dates the write that changed it moved.
@@ -130,12 +126,6 @@
             try url.updateModificationDate()
 
             self = URLProperties(url: url)
-        }
-
-        private mutating func initialize() {
-            if let fileSize {
-                fileSizeString = ByteCount.toString(fileSize.int64)
-            }
         }
     }
 
@@ -190,8 +180,6 @@
                     Date.self, forKey: .attributeModificationDate
                 )
             )
-
-            initialize()
         }
 
         public func encode(to encoder: any Encoder) throws {
