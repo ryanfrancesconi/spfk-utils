@@ -122,6 +122,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case link
     case listAndFilm = "list.and.film"
     case listBullet = "list.bullet"
+    case listBulletBadgeEllipsis = "list.bullet.badge.ellipsis"
     case lock
     case lockOpen = "lock.open"
     case lockSquareStack = "lock.square.stack"
