@@ -209,6 +209,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sidebarLeading = "sidebar.leading"
     case sidebarTrailing = "sidebar.trailing"
     case sliderHorizontal = "slider.horizontal.3"
+    case sliderHorizontalReset = "slider.horizontal.2.arrow.trianglehead.counterclockwise"
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
@@ -311,6 +312,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .horizontalPanelMinimized: "rectangle.bottomthird.inset.filled"
         case .numbers: "textformat.123"
         case .paste: "doc.on.clipboard"
+        case .sliderHorizontalReset: "arrow.counterclockwise.circle"
         case .textDocumentMagnifyingGlass: "doc.text.magnifyingglass"
         case .textFormatCharacters: "textformat"
         case .wandAndSparkles: "wand.and.stars"
@@ -343,7 +345,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
 
         case .arrowDownDocument, .center, .clockArrows, .document, .documentBadgePlus, .documentOnDocument,
              .documentOnDocumentFill, .fill, .hideOthers, .horizontalPanelMaximized,
-             .horizontalPanelMinimized, .numbers, .paste, .textDocumentMagnifyingGlass,
+             .horizontalPanelMinimized, .numbers, .paste, .sliderHorizontalReset, .textDocumentMagnifyingGlass,
              .textFormatCharacters, .wandAndSparkles:
             OSVersion.macOS15.isAvailable
 
