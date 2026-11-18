@@ -58,6 +58,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case clockArrowCirclepath = "clock.arrow.circlepath"
     case clockArrows = "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
     case crop
+    case cropRotate = "crop.rotate"
     case curlybraces
     case curlybracesEllipsis = "ellipsis.curlybraces"
     case dialHigh = "dial.high"
