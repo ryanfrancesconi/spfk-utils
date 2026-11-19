@@ -333,6 +333,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .musicNoteSlash: "waveform.slash"
         case .musicNoteSquareStack, .musicPages: "music.note.list"
         case .interfaceWindowOnRectangle: "macwindow.on.rectangle"
+        case .listBulletBadgeEllipsis: "list.bullet"
         case .waveformMid: "waveform"
 
         default: nil
@@ -356,8 +357,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .infoTriangle: OSVersion.macOS15_2.isAvailable
         case .textSparkle: OSVersion.macOS15_4.isAvailable
 
-        case .dragAndDrop, .finder, .interfaceWindowOnRectangle, .minusPlusLines, .musicNoteSlash, .musicNoteSquareStack,
-             .musicPages, .waveformMid:
+        case .dragAndDrop, .finder, .interfaceWindowOnRectangle, .listBulletBadgeEllipsis, .minusPlusLines, .musicNoteSlash,
+             .musicNoteSquareStack, .musicPages, .waveformMid:
             OSVersion.macOS26.isAvailable
 
         default: true
