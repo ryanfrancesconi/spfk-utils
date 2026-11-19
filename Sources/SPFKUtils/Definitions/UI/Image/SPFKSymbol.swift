@@ -183,6 +183,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case rectangleCompressVertical = "rectangle.compress.vertical"
     case rectangleExpandVertical = "rectangle.expand.vertical"
     case rectanglePortraitArrowTriangle = "rectangle.portrait.arrowtriangle.2.inward"
+    case rectanglePortraitRotate = "rectangle.portrait.rotate"
     case redo = "arrow.uturn.forward"
     case returnKey = "return"
     case revert = "arrow.counterclockwise"
@@ -297,6 +298,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
         case .gaugeNeedle67, .gaugeNeedle100: "gauge.high"
         case .movieclapper: "film"
         case .performZoom: "arrow.up.left.and.arrow.down.right"
+        case .rectanglePortraitRotate: "rectangle.2.swap"
         case .speakerWaveBubble: "speaker.wave.2"
         case .waveformMagnifyingGlass: "waveform.and.magnifyingglass"
 
@@ -341,7 +343,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     private var isRawValueAvailable: Bool {
         switch self {
         case .gaugeNeedle0, .gaugeNeedle33, .gaugeNeedle50, .gaugeNeedle67, .gaugeNeedle100,
-             .movieclapper, .performZoom, .speakerWaveBubble, .waveformMagnifyingGlass:
+             .movieclapper, .performZoom, .rectanglePortraitRotate, .speakerWaveBubble, .waveformMagnifyingGlass:
             OSVersion.macOS14.isAvailable
 
         case .arrowDownDocument, .center, .clockArrows, .document, .documentBadgePlus, .documentOnDocument,
