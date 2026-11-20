@@ -14,14 +14,16 @@ public actor ImageDataStore {
     public nonisolated let directoryURL: URL
     nonisolated let shardedDirectory: ShardedDirectory
 
-    /// Session-scoped content fingerprint caches: fingerprint → the key whose file holds it.
-    /// Identical pixels inserted for two keys share one file through a hardlink. Rewriting a key
-    /// drops its entries first, so it never changes what another key holds.
-    private var thumbnailFingerprintCache: [Int: String] = [:]
+    /// Session-scoped content fingerprint caches: fingerprint → the thumbnail file, or the key whose
+    /// primary, holding it. Identical pixels inserted twice share one file through a hardlink.
+    /// Rewriting an entry drops its cache entries first, so it never changes what another holds.
+    private var thumbnailFingerprintCache: [Int: URL] = [:]
     private var primaryFingerprintCache: [Int: String] = [:]
 
     /// File naming constants - implementation detail of the disk layout.
     static let thumbSuffix = "_thumb.png"
+    /// A variant thumbnail is `<key>_thumb-<variant>.png`.
+    static let variantInfix = "_thumb-"
     static let fullSuffix = "_full"
     static let fullExtensions = ["png", "jpeg", "jpg"]
 
@@ -41,6 +43,22 @@ public actor ImageDataStore {
         shardedDirectory.fileURL(for: key, suffix: Self.thumbSuffix)
     }
 
+    private nonisolated func thumbnailURL(for key: String, variant: CachedImageVariant) -> URL {
+        shardedDirectory.fileURL(for: key, suffix: "\(Self.variantInfix)\(variant.name).png")
+    }
+
+    /// Every variant thumbnail written for `key`.
+    private func variantThumbnailURLs(for key: String) -> [URL] {
+        let prefix = key + Self.variantInfix
+
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: shardedDirectory.shardURL(for: key),
+            includingPropertiesForKeys: nil
+        ) else { return [] }
+
+        return files.filter { $0.lastPathComponent.hasPrefix(prefix) && $0.pathExtension == "png" }
+    }
+
     private func primaryURL(for key: String, ext: String) -> URL {
         shardedDirectory.fileURL(for: key, suffix: "\(Self.fullSuffix).\(ext)")
     }
@@ -58,6 +76,9 @@ public actor ImageDataStore {
     private func deleteFiles(for key: String) {
         let fm = FileManager.default
         try? fm.removeItem(at: thumbnailURL(for: key))
+        for url in variantThumbnailURLs(for: key) {
+            try? fm.removeItem(at: url)
+        }
         for ext in Self.fullExtensions {
             try? fm.removeItem(at: primaryURL(for: key, ext: ext))
         }
@@ -67,7 +88,12 @@ public actor ImageDataStore {
     private func entryKeys() -> [String] {
         let suffixes = [Self.thumbSuffix] + Self.fullExtensions.map { "\(Self.fullSuffix).\($0)" }
         let keys = suffixes.flatMap { shardedDirectory.entryKeys(suffix: $0) }
-        return Array(Set(keys))
+
+        let variantKeys = shardedDirectory.entryKeys(suffix: ".png").compactMap { name in
+            name.range(of: Self.variantInfix).map { String(name[..<$0.lowerBound]) }
+        }
+
+        return Array(Set(keys + variantKeys))
     }
 }
 
@@ -77,7 +103,9 @@ extension ImageDataStore {
     public func insert(_ type: CachedImageType, cgImage: CGImage, for url: URL) throws {
         switch type {
         case .thumbnail:
-            try insertThumbnail(cgImage: cgImage, url: url)
+            try insertThumbnail(cgImage: cgImage, url: url, at: thumbnailURL(for: url.sha256))
+        case let .thumbnailVariant(variant):
+            try insertThumbnail(cgImage: cgImage, url: url, at: thumbnailURL(for: url.sha256, variant: variant))
         case .fullQuality:
             try insertPrimary(cgImage: cgImage, url: url)
         }
@@ -95,6 +123,8 @@ extension ImageDataStore {
             // Decoded here, off the main actor. Left lazy, the PNG decode runs in the main
             // thread's Core Animation commit the first time a layer shows it.
             return Self.readImage(at: thumbnailURL(for: key), decodingImmediately: true)
+        case let .thumbnailVariant(variant):
+            return Self.readImage(at: thumbnailURL(for: key, variant: variant), decodingImmediately: true)
         case .fullQuality:
             return await fetchPrimary(key: key)
         }
@@ -122,6 +152,9 @@ extension ImageDataStore {
         switch type {
         case .thumbnail:
             let thumbURL = thumbnailURL(for: key)
+            fileURL = FileManager.default.fileExists(atPath: thumbURL.path) ? thumbURL : nil
+        case let .thumbnailVariant(variant):
+            let thumbURL = thumbnailURL(for: key, variant: variant)
             fileURL = FileManager.default.fileExists(atPath: thumbURL.path) ? thumbURL : nil
         case .fullQuality:
             fileURL = existingPrimaryURL(for: key)
@@ -154,6 +187,7 @@ extension ImageDataStore {
             for file in files {
                 let name = file.lastPathComponent
                 if name.hasSuffix(Self.thumbSuffix) ||
+                    (name.contains(Self.variantInfix) && name.hasSuffix(".png")) ||
                     Self.fullExtensions.contains(where: { name.hasSuffix("\(Self.fullSuffix).\($0)") })
                 {
                     try? fm.removeItem(at: file)
@@ -184,7 +218,10 @@ extension ImageDataStore {
 
         let fm = FileManager.default
 
-        guard !fm.fileExists(atPath: thumbnailURL(for: newKey).path), existingPrimaryURL(for: newKey) == nil else {
+        guard !fm.fileExists(atPath: thumbnailURL(for: newKey).path),
+              existingPrimaryURL(for: newKey) == nil,
+              variantThumbnailURLs(for: newKey).isEmpty
+        else {
             return
         }
 
@@ -193,6 +230,11 @@ extension ImageDataStore {
         let thumbnail = thumbnailURL(for: oldKey)
         if fm.fileExists(atPath: thumbnail.path) {
             moves.append((thumbnail, thumbnailURL(for: newKey)))
+        }
+
+        for variant in variantThumbnailURLs(for: oldKey) {
+            let name = newKey + variant.lastPathComponent.dropFirst(oldKey.count)
+            moves.append((variant, shardedDirectory.shardURL(for: newKey).appendingPathComponent(name)))
         }
 
         if let primary = existingPrimaryURL(for: oldKey) {
@@ -218,7 +260,7 @@ extension ImageDataStore {
             }
         }
 
-        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != oldKey }
+        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { !$0.value.lastPathComponent.hasPrefix(oldKey) }
         primaryFingerprintCache = primaryFingerprintCache.filter { $0.value != oldKey }
     }
 
@@ -251,21 +293,19 @@ extension ImageDataStore {
 // MARK: - Private Insert Helpers
 
 extension ImageDataStore {
-    private func insertThumbnail(cgImage: CGImage, url: URL) throws {
+    private func insertThumbnail(cgImage: CGImage, url: URL, at destURL: URL) throws {
         let key = url.sha256
-        let destURL = thumbnailURL(for: key)
 
         let fingerprint = cgImage.fingerprint
-        let existingKey = fingerprint.flatMap { thumbnailFingerprintCache[$0] }
+        let existingURL = fingerprint.flatMap { thumbnailFingerprintCache[$0] }
 
-        if existingKey == key, FileManager.default.fileExists(atPath: destURL.path) {
+        if existingURL == destURL, FileManager.default.fileExists(atPath: destURL.path) {
             return
         }
 
-        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != key }
+        thumbnailFingerprintCache = thumbnailFingerprintCache.filter { $0.value != destURL }
 
-        if let existingKey {
-            let existingURL = thumbnailURL(for: existingKey)
+        if let existingURL {
             if existingURL != destURL, FileManager.default.fileExists(atPath: existingURL.path) {
                 try shardedDirectory.ensureShardDirectory(for: key)
                 try? FileManager.default.removeItem(at: destURL)
@@ -282,7 +322,7 @@ extension ImageDataStore {
         try data.write(to: destURL, options: .atomic)
 
         if let fingerprint {
-            thumbnailFingerprintCache[fingerprint] = key
+            thumbnailFingerprintCache[fingerprint] = destURL
         }
     }
 
