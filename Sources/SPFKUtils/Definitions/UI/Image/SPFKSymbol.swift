@@ -35,6 +35,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case bookmarkSlash = "bookmark.slash"
     case bubbleLeft = "bubble.left"
     case calendar
+    case camera
     case cart
     case cCircle = "c.circle"
     case cCircleFill = "c.circle.fill"
