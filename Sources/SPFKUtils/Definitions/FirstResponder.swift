@@ -121,8 +121,16 @@
             }
         }
 
+        /// With no key window (the app is not active), `sendAction` has no chain to walk, so the
+        /// main window's first responder is asked first.
         private static func send(selector: Selector) {
             Task { @MainActor in
+                if NSApp.keyWindow == nil,
+                   let window = NSApp.mainWindow ?? NSApp.windows.first(where: { $0.isVisible && $0.canBecomeMain }),
+                   window.firstResponder?.tryToPerform(selector, with: nil) == true {
+                    return
+                }
+
                 NSApp.sendAction(selector, to: nil, from: nil)
             }
         }
