@@ -215,6 +215,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case sliderHorizontalReset = "slider.horizontal.2.arrow.trianglehead.counterclockwise"
     case sliderVertical = "slider.vertical.3"
     case sort = "arrow.up.arrow.down"
+    case sparkle
     case sparkleMagnifyingGlass = "sparkle.magnifyingglass"
     case speaker
     case speakerFill = "speaker.fill"
