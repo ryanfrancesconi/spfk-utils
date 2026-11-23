@@ -153,6 +153,7 @@ extension MovePlanBuilder {
             }
 
             var claimed: Set<String> = []
+            var nextNumber: [String: Int] = [:]
 
             for (unit, base) in zip(named, bases) {
                 guard isMoving(unit, base: base) else {
@@ -164,7 +165,7 @@ extension MovePlanBuilder {
                     continue
                 }
 
-                switch claim(unit, base: base, claimed: &claimed, vacating: vacating) {
+                switch claim(unit, base: base, claimed: &claimed, nextNumber: &nextNumber, vacating: vacating) {
                 case let .claimed(groups):
                     groups.forEach { entries[$0.source] = .move($0) }
                 case let .skipped(reason):
@@ -181,6 +182,7 @@ extension MovePlanBuilder {
             _ unit: Unit,
             base: String,
             claimed: inout Set<String>,
+            nextNumber: inout [String: Int],
             vacating: Set<String>
         ) -> ClaimResult {
             func isTaken(_ url: URL) -> Bool {
@@ -188,7 +190,16 @@ extension MovePlanBuilder {
                 return claimed.contains(key) || learnedTaken.contains(key) || (listing.contains(url) && !vacating.contains(key))
             }
 
-            for number in 0 ... 100_000 {
+            // Every number below the last one claimed for this name was taken then and still is, so
+            // many files rendering one name cost one check each rather than one per earlier file.
+            // Keyed by every extension the unit claims, since a name free for one is not for another.
+            let extensions = unit.members.flatMap { member in
+                [member.url.pathExtension] + companions[member.url, default: []].map(\.pathExtension)
+            }
+            let numberKey = listing.key(destination(of: unit.members[0].url, base: base)) + "|" + extensions.map { $0.lowercased() }.sorted().joined(separator: ",")
+            let first = nextNumber[numberKey] ?? 0
+
+            for number in first ... first + 100_000 {
                 let numbered = number == 0 ? base : "\(base) \(number)"
 
                 guard numbered.utf8.count <= NameTemplate.maximumNameByteCount else { return .skipped(.overByteCap) }
@@ -210,6 +221,7 @@ extension MovePlanBuilder {
                 guard !urls.contains(where: isTaken) else { continue }
 
                 claimed.formUnion(keys)
+                nextNumber[numberKey] = number + 1
                 return .claimed(groups)
             }
 
