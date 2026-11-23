@@ -86,7 +86,7 @@ public enum BatchOutputClaims {
 
     /// Reads the nearest existing ancestor, since an output folder may not exist yet. An unreadable
     /// volume counts as case-insensitive, which can only number a name that needed none.
-    private static func volumeIsCaseSensitive(at folder: URL) -> Bool {
+    static func volumeIsCaseSensitive(at folder: URL) -> Bool {
         var folder = folder
 
         while !folder.exists, folder.path != "/" {
