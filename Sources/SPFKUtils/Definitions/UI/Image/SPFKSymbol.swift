@@ -89,6 +89,8 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case filmStack = "film.stack"
     case finder
     case flag
+    case flagFill = "flag.fill"
+    case flagSlashFill = "flag.slash.fill"
     case flipHorizontal = "arrow.left.and.right.righttriangle.left.righttriangle.right"
     case flipVertical = "arrow.up.and.down.righttriangle.up.righttriangle.down"
     case folder
