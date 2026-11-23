@@ -3,76 +3,103 @@
 import Foundation
 
 /// How an export names its files, before the extension and before ``BatchOutputClaims`` numbers
-/// any that collide.
+/// any that collide. Every scheme renders through a ``NameTemplate``.
 public struct ExportNaming: Sendable, Hashable, Codable {
     public enum Scheme: String, Sendable, Hashable, Codable, CaseIterable {
         case fileName
         case title
         case sequential
         case collectionNameWithNumber
+        case custom
     }
 
     public var scheme: Scheme
 
-    /// Leads each name under ``Scheme/sequential``.
+    /// Leads each name under ``Scheme/sequential``; `{text}` in a template.
     public var prefix: String
 
-    /// Between a name and its number.
-    public static let separator = " "
+    /// The source of the ``Scheme/custom`` template.
+    public var template: String
 
-    /// Leaves room under the 255-byte file name limit for an extension and a collision number.
-    static let maximumByteCount = 240
+    /// The ``NameTemplate/currentVersion`` the template was written at.
+    public var templateVersion: Int
 
-    public init(scheme: Scheme = .fileName, prefix: String = "") {
+    public init(
+        scheme: Scheme = .fileName,
+        prefix: String = "",
+        template: String = "",
+        templateVersion: Int = NameTemplate.currentVersion
+    ) {
         self.scheme = scheme
         self.prefix = prefix
+        self.template = template
+        self.templateVersion = templateVersion
     }
 
-    /// One base name per item, in the order given, which is the order numbers are assigned in.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        scheme = try container.decode(Scheme.self, forKey: .scheme)
+        prefix = try container.decodeIfPresent(String.self, forKey: .prefix) ?? ""
+        template = try container.decodeIfPresent(String.self, forKey: .template) ?? ""
+        templateVersion = try container.decodeIfPresent(Int.self, forKey: .templateVersion) ?? NameTemplate.currentVersion
+    }
+
+    private static let fileNameTemplate = NameTemplate("{name}")
+    private static let titleTemplate = NameTemplate("{title?name}")
+    private static let sequentialTemplate = NameTemplate("[{text} ]{seq}")
+    private static let collectionTemplate = NameTemplate("[{collection} ]{seq}")
+
+    /// The scheme's preset, or the custom template.
+    public var nameTemplate: NameTemplate {
+        switch scheme {
+        case .fileName: Self.fileNameTemplate
+        case .title: Self.titleTemplate
+        case .sequential: Self.sequentialTemplate
+        case .collectionNameWithNumber: Self.collectionTemplate
+        case .custom: NameTemplate(template)
+        }
+    }
+
+    /// One base name per item, in the order given, which is the order `{seq}` counts in.
     ///
-    /// An empty title falls back to the file name. Numbers count from 1, padded to the width of the
-    /// count so the names sort in order.
+    /// A name that renders empty falls back to the item's `name` value, sanitized.
     public func baseNames<Item>(
         for items: [Item],
-        fileName: (Item) -> String,
-        title: (Item) -> String?,
+        values: (Item) -> [String: NameTemplate.Value],
         collectionName: String
     ) -> [String] {
-        let width = String(items.count).count
+        let template = nameTemplate
 
-        return items.enumerated().map { offset, item in
-            let number = String(repeating: "0", count: max(0, width - String(offset + 1).count)) + String(offset + 1)
-            let fallback = Self.sanitized(fileName(item))
-
-            let name: String = switch scheme {
-            case .fileName: fallback
-            case .title: Self.sanitized(title(item) ?? "")
-            case .sequential: Self.numbered(prefix, number)
-            case .collectionNameWithNumber: Self.numbered(collectionName, number)
-            }
-
-            return name.isEmpty ? fallback : name
+        return items.indices.map {
+            baseName(at: $0, of: items, values: values, collectionName: collectionName, template: template)
         }
     }
 
-    private static func numbered(_ name: String, _ number: String) -> String {
-        let name = sanitized(name)
-        return name.isEmpty ? number : name + separator + number
+    /// The base name ``baseNames(for:values:collectionName:)`` gives the item at `index`, reading
+    /// only that item's values.
+    public func baseName<Item>(
+        at index: Int,
+        of items: [Item],
+        values: (Item) -> [String: NameTemplate.Value],
+        collectionName: String
+    ) -> String {
+        baseName(at: index, of: items, values: values, collectionName: collectionName, template: nameTemplate)
     }
 
-    /// Trims whitespace and leading dots, which hide a file, replaces `/` and `:` with `-`, and
-    /// shortens to ``maximumByteCount`` on whole characters.
-    static func sanitized(_ name: String) -> String {
-        let cleaned = String(name.trimmingCharacters(in: .whitespacesAndNewlines).drop { $0 == "." })
-            .replacingOccurrences(of: "/", with: "-")
-            .replacingOccurrences(of: ":", with: "-")
+    private func baseName<Item>(
+        at index: Int,
+        of items: [Item],
+        values: (Item) -> [String: NameTemplate.Value],
+        collectionName: String,
+        template: NameTemplate
+    ) -> String {
+        var values = values(items[index])
+        values["text"] = .text(prefix)
 
-        var byteCount = 0
-        let kept = cleaned.prefix {
-            byteCount += $0.utf8.count
-            return byteCount <= maximumByteCount
-        }
+        let context = NameTemplate.RenderContext(index: index + 1, count: items.count, collection: collectionName)
+        let name = template.render(values: values, context: context)
 
-        return String(kept).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard name.isEmpty, case let .text(fileName)? = values["name"] else { return name }
+        return NameTemplate.sanitizedName(fileName)
     }
 }
