@@ -115,6 +115,13 @@ final class GroupByTagDirectoryTests {
         #expect(result.path.contains("-"))
     }
 
+    @Test func aValueKeepsItsCase() {
+        let directory = GroupByTagDirectory(["camera", "make"])
+        let result = directory.resolve(base: base, tags: ["camera": "iPhone 15 Pro", "make": "canon"])
+
+        #expect(result.path.hasSuffix("/output/iPhone 15 Pro/canon"))
+    }
+
     @Test func leadingTrailingWhitespaceInValueIsTrimmed() {
         let result = GroupByTagDirectory(["genre"]).resolve(base: base, tags: ["genre": "  Jazz  "])
         #expect(result.path.hasSuffix("/Jazz"))
