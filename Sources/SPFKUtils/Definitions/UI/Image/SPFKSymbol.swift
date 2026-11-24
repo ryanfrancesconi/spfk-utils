@@ -143,6 +143,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case metronome
     case metronomeFill = "metronome.fill"
     case minus
+    case minusCircle = "minus.circle"
     case minusDiamond = "minus.diamond"
     case minusPlusLines = "minus.plus.lines.measurement.horizontal.aligned.bottom"
     case mountain = "mountain.2"
@@ -164,6 +165,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case performZoom = "square.arrowtriangle.4.outward"
     case person
     case photo
+    case photoCircle = "photo.circle"
     case photoCircleFill = "photo.circle.fill"
     case photoStack = "photo.stack"
     case piano = "pianokeys.inverse"
