@@ -130,6 +130,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case lock
     case lockOpen = "lock.open"
     case lockSquareStack = "lock.square.stack"
+    case longTextPageAndPencil = "long.text.page.and.pencil"
     case loop = "repeat"
     case macwindow
     case metadataTemplate = "list.bullet.rectangle"
@@ -329,6 +330,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
 
         // macOS 15.0, 15.1, 15.2, 15.4
         case .hideOthers: "square.on.square.dashed"
+        case .longTextPageAndPencil: "pencil.circle"
         case .waveformBadgeCheckmark: "waveform.badge.plus"
         case .infoTriangle: "exclamationmark.triangle"
         case .textSparkle: "sparkles"
