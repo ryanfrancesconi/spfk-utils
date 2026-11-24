@@ -13,7 +13,7 @@ import UniformTypeIdentifiers
 /// Prepare one per selection, then plan each template against it. Claims are made against a
 /// ``FolderListing`` and the run's own earlier claims. A preview reads only destination folders not
 /// listed before, once each for the builder's lifetime; ``plan(template:placement:collection:)``
-/// adds the disk check a run needs before moving.
+/// adds the disk check a run needs before moving or copying.
 public struct MovePlanBuilder: Sendable {
     let prepared: [Prepared]
     var listing: FolderListing
@@ -85,34 +85,42 @@ public struct MovePlanBuilder: Sendable {
         public let unresolved: Set<DuplicateVerdicts.Pair>
     }
 
-    /// - Parameter duplicates: verdicts on the candidate pairs compared so far. Under a folder
-    ///   placement, a source of the same size as the one holding its destination is a candidate.
+    /// - Parameters:
+    ///   - duplicates: verdicts on the candidate pairs compared so far. Under a folder placement, a
+    ///     source of the same size as the one holding its destination is a candidate.
+    ///   - operation: under ``MoveOperation/copy`` no file gives up its name, so a copy rendering
+    ///     its source's own path is numbered.
     public mutating func preview(
         template: NameTemplate,
         placement: FolderPlacement = .keepCurrent,
         collection: String = "",
-        duplicates: DuplicateVerdicts = DuplicateVerdicts()
+        duplicates: DuplicateVerdicts = DuplicateVerdicts(),
+        operation: MoveOperation = .move
     ) -> Preview {
-        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates)
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates, operation: operation)
         let plan = pass.settled()
         listing = pass.listing
         return Preview(plan: plan, numbered: pass.numbered, unresolved: pass.unresolved)
     }
 
     /// The plan checked against the disk, which a listing can be out of step with, and ready for
-    /// `FileCommands.move`.
+    /// `FileCommands.move` or, under ``MoveOperation/copy``, `FileCommands.copy`.
     public mutating func plan(
         template: NameTemplate,
         placement: FolderPlacement = .keepCurrent,
         collection: String = "",
-        duplicates: DuplicateVerdicts = DuplicateVerdicts()
+        duplicates: DuplicateVerdicts = DuplicateVerdicts(),
+        operation: MoveOperation = .move
     ) -> MovePlan {
-        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates)
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates, operation: operation)
         defer { listing = pass.listing }
 
         while true {
             let plan = pass.settled()
-            let conflicts = FileCommands.moveConflicts(in: plan)
+            let conflicts = switch operation {
+            case .move: FileCommands.moveConflicts(in: plan)
+            case .copy: FileCommands.copyConflicts(in: plan)
+            }
 
             guard conflicts.isNotEmpty else { return plan }
 
@@ -120,6 +128,18 @@ public struct MovePlanBuilder: Sendable {
                 pass.learn(error, refusing: source)
             }
         }
+    }
+
+    /// The bytes copying `plan` under `root` writes: its planned files that `root` cannot clone.
+    /// Companions are not counted.
+    public func bytesToCopy(_ plan: MovePlan, root: MoveRoot) -> UInt64 {
+        let sources = plan.groups.compactMap { group -> (size: UInt64?, volume: URL?)? in
+            guard let index = indexByURL[group.source] else { return nil }
+            let input = prepared[index].input
+            return (input.fileSize, input.volume)
+        }
+
+        return MoveRoot.bytesToCopy(sources, rootVolume: root.volume, rootClones: root.supportsCloning)
     }
 
     /// One template's checked plan, from a builder used once.

@@ -52,6 +52,33 @@ final class MoveRootTests: BinTestCase {
         #expect(root.isCaseSensitive == BatchOutputClaims.volumeIsCaseSensitive(at: bin))
     }
 
+    @Test func aRootReadsItsVolumesFreeSpaceAndCloning() throws {
+        let open = try folder("open")
+        let root = try MoveRoot(validating: open)
+        let cloning = try open.resourceValues(forKeys: [.volumeSupportsFileCloningKey]).volumeSupportsFileCloning
+
+        #expect(root.availableCapacity.map { $0 > 0 } == true)
+        #expect(root.supportsCloning == cloning)
+    }
+
+    /// Free space moves between reads; the root is the same folder.
+    @Test func twoReadsOfOneFolderAreEqual() throws {
+        let open = try folder("open")
+        let first = try MoveRoot(validating: open)
+        try Data(count: 1_048_576).write(to: open.appendingPathComponent("filler"))
+
+        #expect(try MoveRoot(validating: open) == first)
+    }
+
+    @Test func aCopyNeedsTheBytesOfFilesTheRootCannotClone() {
+        let here = URL(fileURLWithPath: "/", isDirectory: true)
+        let there = URL(fileURLWithPath: "/Volumes/Other", isDirectory: true)
+        let sources: [(size: UInt64?, volume: URL?)] = [(10, here), (20, there), (5, nil), (nil, there)]
+
+        #expect(MoveRoot.bytesToCopy(sources, rootVolume: here, rootClones: true) == 25)
+        #expect(MoveRoot.bytesToCopy(sources, rootVolume: here, rootClones: false) == 35)
+    }
+
     @Test func twoFoldersInTheBinReadAsOneVolume() throws {
         let a = try #require(MoveRoot.volume(of: try folder("a")))
 

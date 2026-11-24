@@ -22,7 +22,8 @@ public struct MovePlanInput: Sendable, Hashable {
     /// no root refuses.
     public var volume: URL?
 
-    /// From the element's properties, so finding duplicate candidates adds no read.
+    /// Read once with the selection. Duplicate candidates are equal in size, and a copy's bytes
+    /// are summed from it.
     public var fileSize: UInt64?
 
     public init(

@@ -117,6 +117,52 @@ final class MovePlanRetentionTests: BinTestCase {
         #expect(MoveRunLog.pending(in: journals).isEmpty)
     }
 
+    /// Planned as a copy and copied, journaled, as Organize Files' Copy runs in the app.
+    @Test func copyingLivePhotosIntoNewFoldersRetainsNothingPerFile() async throws {
+        let (still, movie) = try await makeLivePhoto()
+        let bin = bin
+        let journals = bin.appendingPathComponent("Journals", isDirectory: true)
+        let root = try MoveRoot(validating: bin)
+        let folders = FolderPlacement.template(NameTemplate("{date:YYYY}/{date:YYYY-MM-DD}"), root: root)
+
+        let grown = try await retainedMemoryMB(warmUp: 200, measured: 2000, width: 8) { index in
+            let folder = bin.appendingPathComponent("item-\(index)", isDirectory: true)
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: folder) }
+
+            let photo = folder.appendingPathComponent("IMG_1234.HEIC")
+            try FileManager.default.copyItem(at: still, to: photo)
+            try FileManager.default.copyItem(at: movie, to: folder.appendingPathComponent("IMG_1234.MOV"))
+
+            let companions = await FileCompanions.resolve([photo])
+            var values = NameTemplate.urlValues(for: photo)
+            values["date"] = .date(NameTemplate.DateParts(year: 2000 + index / 365, month: 1 + index % 12, day: 1 + index % 28))
+
+            var builder = MovePlanBuilder(
+                inputs: [MovePlanInput(url: photo, values: values, volume: root.volume, fileSize: photo.fileSize.map { UInt64($0) })],
+                companions: companions,
+                listing: FolderListing.reading([folder])
+            )
+            let plan = builder.plan(template: NameTemplate("item-\(index)"), placement: folders, operation: .copy)
+
+            guard builder.bytesToCopy(plan, root: root) == 0 || !root.supportsCloning else { throw CocoaError(.fileWriteUnknown) }
+
+            let log = try MoveRunLog.create(in: journals, context: Data(), operation: .copy)
+            let copies = try FileCommands.copy(plan, rollingBackOnFailure: true, log: log, progress: { _, _ in })
+            log.remove()
+
+            guard copies.companions.count == 1, let copy = copies.moved[photo], let movieCopy = copies.companions.values.first else {
+                throw CocoaError(.fileWriteUnknown)
+            }
+
+            try FileManager.default.removeItem(at: copy)
+            try FileManager.default.removeItem(at: movieCopy)
+        }
+
+        #expect(grown < 50, "grew \(Int(grown)) MB over 2000 copies into folders")
+        #expect(MoveRunLog.pending(in: journals).isEmpty)
+    }
+
     @Test func comparingPhotoSizedDuplicatesRetainsNothingPerPair() async throws {
         let first = bin.appendingPathComponent("first.HEIC")
         let second = bin.appendingPathComponent("second.HEIC")

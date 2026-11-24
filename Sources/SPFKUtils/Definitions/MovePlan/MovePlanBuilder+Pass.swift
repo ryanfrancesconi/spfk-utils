@@ -23,6 +23,7 @@ extension MovePlanBuilder {
         let placement: FolderPlacement
         let collection: String
         let duplicates: DuplicateVerdicts
+        let operation: MoveOperation
 
         /// The builder's listing, grown by each destination folder a round reads.
         var listing: FolderListing
@@ -40,12 +41,20 @@ extension MovePlanBuilder {
         /// The last settled round's candidate pairs with no verdict.
         private(set) var unresolved: Set<DuplicateVerdicts.Pair> = []
 
-        init(builder: MovePlanBuilder, template: NameTemplate, placement: FolderPlacement, collection: String, duplicates: DuplicateVerdicts) {
+        init(
+            builder: MovePlanBuilder,
+            template: NameTemplate,
+            placement: FolderPlacement,
+            collection: String,
+            duplicates: DuplicateVerdicts,
+            operation: MoveOperation
+        ) {
             self.builder = builder
             self.template = template
             self.placement = placement
             self.collection = collection
             self.duplicates = duplicates
+            self.operation = operation
             listing = builder.listing
         }
 
@@ -84,17 +93,22 @@ extension MovePlanBuilder {
             }
         }
 
+        /// A copy only reads its source, so it skips a locked file or one on another volume, and
+        /// a source's folder only when the copy is written beside it.
         private func skipReason(_ index: Int) -> MoveSkipReason? {
             if let reason = forced[index] { return reason }
 
             let input = builder.prepared[index].input
-            if input.isMissing { return .missing }
-            if input.isLocked { return .locked }
-            if input.isBusy { return .busy }
-            if !input.isFolderWritable { return .sourceFolderNotWritable }
-            if input.isInsidePackage { return .insidePackage }
+            let isCopy = operation == .copy
+            let writesSourceFolder = !isCopy || placement == .keepCurrent
 
-            if case let .template(_, root) = placement, let volume = input.volume, let rootVolume = root.volume, volume != rootVolume {
+            if input.isMissing { return .missing }
+            if input.isLocked, !isCopy { return .locked }
+            if input.isBusy { return .busy }
+            if !input.isFolderWritable, writesSourceFolder { return .sourceFolderNotWritable }
+            if input.isInsidePackage, writesSourceFolder { return .insidePackage }
+
+            if !isCopy, case let .template(_, root) = placement, let volume = input.volume, let rootVolume = root.volume, volume != rootVolume {
                 return .otherVolume
             }
 
@@ -132,13 +146,14 @@ extension MovePlanBuilder {
                 }
 
                 let destination = destinations[offset]
-                let isMoving = unit.contains { destination.path != prepared[$0].folderPath || prepared[$0].name(base: base) != prepared[$0].name }
+                let isMoving = operation == .copy || unit.contains { destination.path != prepared[$0].folderPath || prepared[$0].name(base: base) != prepared[$0].name }
                 named.append((unit, base, destination, isMoving))
             }
 
+            // A copy leaves its source in place, so its name stays taken.
             var vacating: Set<String> = []
 
-            for (unit, _, _, isMoving) in named where isMoving {
+            for (unit, _, _, isMoving) in named where isMoving && operation == .move {
                 for member in unit {
                     vacating.insert(prepared[member].key)
                     prepared[member].companions.forEach { vacating.insert($0.key) }
