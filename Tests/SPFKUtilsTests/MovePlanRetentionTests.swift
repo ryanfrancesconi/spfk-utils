@@ -75,9 +75,11 @@ final class MovePlanRetentionTests: BinTestCase {
         #expect(grown < 50, "grew \(Int(grown)) MB over 2000 renames")
     }
 
+    /// Each move journaled, as a move across folders is in the app.
     @Test func filingLivePhotosIntoNewFoldersRetainsNothingPerFile() async throws {
         let (still, movie) = try await makeLivePhoto()
         let bin = bin
+        let journals = bin.appendingPathComponent("Journals", isDirectory: true)
         let folders = FolderPlacement.template(NameTemplate("{date:YYYY}/{date:YYYY-MM-DD}"), root: try MoveRoot(validating: bin))
 
         let grown = try await retainedMemoryMB(warmUp: 200, measured: 2000, width: 8) { index in
@@ -100,7 +102,9 @@ final class MovePlanRetentionTests: BinTestCase {
                 listing: FolderListing.reading([folder])
             )
 
-            let moves = try await MainActor.run { try FileCommands.move(plan, rollingBackOnFailure: true) }
+            let log = try MoveRunLog.create(in: journals, context: Data())
+            let moves = try FileCommands.move(plan, rollingBackOnFailure: true, log: log)
+            log.remove()
 
             guard moves.companions.count == 1, let destination = moves.moved[photo] else { throw CocoaError(.fileWriteUnknown) }
 
@@ -110,6 +114,7 @@ final class MovePlanRetentionTests: BinTestCase {
         }
 
         #expect(grown < 50, "grew \(Int(grown)) MB over 2000 moves into folders")
+        #expect(MoveRunLog.pending(in: journals).isEmpty)
     }
 
     @Test func comparingPhotoSizedDuplicatesRetainsNothingPerPair() async throws {
