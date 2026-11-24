@@ -364,7 +364,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
 
         case .waveformBadgeCheckmark: OSVersion.macOS15_1.isAvailable
         case .infoTriangle: OSVersion.macOS15_2.isAvailable
-        case .textSparkle: OSVersion.macOS15_4.isAvailable
+        case .longTextPageAndPencil, .textSparkle: OSVersion.macOS15_4.isAvailable
 
         case .dragAndDrop, .finder, .interfaceWindowOnRectangle, .listBulletBadgeEllipsis, .minusPlusLines, .musicNoteSlash,
              .musicNoteSquareStack, .musicPages, .waveformMid:
