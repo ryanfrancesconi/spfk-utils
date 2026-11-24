@@ -233,6 +233,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case speakerWave3Fill = "speaker.wave.3.fill"
     case speakerWaveBubble = "speaker.wave.2.bubble"
     case squareAndPencil = "square.and.pencil"
+    case squareGrid3x1FolderBadgePlus = "square.grid.3x1.folder.badge.plus"
     case squareStack = "square.stack"
     case squareStack3d = "square.stack.3d.up"
     case squareStack3dFill = "square.stack.3d.up.fill"
