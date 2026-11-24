@@ -40,8 +40,10 @@ struct MovePlanBuilderFolderTests {
         .date(NameTemplate.DateParts(year: year, month: month, day: day))
     }
 
-    private func input(_ path: String, _ values: [String: NameTemplate.Value] = [:]) -> MovePlanInput {
-        MovePlanInput(url: url(path), values: NameTemplate.urlValues(for: url(path)).merging(values) { $1 })
+    private func input(_ path: String, _ values: [String: NameTemplate.Value] = [:], size: UInt64? = nil) -> MovePlanInput {
+        var input = MovePlanInput(url: url(path), values: NameTemplate.urlValues(for: url(path)).merging(values) { $1 })
+        input.fileSize = size
+        return input
     }
 
     /// Each input's folder listed with the inputs and companions in it; any other folder is read from
@@ -207,6 +209,103 @@ struct MovePlanBuilderFolderTests {
         #expect(filed.entries.first == .skipped(away.url, .otherVolume))
         #expect(destinations(filed) == ["y.jpg": "a/y.jpg"])
         #expect(destinations(renamed) == ["x.jpg": "dump/Trip.jpg", "y.jpg": "dump/Trip 1.jpg"])
+    }
+
+    // MARK: - Duplicates (D16)
+
+    private func pair(_ first: String, _ second: String) -> DuplicateVerdicts.Pair {
+        DuplicateVerdicts.Pair(first: url(first), second: url(second))
+    }
+
+    private func verdicts(_ identical: Bool, _ first: String, _ second: String) -> DuplicateVerdicts {
+        var verdicts = DuplicateVerdicts()
+        verdicts.record(identical, for: pair(first, second))
+        return verdicts
+    }
+
+    /// Two files of equal size dated one day, so both render `2024/x.jpg`.
+    private var twoCandidates: [MovePlanInput] {
+        [input("a/x.jpg", ["date": date(2024, 5, 1)], size: 10), input("b/x.jpg", ["date": date(2024, 5, 1)], size: 10)]
+    }
+
+    @Test func anIdenticalSecondSourceStaysWhereItIs() {
+        var builder = builder(twoCandidates)
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"), duplicates: verdicts(true, "a/x.jpg", "b/x.jpg"))
+
+        #expect(preview.plan.entries == [
+            .move(MovePlan.Group(source: url("a/x.jpg"), destination: url("2024/x.jpg"))),
+            .skipped(url("b/x.jpg"), .duplicate(of: url("a/x.jpg"))),
+        ])
+        #expect(preview.unresolved.isEmpty)
+    }
+
+    @Test func aDifferentSecondSourceIsNumbered() {
+        var builder = builder(twoCandidates)
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"), duplicates: verdicts(false, "a/x.jpg", "b/x.jpg"))
+
+        #expect(preview.plan.groups.map(\.destination) == [url("2024/x.jpg"), url("2024/x 1.jpg")])
+        #expect(preview.unresolved.isEmpty)
+    }
+
+    @Test func aPairNotComparedYetIsNumberedAndReported() {
+        var builder = builder(twoCandidates)
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"))
+
+        #expect(preview.plan.groups.map(\.destination) == [url("2024/x.jpg"), url("2024/x 1.jpg")])
+        #expect(preview.unresolved == [pair("a/x.jpg", "b/x.jpg")])
+    }
+
+    @Test func filesOfDifferentSizesAreNeverCandidates() {
+        var builder = builder([input("a/x.jpg", ["date": date(2024, 5, 1)], size: 10), input("b/x.jpg", ["date": date(2024, 5, 1)], size: 11)])
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"))
+
+        #expect(preview.plan.groups.count == 2)
+        #expect(preview.unresolved.isEmpty)
+    }
+
+    @Test func aDuplicatesCompanionsStayWithIt() {
+        let inputs = twoCandidates
+        let companions = [inputs[1].url: [url("b/x.xmp")]]
+        var builder = builder(inputs, companions: companions)
+
+        let plan = builder.plan(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"), duplicates: verdicts(true, "a/x.jpg", "b/x.jpg"))
+
+        #expect(plan.groups.map(\.source) == [url("a/x.jpg")])
+        #expect(plan.groups.flatMap(\.companions).isEmpty)
+    }
+
+    /// Only sources of the run are compared: a file already at the destination outside it numbers
+    /// the incoming file, however alike they are.
+    @Test func aDestinationHeldOutsideTheRunIsNeverACandidate() {
+        var builder = builder([input("a/x.jpg", ["date": date(2024, 5, 1)], size: 10)], disk: ["": ["a", "2024"], "/2024": ["x.jpg"]])
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"))
+
+        #expect(destinations(preview.plan) == ["x.jpg": "2024/x 1.jpg"])
+        #expect(preview.unresolved.isEmpty)
+    }
+
+    /// A source already in place holds its name for the rest, wherever it falls in display order.
+    @Test func aSourceAlreadyInPlaceIsCompared() {
+        let inputs = [input("dump/x.jpg", ["date": date(2024, 5, 1)], size: 10), input("2024/x.jpg", ["date": date(2024, 5, 1)], size: 10)]
+        var builder = builder(inputs)
+
+        let preview = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"), duplicates: verdicts(true, "2024/x.jpg", "dump/x.jpg"))
+
+        #expect(preview.plan.entries == [.skipped(url("dump/x.jpg"), .duplicate(of: url("2024/x.jpg"))), .alreadyInPlace(url("2024/x.jpg"))])
+    }
+
+    @Test func keepCurrentFolderNeverComparesFiles() {
+        var builder = builder([input("a/1.jpg", size: 10), input("a/2.jpg", size: 10)])
+
+        let preview = builder.preview(template: NameTemplate("Trip"))
+
+        #expect(preview.plan.groups.map(\.destination) == [url("a/Trip.jpg"), url("a/Trip 1.jpg")])
+        #expect(preview.unresolved.isEmpty)
     }
 
     // MARK: - Destination listings

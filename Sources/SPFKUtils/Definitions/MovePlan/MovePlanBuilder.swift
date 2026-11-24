@@ -80,19 +80,34 @@ public struct MovePlanBuilder: Sendable {
 
         /// Sources whose rendered name was taken, so they were numbered.
         public let numbered: Set<URL>
+
+        /// Candidate pairs not compared yet, whose second source was numbered meanwhile.
+        public let unresolved: Set<DuplicateVerdicts.Pair>
     }
 
-    public mutating func preview(template: NameTemplate, placement: FolderPlacement = .keepCurrent, collection: String = "") -> Preview {
-        var pass = Pass(builder: self, template: template, placement: placement, collection: collection)
+    /// - Parameter duplicates: verdicts on the candidate pairs compared so far. Under a folder
+    ///   placement, a source of the same size as the one holding its destination is a candidate.
+    public mutating func preview(
+        template: NameTemplate,
+        placement: FolderPlacement = .keepCurrent,
+        collection: String = "",
+        duplicates: DuplicateVerdicts = DuplicateVerdicts()
+    ) -> Preview {
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates)
         let plan = pass.settled()
         listing = pass.listing
-        return Preview(plan: plan, numbered: pass.numbered)
+        return Preview(plan: plan, numbered: pass.numbered, unresolved: pass.unresolved)
     }
 
     /// The plan checked against the disk, which a listing can be out of step with, and ready for
     /// `FileCommands.move`.
-    public mutating func plan(template: NameTemplate, placement: FolderPlacement = .keepCurrent, collection: String = "") -> MovePlan {
-        var pass = Pass(builder: self, template: template, placement: placement, collection: collection)
+    public mutating func plan(
+        template: NameTemplate,
+        placement: FolderPlacement = .keepCurrent,
+        collection: String = "",
+        duplicates: DuplicateVerdicts = DuplicateVerdicts()
+    ) -> MovePlan {
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection, duplicates: duplicates)
         defer { listing = pass.listing }
 
         while true {

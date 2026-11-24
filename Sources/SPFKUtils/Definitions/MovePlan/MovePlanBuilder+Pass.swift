@@ -22,6 +22,7 @@ extension MovePlanBuilder {
         let template: NameTemplate
         let placement: FolderPlacement
         let collection: String
+        let duplicates: DuplicateVerdicts
 
         /// The builder's listing, grown by each destination folder a round reads.
         var listing: FolderListing
@@ -36,21 +37,26 @@ extension MovePlanBuilder {
         /// The last settled round's sources whose rendered name was numbered.
         private(set) var numbered: Set<URL> = []
 
-        init(builder: MovePlanBuilder, template: NameTemplate, placement: FolderPlacement, collection: String) {
+        /// The last settled round's candidate pairs with no verdict.
+        private(set) var unresolved: Set<DuplicateVerdicts.Pair> = []
+
+        init(builder: MovePlanBuilder, template: NameTemplate, placement: FolderPlacement, collection: String, duplicates: DuplicateVerdicts) {
             self.builder = builder
             self.template = template
             self.placement = placement
             self.collection = collection
+            self.duplicates = duplicates
             listing = builder.listing
         }
 
         /// Repeats a round until it finds no new skip, since a skipped file stops vacating its name.
         mutating func settled() -> MovePlan {
             while true {
-                let (plan, skips, numbered) = run()
+                let (plan, skips, numbered, unresolved) = run()
 
                 guard skips.isNotEmpty else {
                     self.numbered = numbered
+                    self.unresolved = unresolved
                     return plan
                 }
 
@@ -97,7 +103,7 @@ extension MovePlanBuilder {
 
         // MARK: Run
 
-        private mutating func run() -> (MovePlan, [Int: MoveSkipReason], Set<URL>) {
+        private mutating func run() -> (MovePlan, [Int: MoveSkipReason], Set<URL>, Set<DuplicateVerdicts.Pair>) {
             let prepared = builder.prepared
             var entries = [MovePlan.Entry?](repeating: nil, count: prepared.count)
             var skips: [Int: MoveSkipReason] = [:]
@@ -142,6 +148,18 @@ extension MovePlanBuilder {
             var claimed: Set<String> = []
             var nextNumber: [String: Int] = [:]
             var numbered: Set<URL> = []
+            var unresolved: Set<DuplicateVerdicts.Pair> = []
+
+            // Under a folder placement, the source holding each name: one already in place, or the
+            // first to claim it unnumbered.
+            var holders: [String: Int] = [:]
+            let comparesDuplicates = if case .template = placement { true } else { false }
+
+            if comparesDuplicates {
+                for (unit, _, _, isMoving) in named where !isMoving {
+                    unit.forEach { holders[prepared[$0].key] = $0 }
+                }
+            }
 
             for (unit, base, destination, isMoving) in named {
                 guard isMoving else {
@@ -153,8 +171,30 @@ extension MovePlanBuilder {
                     continue
                 }
 
+                let lead = unit[0]
+                let destinationKey = FolderListing.key(name: prepared[lead].name(base: base), folderPath: destination.path, isCaseSensitive: destination.isCaseSensitive)
+
+                if comparesDuplicates, unit.count == 1, let holder = holders[destinationKey], holder != lead,
+                   let size = prepared[lead].input.fileSize, size == prepared[holder].input.fileSize {
+                    let pair = DuplicateVerdicts.Pair(first: prepared[holder].input.url, second: prepared[lead].input.url)
+
+                    switch duplicates[pair] {
+                    case true?:
+                        skips[lead] = .duplicate(of: prepared[holder].input.url)
+                        continue
+                    case false?:
+                        break
+                    case nil:
+                        unresolved.insert(pair)
+                    }
+                }
+
                 switch claim(unit, base: base, in: destination, claimed: &claimed, nextNumber: &nextNumber, vacating: vacating) {
                 case let .claimed(unit, claimedBase):
+                    if comparesDuplicates, claimedBase == base, holders[destinationKey] == nil {
+                        holders[destinationKey] = lead
+                    }
+
                     unit.forEach { entries[$0] = .move(prepared[$0].group(base: claimedBase, in: destination.folder)) }
 
                     if claimedBase != base {
@@ -165,7 +205,7 @@ extension MovePlanBuilder {
                 }
             }
 
-            return (MovePlan(entries: entries.compactMap { $0 }), skips, numbered)
+            return (MovePlan(entries: entries.compactMap { $0 }), skips, numbered, unresolved)
         }
 
         /// The first free numbering of `base` for the unit in `destination`, claimed.

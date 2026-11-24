@@ -22,6 +22,9 @@ public struct MovePlanInput: Sendable, Hashable {
     /// no root refuses.
     public var volume: URL?
 
+    /// From the element's properties, so finding duplicate candidates adds no read.
+    public var fileSize: UInt64?
+
     public init(
         url: URL,
         values: [String: NameTemplate.Value],
@@ -30,7 +33,8 @@ public struct MovePlanInput: Sendable, Hashable {
         isMissing: Bool = false,
         isFolderWritable: Bool = true,
         isInsidePackage: Bool = false,
-        volume: URL? = nil
+        volume: URL? = nil,
+        fileSize: UInt64? = nil
     ) {
         self.url = url
         self.values = values
@@ -40,5 +44,6 @@ public struct MovePlanInput: Sendable, Hashable {
         self.isFolderWritable = isFolderWritable
         self.isInsidePackage = isInsidePackage
         self.volume = volume
+        self.fileSize = fileSize
     }
 }
