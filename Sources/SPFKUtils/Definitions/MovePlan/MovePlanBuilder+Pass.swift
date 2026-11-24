@@ -29,6 +29,9 @@ extension MovePlanBuilder {
         /// Names the disk check found taken although the listing did not hold them.
         var learnedTaken: Set<String> = []
 
+        /// The last settled round's sources whose rendered name was numbered.
+        private(set) var numbered: Set<URL> = []
+
         init(builder: MovePlanBuilder, template: NameTemplate, collection: String) {
             self.builder = builder
             self.template = template
@@ -38,8 +41,13 @@ extension MovePlanBuilder {
         /// Repeats a round until it finds no new skip, since a skipped file stops vacating its name.
         mutating func settled() -> MovePlan {
             while true {
-                let (plan, skips) = run()
-                guard skips.isNotEmpty else { return plan }
+                let (plan, skips, numbered) = run()
+
+                guard skips.isNotEmpty else {
+                    self.numbered = numbered
+                    return plan
+                }
+
                 forced.merge(skips) { first, _ in first }
             }
         }
@@ -78,7 +86,7 @@ extension MovePlanBuilder {
 
         // MARK: Run
 
-        private func run() -> (MovePlan, [Int: MoveSkipReason]) {
+        private func run() -> (MovePlan, [Int: MoveSkipReason], Set<URL>) {
             let prepared = builder.prepared
             var entries = [MovePlan.Entry?](repeating: nil, count: prepared.count)
             var skips: [Int: MoveSkipReason] = [:]
@@ -120,6 +128,7 @@ extension MovePlanBuilder {
 
             var claimed: Set<String> = []
             var nextNumber: [String: Int] = [:]
+            var numbered: Set<URL> = []
 
             for (unit, base, isMoving) in named {
                 guard isMoving else {
@@ -132,14 +141,18 @@ extension MovePlanBuilder {
                 }
 
                 switch claim(unit, base: base, claimed: &claimed, nextNumber: &nextNumber, vacating: vacating) {
-                case let .claimed(unit, numbered):
-                    unit.forEach { entries[$0] = .move(prepared[$0].group(base: numbered)) }
+                case let .claimed(unit, claimedBase):
+                    unit.forEach { entries[$0] = .move(prepared[$0].group(base: claimedBase)) }
+
+                    if claimedBase != base {
+                        unit.forEach { numbered.insert(prepared[$0].input.url) }
+                    }
                 case let .skipped(reason):
                     unit.forEach { skips[$0] = reason }
                 }
             }
 
-            return (MovePlan(entries: entries.compactMap { $0 }), skips)
+            return (MovePlan(entries: entries.compactMap { $0 }), skips, numbered)
         }
 
         /// The first free numbering of `base` for the unit, claimed.

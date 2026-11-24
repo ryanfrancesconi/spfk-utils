@@ -68,10 +68,18 @@ public struct MovePlanBuilder: Sendable {
         indexByURL = Dictionary(inputs.enumerated().map { ($1.url, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
-    /// The plan by the listing alone, for a preview redrawn on each keystroke.
-    public func preview(template: NameTemplate, collection: String = "") -> MovePlan {
+    /// A plan by the listing alone, for a preview redrawn on each keystroke.
+    public struct Preview: Sendable, Equatable {
+        public let plan: MovePlan
+
+        /// Sources whose rendered name was taken, so they were numbered.
+        public let numbered: Set<URL>
+    }
+
+    public func preview(template: NameTemplate, collection: String = "") -> Preview {
         var pass = Pass(builder: self, template: template, collection: collection)
-        return pass.settled()
+        let plan = pass.settled()
+        return Preview(plan: plan, numbered: pass.numbered)
     }
 
     /// The plan checked against the disk, which a listing can be out of step with, and ready for

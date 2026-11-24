@@ -238,4 +238,13 @@ struct NameTemplateTests {
         let values = NameTemplate.urlValues(for: URL(fileURLWithPath: "/Volumes/Photos/Trip/IMG_0001.HEIC"))
         #expect(values == ["name": .text("IMG_0001"), "ext": .text("HEIC"), "folder": .text("Trip")])
     }
+
+    /// What a preview counts as undated: a template that asks for the date, wherever the token sits.
+    @Test func aTemplateKnowsWhichValuesItReads() {
+        #expect(NameTemplate("{date:YYYY-MM-DD}_{name}").reads("date"))
+        #expect(NameTemplate("[_{title?date}]").reads("date"))
+        #expect(NameTemplate("{date:YYYY}/{name}").reads("date"))
+        #expect(!NameTemplate("{name} date").reads("date"))
+        #expect(!NameTemplate("{created:YYYY}").reads("date"))
+    }
 }

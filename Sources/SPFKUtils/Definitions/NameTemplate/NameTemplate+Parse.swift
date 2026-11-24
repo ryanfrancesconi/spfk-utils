@@ -26,6 +26,25 @@ extension NameTemplate {
         var modifiers: [Modifier]
     }
 
+    /// Whether any token reads the value `name`, in any alternative.
+    public func reads(_ name: String) -> Bool {
+        func reads(_ parts: [Part]) -> Bool {
+            parts.contains { part in
+                switch part {
+                case .literal, .slash: false
+                case let .section(inner): reads(inner)
+                case let .token(token):
+                    token.alternatives.contains {
+                        guard case let .value(valueName, _) = $0 else { return false }
+                        return valueName == name
+                    }
+                }
+            }
+        }
+
+        return reads(parts)
+    }
+
     // MARK: - Lexing
 
     static func lex(_ source: String) -> [Lexeme] {

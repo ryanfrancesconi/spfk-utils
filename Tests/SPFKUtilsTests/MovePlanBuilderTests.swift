@@ -106,6 +106,18 @@ struct MovePlanBuilderTests {
         #expect(destinations(plan) == ["a.jpg": "Trip.jpg", "b.jpg": "Trip 1.jpg", "c.jpg": "Trip 2.jpg"])
     }
 
+    /// The preview's "numbered" count: a group whose rendered name was taken, with its RAW partner.
+    @Test func aPreviewNamesTheFilesItNumbered() {
+        let inputs = [input("a.jpg"), input("DSCF1.RAF"), input("DSCF1.JPG"), input("Trip.jpg")]
+        let builder = MovePlanBuilder(inputs: inputs, companions: [:], listing: listing([], inputs: inputs))
+
+        let preview = builder.preview(template: NameTemplate("Trip"))
+
+        #expect(preview.plan.entries.last == .alreadyInPlace(url("Trip.jpg")))
+        #expect(preview.numbered == [url("a.jpg"), url("DSCF1.RAF"), url("DSCF1.JPG")])
+        #expect(builder.preview(template: NameTemplate("{name}")).numbered.isEmpty)
+    }
+
     @Test func anInPlaceFileKeepsItsNameHeld() {
         let plan = build([input("Trip.jpg"), input("b.jpg")], "Trip")
 
@@ -227,7 +239,7 @@ struct MovePlanBuilderTests {
             let fresh = MovePlanBuilder.build(inputs: inputs, companions: companions, template: NameTemplate(template), listing: listing)
 
             #expect(builder.plan(template: NameTemplate(template)) == fresh, "\(template)")
-            #expect(builder.preview(template: NameTemplate(template)) == fresh, "\(template)")
+            #expect(builder.preview(template: NameTemplate(template)).plan == fresh, "\(template)")
         }
     }
 }
@@ -266,7 +278,7 @@ final class MovePlanBuilderDiskTests: BinTestCase {
 
         let builder = MovePlanBuilder(inputs: [MovePlanInput(url: a, values: NameTemplate.urlValues(for: a))], companions: [:], listing: stale)
 
-        #expect(builder.preview(template: NameTemplate("Trip")).groups.map(\.destination.lastPathComponent) == ["Trip.jpg"])
+        #expect(builder.preview(template: NameTemplate("Trip")).plan.groups.map(\.destination.lastPathComponent) == ["Trip.jpg"])
         #expect(builder.plan(template: NameTemplate("Trip")).groups.map(\.destination.lastPathComponent) == ["Trip 1.jpg"])
     }
 
