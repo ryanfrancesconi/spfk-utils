@@ -211,6 +211,25 @@ struct MovePlanBuilderTests {
         #expect(plan.entries.count == 1)
         #expect(plan.groups.first?.companions.map(\.to.lastPathComponent) == ["Trip.MOV"])
     }
+
+    // MARK: - One preparation, many templates
+
+    /// A builder prepared once plans each template as a fresh build would, whatever came before.
+    @Test func aPreparedBuilderPlansEachTemplateAsAFreshBuildWould() {
+        let raw = input("DSCF1.RAF")
+        let inputs = [raw, input("DSCF1.JPG"), input("b.jpg"), input("Trip.jpg"), input("c.jpg", isLocked: true)]
+        let companions = [raw.url: [url("DSCF1.xmp")]]
+        let listing = listing(["Trip 1.jpg", "DSCF1.xmp"], inputs: inputs)
+
+        let builder = MovePlanBuilder(inputs: inputs, companions: companions, listing: listing)
+
+        for template in ["Trip", "{name}", "Trip_{seq:3}", "{title}", "Trip"] {
+            let fresh = MovePlanBuilder.build(inputs: inputs, companions: companions, template: NameTemplate(template), listing: listing)
+
+            #expect(builder.plan(template: NameTemplate(template)) == fresh, "\(template)")
+            #expect(builder.preview(template: NameTemplate(template)) == fresh, "\(template)")
+        }
+    }
 }
 
 /// The builder's last step asks the disk, which a listing can be out of step with.
@@ -235,6 +254,20 @@ final class MovePlanBuilderDiskTests: BinTestCase {
 
         #expect(plan.groups.map(\.destination.lastPathComponent) == ["Trip_001 1.jpg", "Trip_002.jpg"])
         #expect(FileCommands.moveConflicts(in: plan).isEmpty)
+    }
+
+    /// A keystroke's preview never asks the disk, so it trusts the listing.
+    @Test func aPreviewTrustsTheListing() throws {
+        let a = bin.appendingPathComponent("a.jpg")
+        try Data().write(to: a)
+
+        let stale = FolderListing.reading([bin])
+        try Data().write(to: bin.appendingPathComponent("Trip.jpg"))
+
+        let builder = MovePlanBuilder(inputs: [MovePlanInput(url: a, values: NameTemplate.urlValues(for: a))], companions: [:], listing: stale)
+
+        #expect(builder.preview(template: NameTemplate("Trip")).groups.map(\.destination.lastPathComponent) == ["Trip.jpg"])
+        #expect(builder.plan(template: NameTemplate("Trip")).groups.map(\.destination.lastPathComponent) == ["Trip 1.jpg"])
     }
 
     @Test func aListingReadsEachFolderOnceAndItsCaseRule() throws {
