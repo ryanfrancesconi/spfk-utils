@@ -9,7 +9,7 @@ import SPFKFileSystem
 extension MovePlanBuilder {
     /// One file, or a RAW and its other formats selected together, named as one: indexes into
     /// ``prepared``.
-    private typealias Unit = [Int]
+    typealias Unit = [Int]
 
     private enum ClaimResult {
         case claimed(Unit, base: String)
@@ -20,7 +20,11 @@ extension MovePlanBuilder {
     struct Pass {
         let builder: MovePlanBuilder
         let template: NameTemplate
+        let placement: FolderPlacement
         let collection: String
+
+        /// The builder's listing, grown by each destination folder a round reads.
+        var listing: FolderListing
 
         /// Skips found while naming or claiming, and from the disk check, which hold on every later
         /// round, keyed by input index.
@@ -32,10 +36,12 @@ extension MovePlanBuilder {
         /// The last settled round's sources whose rendered name was numbered.
         private(set) var numbered: Set<URL> = []
 
-        init(builder: MovePlanBuilder, template: NameTemplate, collection: String) {
+        init(builder: MovePlanBuilder, template: NameTemplate, placement: FolderPlacement, collection: String) {
             self.builder = builder
             self.template = template
+            self.placement = placement
             self.collection = collection
+            listing = builder.listing
         }
 
         /// Repeats a round until it finds no new skip, since a skipped file stops vacating its name.
@@ -57,7 +63,7 @@ extension MovePlanBuilder {
 
             switch error {
             case let .nameInUse(url), let .companionNameInUse(url):
-                guard learnedTaken.insert(builder.listing.key(url)).inserted else {
+                guard learnedTaken.insert(listing.key(url)).inserted else {
                     forced[index] = .nameInUse(url)
                     return
                 }
@@ -86,7 +92,7 @@ extension MovePlanBuilder {
 
         // MARK: Run
 
-        private func run() -> (MovePlan, [Int: MoveSkipReason], Set<URL>) {
+        private mutating func run() -> (MovePlan, [Int: MoveSkipReason], Set<URL>) {
             let prepared = builder.prepared
             var entries = [MovePlan.Entry?](repeating: nil, count: prepared.count)
             var skips: [Int: MoveSkipReason] = [:]
@@ -101,25 +107,27 @@ extension MovePlanBuilder {
             }
 
             let units = units(of: active)
-            var named: [(unit: Unit, base: String, isMoving: Bool)] = []
+            let destinations = destinations(of: units)
+            let contexts = nameContexts(of: destinations)
+            var named: [(unit: Unit, base: String, destination: Destination, isMoving: Bool)] = []
             named.reserveCapacity(units.count)
 
             for (offset, unit) in units.enumerated() {
-                let context = NameTemplate.RenderContext(index: offset + 1, count: units.count, collection: collection)
-                let base = template.render(values: prepared[unit[0]].input.values, context: context)
+                let base = template.render(values: prepared[unit[0]].input.values, context: contexts[offset])
 
                 guard base.isNotEmpty else {
                     unit.forEach { skips[$0] = .emptyName }
                     continue
                 }
 
-                let isMoving = unit.contains { prepared[$0].name(base: base) != prepared[$0].name }
-                named.append((unit, base, isMoving))
+                let destination = destinations[offset]
+                let isMoving = unit.contains { destination.path != prepared[$0].folderPath || prepared[$0].name(base: base) != prepared[$0].name }
+                named.append((unit, base, destination, isMoving))
             }
 
             var vacating: Set<String> = []
 
-            for (unit, _, isMoving) in named where isMoving {
+            for (unit, _, _, isMoving) in named where isMoving {
                 for member in unit {
                     vacating.insert(prepared[member].key)
                     prepared[member].companions.forEach { vacating.insert($0.key) }
@@ -130,7 +138,7 @@ extension MovePlanBuilder {
             var nextNumber: [String: Int] = [:]
             var numbered: Set<URL> = []
 
-            for (unit, base, isMoving) in named {
+            for (unit, base, destination, isMoving) in named {
                 guard isMoving else {
                     for member in unit {
                         entries[member] = .alreadyInPlace(prepared[member].input.url)
@@ -140,9 +148,9 @@ extension MovePlanBuilder {
                     continue
                 }
 
-                switch claim(unit, base: base, claimed: &claimed, nextNumber: &nextNumber, vacating: vacating) {
+                switch claim(unit, base: base, in: destination, claimed: &claimed, nextNumber: &nextNumber, vacating: vacating) {
                 case let .claimed(unit, claimedBase):
-                    unit.forEach { entries[$0] = .move(prepared[$0].group(base: claimedBase)) }
+                    unit.forEach { entries[$0] = .move(prepared[$0].group(base: claimedBase, in: destination.folder)) }
 
                     if claimedBase != base {
                         unit.forEach { numbered.insert(prepared[$0].input.url) }
@@ -155,10 +163,11 @@ extension MovePlanBuilder {
             return (MovePlan(entries: entries.compactMap { $0 }), skips, numbered)
         }
 
-        /// The first free numbering of `base` for the unit, claimed.
+        /// The first free numbering of `base` for the unit in `destination`, claimed.
         private func claim(
             _ unit: Unit,
             base: String,
+            in destination: Destination,
             claimed: inout Set<String>,
             nextNumber: inout [String: Int],
             vacating: Set<String>
@@ -167,13 +176,17 @@ extension MovePlanBuilder {
             let lead = prepared[unit[0]]
 
             func isTaken(_ key: String) -> Bool {
-                claimed.contains(key) || learnedTaken.contains(key) || (builder.listing.holds(key: key) && !vacating.contains(key))
+                claimed.contains(key) || learnedTaken.contains(key) || (listing.holds(key: key) && !vacating.contains(key))
+            }
+
+            func key(_ name: String) -> String {
+                FolderListing.key(name: name, folderPath: destination.path, isCaseSensitive: destination.isCaseSensitive)
             }
 
             // Every number below the last one claimed for this name was taken then and still is, so
             // many files rendering one name cost one check each rather than one per earlier file.
             let extensions = unit.count == 1 ? lead.extensions : unit.flatMap { prepared[$0].extensions }.sorted()
-            let numberKey = lead.key(for: lead.name(base: base)) + "|" + extensions.joined(separator: ",")
+            let numberKey = key(lead.name(base: base)) + "|" + extensions.joined(separator: ",")
             let first = nextNumber[numberKey] ?? 0
 
             for number in first ... first + 100_000 {
@@ -185,8 +198,8 @@ extension MovePlanBuilder {
 
                 for member in unit {
                     let file = prepared[member]
-                    keys.append(file.key(for: file.name(base: numbered)))
-                    file.companions.forEach { keys.append(file.key(for: numbered + $0.tail)) }
+                    keys.append(key(file.name(base: numbered)))
+                    file.companions.forEach { keys.append(key(numbered + $0.tail)) }
                 }
 
                 guard keys.count == 1 || Set(keys).count == keys.count else { return .skipped(.companionNameClash) }
@@ -197,7 +210,7 @@ extension MovePlanBuilder {
                 return .claimed(unit, base: numbered)
             }
 
-            return .skipped(.nameInUse(lead.folder.appendingPathComponent(lead.name(base: base), isDirectory: false)))
+            return .skipped(.nameInUse(destination.folder.appendingPathComponent(lead.name(base: base), isDirectory: false)))
         }
 
         /// Each input alone, except a RAW and its other formats in one folder, which name together.

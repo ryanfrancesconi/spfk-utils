@@ -7,15 +7,16 @@ import SPFKBase
 import SPFKFileSystem
 import UniformTypeIdentifiers
 
-/// Turns a selection and a name template into a ``MovePlan``, numbering names that are taken
-/// rather than refusing them. Every file stays in its own folder.
+/// Turns a selection, a name template and a ``FolderPlacement`` into a ``MovePlan``, numbering
+/// names that are taken rather than refusing them.
 ///
 /// Prepare one per selection, then plan each template against it. Claims are made against a
-/// ``FolderListing`` and the run's own earlier claims, so ``preview(template:collection:)`` never
-/// touches the disk; ``plan(template:collection:)`` adds the disk check a run needs before moving.
+/// ``FolderListing`` and the run's own earlier claims. A preview reads only destination folders not
+/// listed before, once each for the builder's lifetime; ``plan(template:placement:collection:)``
+/// adds the disk check a run needs before moving.
 public struct MovePlanBuilder: Sendable {
     let prepared: [Prepared]
-    let listing: FolderListing
+    var listing: FolderListing
 
     /// Inputs that move as another input's companion.
     let isCompanionInput: [Bool]
@@ -25,6 +26,10 @@ public struct MovePlanBuilder: Sendable {
     let siblingGroupCount: Int
 
     let indexByURL: [URL: Int]
+
+    /// Each distinct source folder by its path, whose spelling a destination folder matching it by
+    /// case rule takes.
+    let sourceFolders: [String: URL]
 
     /// - Parameters:
     ///   - inputs: in display order, which `{seq}` follows.
@@ -65,6 +70,7 @@ public struct MovePlanBuilder: Sendable {
 
         siblingGroup = groups
         siblingGroupCount = groupByKey.count
+        sourceFolders = Dictionary(prepared.map { ($0.folderPath, $0.folder) }, uniquingKeysWith: { first, _ in first })
         indexByURL = Dictionary(inputs.enumerated().map { ($1.url, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
@@ -76,16 +82,18 @@ public struct MovePlanBuilder: Sendable {
         public let numbered: Set<URL>
     }
 
-    public func preview(template: NameTemplate, collection: String = "") -> Preview {
-        var pass = Pass(builder: self, template: template, collection: collection)
+    public mutating func preview(template: NameTemplate, placement: FolderPlacement = .keepCurrent, collection: String = "") -> Preview {
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection)
         let plan = pass.settled()
+        listing = pass.listing
         return Preview(plan: plan, numbered: pass.numbered)
     }
 
     /// The plan checked against the disk, which a listing can be out of step with, and ready for
     /// `FileCommands.move`.
-    public func plan(template: NameTemplate, collection: String = "") -> MovePlan {
-        var pass = Pass(builder: self, template: template, collection: collection)
+    public mutating func plan(template: NameTemplate, placement: FolderPlacement = .keepCurrent, collection: String = "") -> MovePlan {
+        var pass = Pass(builder: self, template: template, placement: placement, collection: collection)
+        defer { listing = pass.listing }
 
         while true {
             let plan = pass.settled()
@@ -104,11 +112,12 @@ public struct MovePlanBuilder: Sendable {
         inputs: [MovePlanInput],
         companions: [URL: [URL]],
         template: NameTemplate,
+        placement: FolderPlacement = .keepCurrent,
         collection: String = "",
         listing: FolderListing
     ) -> MovePlan {
-        MovePlanBuilder(inputs: inputs, companions: companions, listing: listing)
-            .plan(template: template, collection: collection)
+        var builder = MovePlanBuilder(inputs: inputs, companions: companions, listing: listing)
+        return builder.plan(template: template, placement: placement, collection: collection)
     }
 }
 
@@ -174,17 +183,12 @@ extension MovePlanBuilder {
             pathExtension.isEmpty ? base : base + "." + pathExtension
         }
 
-        /// `name` in this file's folder, as the listing compares it.
-        func key(for name: String) -> String {
-            FolderListing.key(name: name, folderPath: folderPath, isCaseSensitive: isCaseSensitive)
-        }
-
-        func group(base: String) -> MovePlan.Group {
+        func group(base: String, in destination: URL) -> MovePlan.Group {
             MovePlan.Group(
                 source: input.url,
-                destination: folder.appendingPathComponent(name(base: base), isDirectory: false),
+                destination: destination.appendingPathComponent(name(base: base), isDirectory: false),
                 companions: companions.map {
-                    MovePlan.CompanionMove(from: $0.url, to: folder.appendingPathComponent(base + $0.tail, isDirectory: false))
+                    MovePlan.CompanionMove(from: $0.url, to: destination.appendingPathComponent(base + $0.tail, isDirectory: false))
                 }
             )
         }

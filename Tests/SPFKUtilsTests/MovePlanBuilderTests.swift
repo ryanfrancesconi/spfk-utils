@@ -109,7 +109,7 @@ struct MovePlanBuilderTests {
     /// The preview's "numbered" count: a group whose rendered name was taken, with its RAW partner.
     @Test func aPreviewNamesTheFilesItNumbered() {
         let inputs = [input("a.jpg"), input("DSCF1.RAF"), input("DSCF1.JPG"), input("Trip.jpg")]
-        let builder = MovePlanBuilder(inputs: inputs, companions: [:], listing: listing([], inputs: inputs))
+        var builder = MovePlanBuilder(inputs: inputs, companions: [:], listing: listing([], inputs: inputs))
 
         let preview = builder.preview(template: NameTemplate("Trip"))
 
@@ -233,7 +233,7 @@ struct MovePlanBuilderTests {
         let companions = [raw.url: [url("DSCF1.xmp")]]
         let listing = listing(["Trip 1.jpg", "DSCF1.xmp"], inputs: inputs)
 
-        let builder = MovePlanBuilder(inputs: inputs, companions: companions, listing: listing)
+        var builder = MovePlanBuilder(inputs: inputs, companions: companions, listing: listing)
 
         for template in ["Trip", "{name}", "Trip_{seq:3}", "{title}", "Trip"] {
             let fresh = MovePlanBuilder.build(inputs: inputs, companions: companions, template: NameTemplate(template), listing: listing)
@@ -276,10 +276,40 @@ final class MovePlanBuilderDiskTests: BinTestCase {
         let stale = FolderListing.reading([bin])
         try Data().write(to: bin.appendingPathComponent("Trip.jpg"))
 
-        let builder = MovePlanBuilder(inputs: [MovePlanInput(url: a, values: NameTemplate.urlValues(for: a))], companions: [:], listing: stale)
+        var builder = MovePlanBuilder(inputs: [MovePlanInput(url: a, values: NameTemplate.urlValues(for: a))], companions: [:], listing: stale)
 
         #expect(builder.preview(template: NameTemplate("Trip")).plan.groups.map(\.destination.lastPathComponent) == ["Trip.jpg"])
         #expect(builder.plan(template: NameTemplate("Trip")).groups.map(\.destination.lastPathComponent) == ["Trip 1.jpg"])
+    }
+
+    /// An existing destination folder is read and its names numbered around; a missing one claims
+    /// freely and the move creates it.
+    @MainActor @Test func aFolderPlacementReadsTheDestinationsAndTheMoveCreatesThem() throws {
+        let dump = bin.appendingPathComponent("dump", isDirectory: true)
+        let held = bin.appendingPathComponent("2024", isDirectory: true)
+        try FileManager.default.createDirectory(at: dump, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: held, withIntermediateDirectories: true)
+        try Data().write(to: held.appendingPathComponent("a.jpg"))
+
+        let inputs = [("a.jpg", 2024), ("b.jpg", 2025)].map { name, year in
+            let url = dump.appendingPathComponent(name)
+            FileManager.default.createFile(atPath: url.path, contents: Data())
+            return MovePlanInput(url: url, values: NameTemplate.urlValues(for: url).merging(["date": .date(.init(year: year, month: 5))]) { $1 })
+        }
+
+        let root = MoveRoot(url: bin, volume: nil, isCaseSensitive: BatchOutputClaims.volumeIsCaseSensitive(at: bin))
+        var builder = MovePlanBuilder(inputs: inputs, companions: [:], listing: .reading([dump]))
+
+        let plan = builder.plan(template: NameTemplate("{name}"), placement: .template(NameTemplate("{date:YYYY}"), root: root))
+
+        #expect(plan.groups.map(\.destination.path) == [
+            bin.appendingPathComponent("2024/a 1.jpg").path,
+            bin.appendingPathComponent("2025/b.jpg").path,
+        ])
+
+        try FileCommands.move(plan, rollingBackOnFailure: true)
+
+        #expect(FileManager.default.fileExists(atPath: bin.appendingPathComponent("2025/b.jpg").path))
     }
 
     @Test func aListingReadsEachFolderOnceAndItsCaseRule() throws {
