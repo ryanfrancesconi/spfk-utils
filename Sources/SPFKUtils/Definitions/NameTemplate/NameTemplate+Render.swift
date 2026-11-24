@@ -127,9 +127,10 @@ extension NameTemplate.Token {
             return context.collection
 
         default:
-            let key = name == "field" ? "field:" + (argument ?? "") : name
+            // A value keyed `name:argument` answers that argument alone; `{field:x}` has no bare value.
+            let keyed = argument.flatMap { values[name + ":" + $0] }
 
-            switch values[key] {
+            switch keyed ?? (name == "field" ? nil : values[name]) {
             case let .text(text): return text
             case let .date(parts): return parts.formatted(argument ?? NameTemplate.DateParts.defaultPattern) ?? ""
             case nil: return ""
