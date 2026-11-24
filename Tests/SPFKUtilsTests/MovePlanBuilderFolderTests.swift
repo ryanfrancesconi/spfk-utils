@@ -192,6 +192,23 @@ struct MovePlanBuilderFolderTests {
         #expect(plan.groups.map(\.destination) == [url("Canon/x.jpg"), url("Canon/x 1.jpg")])
     }
 
+    // MARK: - Volumes
+
+    @Test func aFileOnAnotherVolumeStaysUnderAFolderPlacementOnly() {
+        let disk = URL(fileURLWithPath: "/Volumes/Disk", isDirectory: true)
+        let boot = MoveRoot(url: root, volume: URL(fileURLWithPath: "/", isDirectory: true), isCaseSensitive: false)
+        var away = input("dump/x.jpg")
+        away.volume = disk
+        var builder = builder([away, input("dump/y.jpg")])
+
+        let filed = builder.plan(template: NameTemplate("{name}"), placement: .template(NameTemplate("a"), root: boot))
+        let renamed = builder.plan(template: NameTemplate("Trip"))
+
+        #expect(filed.entries.first == .skipped(away.url, .otherVolume))
+        #expect(destinations(filed) == ["y.jpg": "a/y.jpg"])
+        #expect(destinations(renamed) == ["x.jpg": "dump/Trip.jpg", "y.jpg": "dump/Trip 1.jpg"])
+    }
+
     // MARK: - Destination listings
 
     @Test func aNameHeldInTheDestinationByAFileOutsideTheRunNumbersTheIncomingFile() {

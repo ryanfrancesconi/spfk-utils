@@ -87,6 +87,11 @@ extension MovePlanBuilder {
             if input.isBusy { return .busy }
             if !input.isFolderWritable { return .sourceFolderNotWritable }
             if input.isInsidePackage { return .insidePackage }
+
+            if case let .template(_, root) = placement, let volume = input.volume, let rootVolume = root.volume, volume != rootVolume {
+                return .otherVolume
+            }
+
             return nil
         }
 

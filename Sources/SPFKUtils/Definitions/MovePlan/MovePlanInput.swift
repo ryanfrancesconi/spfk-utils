@@ -18,6 +18,10 @@ public struct MovePlanInput: Sendable, Hashable {
     /// Inside a bundle or a Photos library, whose layout belongs to the app that owns it.
     public var isInsidePackage: Bool
 
+    /// The mount point of the file's volume, from ``MoveRoot/volume(of:)``. Nil when unread, which
+    /// no root refuses.
+    public var volume: URL?
+
     public init(
         url: URL,
         values: [String: NameTemplate.Value],
@@ -25,7 +29,8 @@ public struct MovePlanInput: Sendable, Hashable {
         isBusy: Bool = false,
         isMissing: Bool = false,
         isFolderWritable: Bool = true,
-        isInsidePackage: Bool = false
+        isInsidePackage: Bool = false,
+        volume: URL? = nil
     ) {
         self.url = url
         self.values = values
@@ -34,5 +39,6 @@ public struct MovePlanInput: Sendable, Hashable {
         self.isMissing = isMissing
         self.isFolderWritable = isFolderWritable
         self.isInsidePackage = isInsidePackage
+        self.volume = volume
     }
 }
