@@ -74,4 +74,58 @@ final class MovePlanRetentionTests: BinTestCase {
 
         #expect(grown < 50, "grew \(Int(grown)) MB over 2000 renames")
     }
+
+    @Test func filingLivePhotosIntoNewFoldersRetainsNothingPerFile() async throws {
+        let (still, movie) = try await makeLivePhoto()
+        let bin = bin
+        let folders = FolderPlacement.template(NameTemplate("{date:YYYY}/{date:YYYY-MM-DD}"), root: try MoveRoot(validating: bin))
+
+        let grown = try await retainedMemoryMB(warmUp: 200, measured: 2000, width: 8) { index in
+            let folder = bin.appendingPathComponent("item-\(index)", isDirectory: true)
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+
+            let photo = folder.appendingPathComponent("IMG_1234.HEIC")
+            try FileManager.default.copyItem(at: still, to: photo)
+            try FileManager.default.copyItem(at: movie, to: folder.appendingPathComponent("IMG_1234.MOV"))
+
+            let companions = await FileCompanions.resolve([photo])
+            var values = NameTemplate.urlValues(for: photo)
+            values["date"] = .date(NameTemplate.DateParts(year: 2000 + index / 365, month: 1 + index % 12, day: 1 + index % 28))
+
+            let plan = MovePlanBuilder.build(
+                inputs: [MovePlanInput(url: photo, values: values)],
+                companions: companions,
+                template: NameTemplate("item-\(index)"),
+                placement: folders,
+                listing: FolderListing.reading([folder])
+            )
+
+            let moves = try await MainActor.run { try FileCommands.move(plan, rollingBackOnFailure: true) }
+
+            guard moves.companions.count == 1, let destination = moves.moved[photo] else { throw CocoaError(.fileWriteUnknown) }
+
+            try FileManager.default.removeItem(at: destination)
+            try FileManager.default.removeItem(at: destination.deletingPathExtension().appendingPathExtension("MOV"))
+            try FileManager.default.removeItem(at: folder)
+        }
+
+        #expect(grown < 50, "grew \(Int(grown)) MB over 2000 moves into folders")
+    }
+
+    @Test func comparingPhotoSizedDuplicatesRetainsNothingPerPair() async throws {
+        let first = bin.appendingPathComponent("first.HEIC")
+        let second = bin.appendingPathComponent("second.HEIC")
+        try FileManager.default.copyItem(at: TestBundleResources.shared.sharksandwich_heic, to: first)
+        try FileManager.default.copyItem(at: TestBundleResources.shared.sharksandwich_heic, to: second)
+        let pair = DuplicateVerdicts.Pair(first: first, second: second)
+
+        let grown = try await retainedMemoryMB(warmUp: 200, measured: 2000, width: 8) { _ in
+            var verdicts = DuplicateVerdicts()
+            try await verdicts.compare([pair])
+
+            guard verdicts[pair] == true else { throw CocoaError(.fileReadUnknown) }
+        }
+
+        #expect(grown < 50, "grew \(Int(grown)) MB over 2000 compares")
+    }
 }
