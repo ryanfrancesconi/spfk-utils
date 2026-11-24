@@ -115,9 +115,19 @@ struct MovePlanBuilderTests {
 
     // MARK: - Skips
 
-    @Test func anOwnerWithBothEditRecordsIsSkippedAndTheRestPlanned() {
+    @Test func anOwnerWithBothEditRecordsKeepsBoth() {
         let photo = input("IMG_1234.HEIC")
         let companions = [photo.url: [url("IMG_1234.aae"), url("IMG_O1234.aae")]]
+
+        let plan = build([photo], "Trip_{seq:3}", companions: companions)
+
+        #expect(plan.groups.first?.companions.map(\.to.lastPathComponent) == ["Trip_001.aae", "Trip_001_O.aae"])
+    }
+
+    /// Two companions that one name would still merge skip their owner, and the rest is planned.
+    @Test func companionsThatWouldMergeSkipTheirOwner() {
+        let photo = input("IMG_1234.HEIC")
+        let companions = [photo.url: [url("IMG_1234.aae"), url("IMG_1234.AAE")]]
 
         let plan = build([photo, input("IMG_2000.HEIC")], "Trip_{seq:3}", companions: companions)
 
@@ -173,13 +183,13 @@ struct MovePlanBuilderTests {
     @Test func aGroupSkippedWhileClaimingIsHeldInPlaceForTheRest() {
         let photo = MovePlanInput(url: url("IMG_1234.HEIC"), values: ["name": .text("x")])
         let wantsIt = MovePlanInput(url: url("a.jpg"), values: ["name": .text("IMG_1234")])
-        let companions = [photo.url: [url("IMG_1234.aae"), url("IMG_O1234.aae")]]
+        let companions = [photo.url: [url("IMG_1234.aae"), url("IMG_1234.AAE")]]
 
         let plan = MovePlanBuilder.build(
             inputs: [wantsIt, photo],
             companions: companions,
             template: NameTemplate("{name}"),
-            listing: listing(["IMG_1234.aae", "IMG_O1234.aae"], inputs: [wantsIt, photo])
+            listing: listing(["IMG_1234.aae", "IMG_1234.AAE"], inputs: [wantsIt, photo])
         )
 
         #expect(plan.entries.last == .skipped(photo.url, .companionNameClash))

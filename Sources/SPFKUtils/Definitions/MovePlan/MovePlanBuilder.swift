@@ -95,6 +95,8 @@ extension MovePlanBuilder {
                     forced[source] = .nameInUse(url)
                     return
                 }
+            case .companionNameClash:
+                forced[source] = .companionNameClash
             case .locked:
                 forced[source] = .locked
             case .invalidName:
@@ -206,8 +208,9 @@ extension MovePlanBuilder {
 
                 let groups = unit.members.map { member in
                     let destination = destination(of: member.url, base: numbered)
-                    let moves = companions[member.url, default: []].map {
-                        MovePlan.CompanionMove(from: $0, to: $0.companionDestination(forOwner: destination))
+                    let found = companions[member.url, default: []]
+                    let moves = zip(found, URL.companionDestinations(found, forOwner: destination)).map {
+                        MovePlan.CompanionMove(from: $0, to: $1)
                     }
                     return MovePlan.Group(source: member.url, destination: destination, companions: moves)
                 }
