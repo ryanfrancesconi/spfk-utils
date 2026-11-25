@@ -91,6 +91,31 @@ extension NameTemplate.DateParts {
     }
 }
 
+// MARK: - Completion
+
+extension NameTemplate.DateParts {
+    /// This date with each missing part taken from `later`, down to the first part `later` lacks.
+    /// Nil when `later` disagrees with a part this date has.
+    public func completed(by later: Self) -> Self? {
+        guard later.year == year else { return nil }
+
+        var result = self
+        let parts: [WritableKeyPath<Self, Int?>] = [\.month, \.day, \.hour, \.minute, \.second]
+
+        for keyPath in parts {
+            guard let value = later[keyPath: keyPath] else { break }
+
+            if let own = self[keyPath: keyPath] {
+                guard own == value else { return nil }
+            } else {
+                result[keyPath: keyPath] = value
+            }
+        }
+
+        return result
+    }
+}
+
 // MARK: - Plausibility
 
 extension NameTemplate.DateParts {

@@ -45,6 +45,26 @@ extension NameTemplate {
         return reads(parts)
     }
 
+    /// The argument of every alternative reading the value `name`, in template order; nil for one
+    /// with no argument.
+    public func arguments(of name: String) -> [String?] {
+        func arguments(_ parts: [Part]) -> [String?] {
+            parts.flatMap { part -> [String?] in
+                switch part {
+                case .literal, .slash: []
+                case let .section(inner): arguments(inner)
+                case let .token(token):
+                    token.alternatives.compactMap { alternative -> String?? in
+                        guard case let .value(valueName, argument) = alternative, valueName == name else { return nil }
+                        return .some(argument)
+                    }
+                }
+            }
+        }
+
+        return arguments(parts)
+    }
+
     // MARK: - Lexing
 
     static func lex(_ source: String) -> [Lexeme] {
