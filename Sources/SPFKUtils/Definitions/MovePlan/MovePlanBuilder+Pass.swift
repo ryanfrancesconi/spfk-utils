@@ -87,8 +87,10 @@ extension MovePlanBuilder {
             case .locked:
                 forced[index] = .locked
             case .invalidName:
+                // Unreached: a rendered name is sanitized, leaving no `.` or `..`, and an empty one is skipped first.
                 forced[index] = .emptyName
             case let .rollbackFailed(url, _):
+                // Unreached: the disk check plans and never moves.
                 forced[index] = .nameInUse(url)
             }
         }
