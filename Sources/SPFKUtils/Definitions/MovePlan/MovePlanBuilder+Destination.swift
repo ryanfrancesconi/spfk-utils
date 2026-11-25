@@ -18,8 +18,9 @@ extension MovePlanBuilder {
 }
 
 extension MovePlanBuilder.Pass {
-    /// Each unit's folder. A rendered folder matching one already known by the root's case rule, a
-    /// source folder or an earlier unit's, takes that spelling, and folders not listed yet are read.
+    /// Each unit's folder. Each rendered level matching one already known by the root's case rule, a
+    /// source folder, an earlier unit's or one on disk, takes that spelling, and folders not listed
+    /// yet are read.
     mutating func destinations(of units: [MovePlanBuilder.Unit]) -> [MovePlanBuilder.Destination] {
         let prepared = builder.prepared
 
@@ -36,12 +37,7 @@ extension MovePlanBuilder.Pass {
 
         let rule = root.isCaseSensitive
         let rootPath = FolderListing.path(of: root.url)
-        var spelling: [String: (folder: URL, path: String)] = [:]
-
-        for (path, folder) in builder.sourceFolders {
-            spelling[FolderListing.folderKey(path: path, isCaseSensitive: rule)] = (folder, path)
-        }
-
+        var spelling = FolderSpelling(sourceFolders: builder.sourceFolders) { _ in rule }
         var folders: [(folder: URL, path: String)] = []
         var unlisted: Set<String> = []
         folders.reserveCapacity(units.count)
@@ -49,20 +45,11 @@ extension MovePlanBuilder.Pass {
         for (offset, unit) in units.enumerated() {
             let context = NameTemplate.RenderContext(index: offset + 1, count: units.count, collection: collection)
             let levels = folderTemplate.renderLevels(values: prepared[unit[0]].input.values, context: context)
-            let path = levels.reduce(rootPath) { $0.hasSuffix("/") ? $0 + $1 : $0 + "/" + $1 }
-            let key = FolderListing.folderKey(path: path, isCaseSensitive: rule)
-
-            if let known = spelling[key] {
-                folders.append(known)
-                continue
-            }
-
-            let folder = (folder: URL(fileURLWithPath: path, isDirectory: true), path: path)
-            spelling[key] = folder
+            let folder = spelling.folder(levels, under: rootPath, isCaseSensitive: rule, listing: &listing)
             folders.append(folder)
 
-            if !listing.isListed(folderPath: path) {
-                unlisted.insert(path)
+            if !listing.isListed(folderPath: folder.path) {
+                unlisted.insert(folder.path)
             }
         }
 
@@ -72,6 +59,65 @@ extension MovePlanBuilder.Pass {
 
         return folders.map {
             MovePlanBuilder.Destination(folder: $0.folder, path: $0.path, isCaseSensitive: listing.isCaseSensitive(folderPath: $0.path))
+        }
+    }
+
+    /// The spelling each folder a pass has met takes, keyed by its path folded by its case rule.
+    struct FolderSpelling {
+        private var known: [String: (folder: URL, path: String)] = [:]
+
+        /// Seeded with each source folder and every folder above it, as they are spelled.
+        init(sourceFolders: [String: URL], isCaseSensitive: (String) -> Bool) {
+            for (path, folder) in sourceFolders {
+                let rule = isCaseSensitive(path)
+                known[Self.key(path, rule)] = (folder, path)
+
+                var ancestor = (path as NSString).deletingLastPathComponent
+
+                while ancestor != "/", known[Self.key(ancestor, rule)] == nil {
+                    known[Self.key(ancestor, rule)] = (URL(fileURLWithPath: ancestor, isDirectory: true), ancestor)
+                    ancestor = (ancestor as NSString).deletingLastPathComponent
+                }
+            }
+        }
+
+        /// `levels` under `base`, each level spelled as a folder already met, else as the listing of
+        /// its parent spells it, else as rendered. Lists each parent not listed yet.
+        mutating func folder(
+            _ levels: [String],
+            under base: String,
+            isCaseSensitive rule: Bool,
+            listing: inout FolderListing
+        ) -> (folder: URL, path: String) {
+            var key = Self.key(base, rule)
+            var current = known[key] ?? (URL(fileURLWithPath: base, isDirectory: true), base)
+
+            for level in levels {
+                key += (key.hasSuffix("/") ? "" : "/") + FolderListing.fold(level, isCaseSensitive: rule)
+
+                if let found = known[key] {
+                    current = found
+                    continue
+                }
+
+                let parent = current.path
+
+                if !listing.isListed(folderPath: parent) {
+                    listing.list([URL(fileURLWithPath: parent, isDirectory: true)], isCaseSensitive: rule)
+                }
+
+                let name = listing.spelling(of: level, inFolderPath: parent) ?? level
+                let path = parent.hasSuffix("/") ? parent + name : parent + "/" + name
+                current = (URL(fileURLWithPath: path, isDirectory: true), path)
+                known[key] = current
+            }
+
+            return current
+        }
+
+        /// The rule is part of the key, so one folder met under both rules is two entries.
+        private static func key(_ path: String, _ isCaseSensitive: Bool) -> String {
+            (isCaseSensitive ? "1" : "0") + FolderListing.folderKey(path: path, isCaseSensitive: isCaseSensitive)
         }
     }
 

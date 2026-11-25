@@ -194,6 +194,27 @@ struct MovePlanBuilderFolderTests {
         #expect(plan.groups.map(\.destination) == [url("Canon/x.jpg"), url("Canon/x 1.jpg")])
     }
 
+    /// Each level takes the spelling an earlier unit gave it, so both models share one make folder.
+    @Test func aParentLevelDifferingOnlyInCaseIsOneFolder() {
+        var builder = builder([
+            input("a/x.jpg", ["make": .text("Canon"), "model": .text("R5")]),
+            input("b/y.jpg", ["make": .text("canon"), "model": .text("R6")]),
+        ])
+
+        let plan = builder.plan(template: NameTemplate("{name}"), placement: placement("{make}/{model}"))
+
+        #expect(plan.groups.map(\.destination) == [url("Canon/R5/x.jpg"), url("Canon/R6/y.jpg")])
+    }
+
+    /// A folder on disk holding no source file still spells the level.
+    @Test func aLevelTakesTheSpellingOfAFolderOnDisk() {
+        var builder = builder([input("a/x.jpg", ["make": .text("Canon")])], disk: ["": ["a", "canon"], "/canon": []])
+
+        let plan = builder.plan(template: NameTemplate("{name}"), placement: placement("{make}"))
+
+        #expect(plan.groups.map(\.destination) == [url("canon/x.jpg")])
+    }
+
     // MARK: - Volumes
 
     @Test func aFileOnAnotherVolumeStaysUnderAFolderPlacementOnly() {

@@ -194,4 +194,12 @@ struct MovePlanBuilderUnderEachFolderTests {
 
         #expect(destinations(plan) == ["A/x.wav": "A/Take.wav"])
     }
+
+    @Test func aLevelTakesTheSpellingOfAFolderOnDisk() {
+        var builder = builder([input("A/x.wav")], disk: ["/A": ["undated"], "/A/undated": []])
+
+        let plan = builder.plan(template: NameTemplate("{name}"), placement: .underEachFolder(NameTemplate("Undated")))
+
+        #expect(destinations(plan) == ["A/x.wav": "A/undated/x.wav"])
+    }
 }

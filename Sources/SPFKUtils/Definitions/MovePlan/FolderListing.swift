@@ -12,6 +12,9 @@ public struct FolderListing: Sendable {
     /// Every listed name as ``key(_:)`` spells it.
     private var keys: Set<String> = []
 
+    /// The name on disk for each key that folds its name to another spelling.
+    private var spellings: [String: String] = [:]
+
     /// Each listed folder's path, with whether its volume compares case.
     private var caseRules: [String: Bool] = [:]
 
@@ -90,6 +93,15 @@ public struct FolderListing: Sendable {
         keys.contains(key)
     }
 
+    /// The listed name in the folder at `folderPath` that `name` matches by that folder's case rule,
+    /// as the disk spells it.
+    func spelling(of name: String, inFolderPath folderPath: String) -> String? {
+        let folded = Self.fold(name, isCaseSensitive: isCaseSensitive(folderPath: folderPath))
+        let key = folderPath + "/" + folded
+        guard keys.contains(key) else { return nil }
+        return spellings[key] ?? folded
+    }
+
     /// `url` as its folder's case rule compares it.
     func key(_ url: URL) -> String {
         let folderPath = Self.path(of: url.deletingLastPathComponent())
@@ -99,7 +111,13 @@ public struct FolderListing: Sendable {
     private mutating func add(_ folder: URL, names: [String], isCaseSensitive: Bool) {
         let path = Self.path(of: folder)
         caseRules[path] = isCaseSensitive
-        keys.formUnion(names.map { Self.key(name: $0, folderPath: path, isCaseSensitive: isCaseSensitive) })
+
+        for name in names {
+            let folded = Self.fold(name, isCaseSensitive: isCaseSensitive)
+            let key = path + "/" + folded
+            keys.insert(key)
+            if folded != name { spellings[key] = name }
+        }
     }
 
     func isListed(folderPath: String) -> Bool {
@@ -108,8 +126,7 @@ public struct FolderListing: Sendable {
 
     /// A folder's path as folders compare under `isCaseSensitive`.
     static func folderKey(path: String, isCaseSensitive: Bool) -> String {
-        let normalized = path.utf8.allSatisfy { $0 < 0x80 } ? path : path.decomposedStringWithCanonicalMapping
-        return isCaseSensitive ? normalized : normalized.lowercased()
+        fold(path, isCaseSensitive: isCaseSensitive)
     }
 
     static func path(of folder: URL) -> String {
@@ -118,8 +135,13 @@ public struct FolderListing: Sendable {
 
     /// `name` in the folder at `folderPath`, normalized and, on a case-insensitive volume, case-folded.
     static func key(name: String, folderPath: String, isCaseSensitive: Bool) -> String {
+        folderPath + "/" + fold(name, isCaseSensitive: isCaseSensitive)
+    }
+
+    /// `string` normalized and, unless `isCaseSensitive`, case-folded.
+    static func fold(_ string: String, isCaseSensitive: Bool) -> String {
         // ASCII has no decomposition, so it skips the bridged normalization.
-        let normalized = name.utf8.allSatisfy { $0 < 0x80 } ? name : name.decomposedStringWithCanonicalMapping
-        return folderPath + "/" + (isCaseSensitive ? normalized : normalized.lowercased())
+        let normalized = string.utf8.allSatisfy { $0 < 0x80 } ? string : string.decomposedStringWithCanonicalMapping
+        return isCaseSensitive ? normalized : normalized.lowercased()
     }
 }

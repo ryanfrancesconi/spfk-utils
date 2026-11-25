@@ -27,15 +27,8 @@ extension MovePlanBuilder.Pass {
     /// leading run of the levels it already ends in, plus the levels. Matched by the lead's case rule.
     mutating func destinations(of units: [MovePlanBuilder.Unit], underEachFolder folderTemplate: NameTemplate) -> [MovePlanBuilder.Destination] {
         let prepared = builder.prepared
-        var spelling: [String: (folder: URL, path: String)] = [:]
-
-        func spellingKey(_ path: String, _ isCaseSensitive: Bool) -> String {
-            (isCaseSensitive ? "1" : "0") + FolderListing.folderKey(path: path, isCaseSensitive: isCaseSensitive)
-        }
-
-        for (path, folder) in builder.sourceFolders {
-            spelling[spellingKey(path, listing.isCaseSensitive(folderPath: path))] = (folder, path)
-        }
+        let sourceListing = listing
+        var spelling = FolderSpelling(sourceFolders: builder.sourceFolders) { sourceListing.isCaseSensitive(folderPath: $0) }
 
         var folders: [(folder: URL, path: String)] = []
         var unlisted: [Bool: [String: String]] = [:]
@@ -46,20 +39,11 @@ extension MovePlanBuilder.Pass {
             let context = NameTemplate.RenderContext(index: offset + 1, count: units.count, collection: collection)
             let levels = folderTemplate.renderLevels(values: lead.input.values, context: context)
             let base = MovePlanBuilder.baseFolder(path: lead.folderPath, levels: levels, isCaseSensitive: lead.isCaseSensitive)
-            let path = levels.reduce(base) { $0.hasSuffix("/") ? $0 + $1 : $0 + "/" + $1 }
-            let key = spellingKey(path, lead.isCaseSensitive)
-
-            if let known = spelling[key] {
-                folders.append(known)
-                continue
-            }
-
-            let folder = (folder: URL(fileURLWithPath: path, isDirectory: true), path: path)
-            spelling[key] = folder
+            let folder = spelling.folder(levels, under: base, isCaseSensitive: lead.isCaseSensitive, listing: &listing)
             folders.append(folder)
 
-            if !listing.isListed(folderPath: path) {
-                unlisted[lead.isCaseSensitive, default: [:]][path] = base
+            if !listing.isListed(folderPath: folder.path) {
+                unlisted[lead.isCaseSensitive, default: [:]][folder.path] = base
             }
         }
 
