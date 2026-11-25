@@ -133,6 +133,25 @@ struct MovePlanBuilderCopyTests {
         ])
     }
 
+    /// A copy gets its row's unsaved edits written on, so it no longer matches the identical file:
+    /// both are copied, under either order. A move still leaves the second where it is.
+    @Test(arguments: [0, 1])
+    func anIdenticalSourceWithUnsavedEditsIsCopiedToo(editedIndex: Int) {
+        let date = NameTemplate.Value.date(NameTemplate.DateParts(year: 2024, month: 5, day: 1))
+        var inputs = [input("a/x.jpg", ["date": date], size: 10), input("b/x.jpg", ["date": date], size: 10)]
+        inputs[editedIndex].hasUnsavedEdits = true
+        var verdicts = DuplicateVerdicts()
+        verdicts.record(true, for: DuplicateVerdicts.Pair(first: url("a/x.jpg"), second: url("b/x.jpg")))
+
+        var builder = builder(inputs)
+        let plan = copyPreview(&builder, "{name}", placement: placement("{date:YYYY}"), duplicates: verdicts)
+
+        #expect(plan.groups.map(\.destination) == [url("2024/x.jpg"), url("2024/x 1.jpg")])
+
+        let moved = builder.preview(template: NameTemplate("{name}"), placement: placement("{date:YYYY}"), duplicates: verdicts).plan
+        #expect(moved.entries.last == .skipped(url("b/x.jpg"), .duplicate(of: url("a/x.jpg"))))
+    }
+
     /// Only planned groups count: a skipped file writes nothing.
     @Test func theBytesToCopyCountThePlannedFilesTheRootCannotClone() {
         let here = URL(fileURLWithPath: "/", isDirectory: true)

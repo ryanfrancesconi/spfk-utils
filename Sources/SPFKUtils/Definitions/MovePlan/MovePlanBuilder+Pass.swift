@@ -93,6 +93,12 @@ extension MovePlanBuilder {
             }
         }
 
+        /// Under a copy, either file of the pair gets its row's unsaved edits written on, so the two
+        /// copies differ however alike the files are.
+        private func writesUnsavedEdits(_ lead: Int, _ holder: Int) -> Bool {
+            operation == .copy && (builder.prepared[lead].input.hasUnsavedEdits || builder.prepared[holder].input.hasUnsavedEdits)
+        }
+
         /// A copy only reads its source, so it skips a locked file or one on another volume, and
         /// a source's folder only when the copy is written beside it.
         private func skipReason(_ index: Int) -> MoveSkipReason? {
@@ -190,7 +196,8 @@ extension MovePlanBuilder {
                 let destinationKey = FolderListing.key(name: prepared[lead].name(base: base), folderPath: destination.path, isCaseSensitive: destination.isCaseSensitive)
 
                 if comparesDuplicates, unit.count == 1, let holder = holders[destinationKey], holder != lead,
-                   let size = prepared[lead].input.fileSize, size == prepared[holder].input.fileSize {
+                   let size = prepared[lead].input.fileSize, size == prepared[holder].input.fileSize,
+                   !writesUnsavedEdits(lead, holder) {
                     let pair = DuplicateVerdicts.Pair(first: prepared[holder].input.url, second: prepared[lead].input.url)
 
                     switch duplicates[pair] {

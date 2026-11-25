@@ -26,6 +26,9 @@ public struct MovePlanInput: Sendable, Hashable {
     /// are summed from it.
     public var fileSize: UInt64?
 
+    /// The row shows edits not yet saved, which a copy has written onto it.
+    public var hasUnsavedEdits = false
+
     public init(
         url: URL,
         values: [String: NameTemplate.Value],
