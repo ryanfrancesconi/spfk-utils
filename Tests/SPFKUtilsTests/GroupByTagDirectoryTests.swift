@@ -2,11 +2,12 @@
 
 import Foundation
 import SPFKBase
+import SPFKTesting
 import Testing
 
 @testable import SPFKUtils
 
-@Suite
+@Suite(.tags(.renameOrganize))
 final class GroupByTagDirectoryTests {
     private let base = URL(filePath: "/output", directoryHint: .isDirectory)
 

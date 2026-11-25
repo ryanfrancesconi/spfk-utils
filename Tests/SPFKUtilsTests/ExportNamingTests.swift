@@ -8,7 +8,7 @@ import Testing
 
 @testable import SPFKUtils
 
-@Suite(.tags(.conversion, .nameTemplate))
+@Suite(.tags(.conversion, .nameTemplate, .renameOrganize))
 struct ExportNamingTests {
     private struct Item {
         var file: String

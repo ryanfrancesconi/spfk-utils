@@ -6,7 +6,7 @@ import Testing
 
 @testable import SPFKUtils
 
-@Suite(.tags(.nameTemplate))
+@Suite(.tags(.nameTemplate, .renameOrganize))
 struct NameTemplateDateTests {
     typealias DateParts = NameTemplate.DateParts
 
