@@ -21,12 +21,23 @@ public struct MoveRoot: Sendable, Hashable {
     /// A copy from the same volume is a clone, which writes no data.
     public let supportsCloning: Bool
 
-    init(url: URL, volume: URL?, isCaseSensitive: Bool, availableCapacity: Int64? = nil, supportsCloning: Bool = false) {
+    /// The volume's name as Finder shows it, for a message about its space.
+    public let volumeName: String?
+
+    init(
+        url: URL,
+        volume: URL?,
+        isCaseSensitive: Bool,
+        availableCapacity: Int64? = nil,
+        supportsCloning: Bool = false,
+        volumeName: String? = nil
+    ) {
         self.url = url.standardizedFileURL
         self.volume = volume
         self.isCaseSensitive = isCaseSensitive
         self.availableCapacity = availableCapacity
         self.supportsCloning = supportsCloning
+        self.volumeName = volumeName
     }
 
     public static func == (lhs: MoveRoot, rhs: MoveRoot) -> Bool {
@@ -59,14 +70,15 @@ extension MoveRoot {
             throw MoveRootError.unreadable(url)
         }
 
-        let space = Self.space(of: url)
+        let space = VolumeSpace.read(at: url)
 
         self.init(
             url: url,
             volume: values.volume,
             isCaseSensitive: values.volumeSupportsCaseSensitiveNames ?? false,
-            availableCapacity: space.available,
-            supportsCloning: space.clones
+            availableCapacity: space.availableCapacity,
+            supportsCloning: space.supportsCloning,
+            volumeName: space.name
         )
     }
 
@@ -77,21 +89,6 @@ extension MoveRoot {
         sources.reduce(0) { total, source in
             let isClone = rootClones && source.volume != nil && source.volume == rootVolume
             return isClone ? total : total + (source.size ?? 0)
-        }
-    }
-
-    /// Read apart from the root's other values, so a volume that cannot answer is not refused.
-    /// Important-usage capacity, which counts purgeable space, is preferred where the volume has it.
-    private static func space(of url: URL) -> (available: Int64?, clones: Bool) {
-        do {
-            let values = try url.resourceValues(forKeys: [
-                .volumeAvailableCapacityForImportantUsageKey, .volumeAvailableCapacityKey, .volumeSupportsFileCloningKey,
-            ])
-            let available = values.volumeAvailableCapacityForImportantUsage ?? values.volumeAvailableCapacity.map(Int64.init)
-            return (available, values.volumeSupportsFileCloning ?? false)
-        } catch {
-            Log.error("Couldn't read the free space of \(url.lastPathComponent)", error)
-            return (nil, false)
         }
     }
 
