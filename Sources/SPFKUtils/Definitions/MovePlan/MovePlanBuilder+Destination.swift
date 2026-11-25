@@ -89,6 +89,9 @@ extension MovePlanBuilder.Pass {
             isCaseSensitive rule: Bool,
             listing: inout FolderListing
         ) -> (folder: URL, path: String) {
+            let rendered = levels.reduce(base) { $0.hasSuffix("/") ? $0 + $1 : $0 + "/" + $1 }
+            if let found = known[Self.key(rendered, rule)] { return found }
+
             var key = Self.key(base, rule)
             var current = known[key] ?? (URL(fileURLWithPath: base, isDirectory: true), base)
 
