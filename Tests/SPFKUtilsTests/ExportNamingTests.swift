@@ -20,7 +20,7 @@ struct ExportNamingTests {
             var values: [String: NameTemplate.Value] = ["name": .text(item.file)]
             values["title"] = item.title.map { .text($0) }
             return values
-        }, collectionName: collection)
+        }, collectionName: collection, untitled: "Untitled")
     }
 
     private let items = [Item(file: "kick", title: "Kick Drum"), Item(file: "snare", title: "Snare")]
@@ -31,6 +31,13 @@ struct ExportNamingTests {
 
     @Test func useTitleNamesEachFileByItsTitle() {
         #expect(names(ExportNaming(scheme: .title), items) == ["Kick Drum", "Snare"])
+    }
+
+    /// A file whose own name sanitizes to nothing, under a template rendering nothing.
+    @Test(arguments: ["..", " ", ". ."])
+    func aNameIsNeverEmpty(file: String) {
+        let naming = ExportNaming(scheme: .custom, template: "{field:Missing}")
+        #expect(names(naming, [Item(file: file)]) == ["Untitled"])
     }
 
     @Test(arguments: [nil, "", "   "])
@@ -109,7 +116,7 @@ struct ExportNamingTests {
             var values: [String: NameTemplate.Value] = ["name": .text("IMG_\(offset)"), "field:camera": .text("X100V")]
             values["date"] = date.map { .date($0) }
             return values
-        }, collectionName: "")
+        }, collectionName: "", untitled: "Untitled")
 
         #expect(result == ["2019-05-07_01_X100V", "_02_X100V", "2020-01-02_03_X100V"])
     }

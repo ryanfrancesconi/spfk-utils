@@ -62,28 +62,31 @@ public struct ExportNaming: Sendable, Hashable, Codable {
 
     /// One base name per item, in the order given, which is the order `{seq}` counts in.
     ///
-    /// A name that renders empty falls back to the item's `name` value, sanitized.
+    /// A name that renders empty falls back to the item's `name` value, sanitized, then to
+    /// `untitled`.
     public func baseNames<Item>(
         for items: [Item],
         values: (Item) -> [String: NameTemplate.Value],
-        collectionName: String
+        collectionName: String,
+        untitled: String
     ) -> [String] {
         let template = nameTemplate
 
         return items.indices.map {
-            baseName(at: $0, of: items, values: values, collectionName: collectionName, template: template)
+            baseName(at: $0, of: items, values: values, collectionName: collectionName, untitled: untitled, template: template)
         }
     }
 
-    /// The base name ``baseNames(for:values:collectionName:)`` gives the item at `index`, reading
-    /// only that item's values.
+    /// The base name ``baseNames(for:values:collectionName:untitled:)`` gives the item at `index`,
+    /// reading only that item's values.
     public func baseName<Item>(
         at index: Int,
         of items: [Item],
         values: (Item) -> [String: NameTemplate.Value],
-        collectionName: String
+        collectionName: String,
+        untitled: String
     ) -> String {
-        baseName(at: index, of: items, values: values, collectionName: collectionName, template: nameTemplate)
+        baseName(at: index, of: items, values: values, collectionName: collectionName, untitled: untitled, template: nameTemplate)
     }
 
     private func baseName<Item>(
@@ -91,6 +94,7 @@ public struct ExportNaming: Sendable, Hashable, Codable {
         of items: [Item],
         values: (Item) -> [String: NameTemplate.Value],
         collectionName: String,
+        untitled: String,
         template: NameTemplate
     ) -> String {
         var values = values(items[index])
@@ -99,7 +103,9 @@ public struct ExportNaming: Sendable, Hashable, Codable {
         let context = NameTemplate.RenderContext(index: index + 1, count: items.count, collection: collectionName)
         let name = template.render(values: values, context: context)
 
-        guard name.isEmpty, case let .text(fileName)? = values["name"] else { return name }
-        return NameTemplate.sanitizedName(fileName)
+        guard name.isEmpty else { return name }
+
+        let fileName: String = if case let .text(fileName)? = values["name"] { NameTemplate.sanitizedName(fileName) } else { "" }
+        return fileName.isEmpty ? untitled : fileName
     }
 }

@@ -77,7 +77,7 @@ extension NameTemplate {
     }
 
     private static func sanitized(_ name: String, maximumByteCount: Int) -> String {
-        let cleaned = String(name.trimmed.drop { $0 == "." })
+        let cleaned = String(name.drop { $0 == "." || $0.isWhitespace })
             .replacingOccurrences(of: "/", with: "-")
             .replacingOccurrences(of: ":", with: "-")
 

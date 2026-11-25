@@ -210,6 +210,11 @@ struct NameTemplateTests {
         #expect(NameTemplate.sanitizedLevel(".hidden: a") == "hidden- a")
     }
 
+    @Test(arguments: [". .x", " . . x", ".. \t.x "])
+    func noDotOrSpaceIsLeftLeading(name: String) {
+        #expect(NameTemplate.sanitizedName(name) == "x")
+    }
+
     @Test func aLongNameIsCutOnAWholeCharacter() {
         let long = String(repeating: "é", count: 150)
         let name = NameTemplate.sanitizedName(long)
