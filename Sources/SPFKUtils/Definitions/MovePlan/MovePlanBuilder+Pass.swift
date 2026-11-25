@@ -100,13 +100,13 @@ extension MovePlanBuilder {
         }
 
         /// A copy only reads its source, so it skips a locked file or one on another volume, and
-        /// a source's folder only when the copy is written beside it.
+        /// a source's folder only when the copy is written into it.
         private func skipReason(_ index: Int) -> MoveSkipReason? {
             if let reason = forced[index] { return reason }
 
             let input = builder.prepared[index].input
             let isCopy = operation == .copy
-            let writesSourceFolder = !isCopy || placement == .keepCurrent
+            let writesSourceFolder = if case .template = placement { !isCopy } else { true }
 
             if input.isMissing { return .missing }
             if input.isLocked, !isCopy { return .locked }
@@ -174,7 +174,7 @@ extension MovePlanBuilder {
             // Under a folder placement, the source holding each name: one already in place, or the
             // first to claim it unnumbered.
             var holders: [String: Int] = [:]
-            let comparesDuplicates = if case .template = placement { true } else { false }
+            let comparesDuplicates = placement.placesFolders
 
             if comparesDuplicates {
                 for (unit, _, _, isMoving) in named where !isMoving {

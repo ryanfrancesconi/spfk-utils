@@ -23,6 +23,10 @@ extension MovePlanBuilder.Pass {
     mutating func destinations(of units: [MovePlanBuilder.Unit]) -> [MovePlanBuilder.Destination] {
         let prepared = builder.prepared
 
+        if case let .underEachFolder(folderTemplate) = placement {
+            return destinations(of: units, underEachFolder: folderTemplate)
+        }
+
         guard case let .template(folderTemplate, root) = placement else {
             return units.map {
                 let lead = prepared[$0[0]]
@@ -74,7 +78,7 @@ extension MovePlanBuilder.Pass {
     /// `{seq}` in the name part: the run under ``FolderPlacement/keepCurrent``, else each destination
     /// folder on its own, in unit order.
     func nameContexts(of destinations: [MovePlanBuilder.Destination]) -> [NameTemplate.RenderContext] {
-        guard case .template = placement else {
+        guard placement.placesFolders else {
             return destinations.indices.map { NameTemplate.RenderContext(index: $0 + 1, count: destinations.count, collection: collection) }
         }
 
@@ -95,7 +99,7 @@ extension MovePlanBuilder.Pass {
 
     /// `paths` and every folder between each and the root, the root included, so a listed parent
     /// answers for a child that does not exist.
-    private static func withAncestors(_ paths: Set<String>, below rootPath: String) -> Set<String> {
+    static func withAncestors(_ paths: Set<String>, below rootPath: String) -> Set<String> {
         var result = paths
 
         for path in paths {
