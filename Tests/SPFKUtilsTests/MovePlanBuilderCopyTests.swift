@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import Foundation
 import SPFKBase
 import SPFKFileSystem
@@ -205,3 +206,4 @@ final class MovePlanBuilderCopyDiskTests: BinTestCase {
         #expect(plan.groups.map(\.destination.lastPathComponent) == ["a 2.jpg"])
     }
 }
+#endif

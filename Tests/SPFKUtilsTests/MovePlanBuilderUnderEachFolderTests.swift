@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import Foundation
 import SPFKBase
 import SPFKFileSystem
@@ -203,3 +204,4 @@ struct MovePlanBuilderUnderEachFolderTests {
         #expect(destinations(plan) == ["A/x.wav": "A/undated/x.wav"])
     }
 }
+#endif

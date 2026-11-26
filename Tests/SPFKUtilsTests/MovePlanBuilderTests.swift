@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import Foundation
 import SPFKBase
 import SPFKFileSystem
@@ -321,3 +322,4 @@ final class MovePlanBuilderDiskTests: BinTestCase {
         #expect(listing.contains(bin.appendingPathComponent("Trip.JPG")))
     }
 }
+#endif

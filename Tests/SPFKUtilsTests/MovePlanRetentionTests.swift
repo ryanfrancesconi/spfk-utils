@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import AVFoundation
 import Foundation
 import ImageIO
@@ -180,3 +181,4 @@ final class MovePlanRetentionTests: BinTestCase {
         #expect(grown < 50, "grew \(Int(grown)) MB over 2000 compares")
     }
 }
+#endif

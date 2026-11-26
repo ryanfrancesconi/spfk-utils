@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import Foundation
 import SPFKBase
 import SPFKFileSystem
@@ -93,3 +94,4 @@ struct CopySpaceTests {
         #expect(space.name?.isEmpty == false)
     }
 }
+#endif

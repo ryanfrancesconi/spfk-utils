@@ -68,6 +68,7 @@ public struct CopySpaceNeed: Sendable, Hashable {
     }
 }
 
+#if os(macOS)
 extension MovePlanBuilder {
     /// Each volume copying `plan` writes data to. Under a folder template that is the root's, as
     /// read when it was chosen; beside the sources it is each source volume, read through
@@ -113,6 +114,7 @@ extension MovePlanBuilder {
         plan.groups.compactMap { group in indexByURL[group.source].map { prepared[$0].input } }
     }
 }
+#endif
 
 extension MoveRoot {
     /// This root with its volume's space as given rather than as read, for a check against known

@@ -1,5 +1,6 @@
 // Copyright Ryan Francesconi. All Rights Reserved.
 
+#if os(macOS)
 import Foundation
 import os
 import SPFKBase
@@ -355,3 +356,4 @@ struct MovePlanBuilderFolderTests {
         #expect(reads.reads == first)
     }
 }
+#endif
