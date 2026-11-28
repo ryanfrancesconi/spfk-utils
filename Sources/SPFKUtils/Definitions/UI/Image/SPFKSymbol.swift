@@ -165,6 +165,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case performMiniaturize = "minus.rectangle"
     case performZoom = "square.arrowtriangle.4.outward"
     case person
+    case personCropSquare = "person.crop.square"
     case photo
     case photoCircle = "photo.circle"
     case photoCircleFill = "photo.circle.fill"
@@ -240,6 +241,7 @@ public enum SPFKSymbol: String, CaseIterable, Sendable, Codable, Hashable {
     case squareStack3dFill = "square.stack.3d.up.fill"
     case star
     case starFill = "star.fill"
+    case starSquare = "star.square"
     case stopwatch
     case tablecellBadgeEllipse = "tablecells.badge.ellipsis"
     case tablecells
